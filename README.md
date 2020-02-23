@@ -44,7 +44,7 @@ An online whiteboard where multiple users can simultaneously interact with the b
 
 ## Description of the technology
 
-Since our application involves users doing collaborative work on a whiteboard, we will require real-time communication between browsers. Therefore, we have planned to use **PeerJS**. The main advantage of using PeerJS provides a complete, configurable, and easy-to-use peer-to-peer connection API.
+Since our application involves users doing collaborative work on a whiteboard, we will require real-time communication between browsers. Therefore, we have planned to use **PeerJS**. The main advantage of using PeerJS provides a complete, configurable, and easy-to-use peer-to-peer connection API. We will be using MongoDB, a NO SQL database, for storing data.
 
 
 ## Five technical challenges
