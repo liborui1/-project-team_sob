@@ -44,7 +44,8 @@ An online whiteboard where multiple users can simultaneously interact with the b
 
 ## Description of the technology
 
-Since our application involves users doing collaborative work on a whiteboard, we will require real-time communication between browsers. Therefore, we have planned to use **PeerJS**. The main advantage of using PeerJS provides a complete, configurable, and easy-to-use peer-to-peer connection API.
+    Since our application involves users doing collaborative work on a whiteboard, we will require real-time communication between browsers. Therefore, we have planned to use **PeerJS**. The main advantage of using PeerJS provides a complete, configurable, and easy-to-use peer-to-peer connection API. We will be using **MongoDB**, a NO SQL database, for storing data.
+
 
 
 ## Five technical challenges
@@ -59,4 +60,7 @@ Since our application involves users doing collaborative work on a whiteboard, w
     Individually keeping track of each user’s actions as well as the team’s actions is going to be complex. As each user will be able to save their own creation, as well as the team saving the entire board visual. We will overcome this challenge by implementing the snapshot method where periodic snapshots are being saved and not the entire board visual. This way we can minimize the load on the backend database, as well as keep track the action of each individual user.
 ### 5. Getting use to all new applications and libraries
 	Applications such as PeerJs for frontend development and MongoDB for the backend require extensive time to learn and understand the use of these new applications. Using new libraries will post a challenge as well as each of us need to learn most from scratch.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8bf401aa4c1affb817105e6434b71b80db715807
