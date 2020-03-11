@@ -60,7 +60,3 @@ An online whiteboard where multiple users can simultaneously interact with the b
     Individually keeping track of each user’s actions as well as the team’s actions is going to be complex. As each user will be able to save their own creation, as well as the team saving the entire board visual. We will overcome this challenge by implementing the snapshot method where periodic snapshots are being saved and not the entire board visual. This way we can minimize the load on the backend database, as well as keep track the action of each individual user.
 ### 5. Getting use to all new applications and libraries
 	Applications such as PeerJs for frontend development and MongoDB for the backend require extensive time to learn and understand the use of these new applications. Using new libraries will post a challenge as well as each of us need to learn most from scratch.
-<<<<<<< HEAD
-
-=======
->>>>>>> 8bf401aa4c1affb817105e6434b71b80db715807
