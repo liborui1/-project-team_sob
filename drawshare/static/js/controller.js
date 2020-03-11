@@ -129,8 +129,8 @@ window.onload = (function() {
     };
 
     let panCanvas = function(panFrom, panTo){
-        panX = prevPan.panX + panFrom.x - panTo.x
-        panY = prevPan.panY + panFrom.y - panTo.y
+        panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
+        panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
 
     window.addEventListener('resize', function(){
