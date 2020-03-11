@@ -37,8 +37,24 @@ window.onload = (function() {
         console.log(points)
     });
 
+    document.querySelector('#save').addEventListener('click', function (){
+        let dataURI = canvas.toDataURL();
+        console.log(dataURI);
+        var element = document.createElement('a');
+        element.setAttribute('href', dataURI);
+        element.setAttribute('download', "Image");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    });
+
     let addClick = function(x, y, dragging){
         points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
+    
     };
 
     let prepareCanvas = function(){
