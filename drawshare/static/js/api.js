@@ -1,23 +1,8 @@
 let api = (function(){
+ 
     let module = {};
-    
-    /*  ******* Data types *******
-        image objects must have at least the following attributes:
-            - (String) imageId 
-            - (String) title
-            - (String) author
-            - (String) url
-            - (Date) date
-    
-        comment objects must have the following attributes
-            - (String) commentId
-            - (String) imageId
-            - (String) author
-            - (String) content
-            - (Date) date
-    
-    ****************************** */ 
-   
+    let peer = null;
+    let connectedPeer = null;
   
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
@@ -49,8 +34,36 @@ let api = (function(){
         }
     }
 
-   
+    module.createLobby = function(incomingData) {
+        peer = new Peer({initiator: true, trickle: false});
+        peer.on('open', function(id) {
+            console.log(id)
+        });
+        peer.on('connection', function (dataConnection){
+             connectedPeer = dataConnection;
+             connectedPeer.on('data', function (data){
+                incomingData(data)
+                console.log("new data: " + data)
+            })
+        })
+    }
+
+
+    module.connectToBoard = function(res, incomingData) {
+        peer = new Peer({initiator: false, trickle: false});
+        connectedPeer = peer.connect(res);
+        connectedPeer.on('data', function (data){
+            incomingData(data)
+            console.log("new data: " + data)
+        })
+    }
+
+    module.sendStrokes = function(data) {
+        connectedPeer.send(data)
+        connectedPeer.on
+    }
 
     return module;
+
 })();
 

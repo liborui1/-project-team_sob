@@ -5,6 +5,7 @@ window.onload = (function() {
     let canvas;
     let context;
     let points = []; // xy pan zoom
+    let strokes = [];
     let paint = false;
     let move = false;
     let lastClick = null;
@@ -14,30 +15,44 @@ window.onload = (function() {
     let currentAction = "draw";
     let currentColor = "#000000";
     let currentScale = 1;
-
+    
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, isDragging){
-            this.x = x;
-            this.y = y;
-            this.panX = panX;
-            this.panY = panY;
-            this.scaleFactor = scaleFactor;
-            this.color = color;
-            this.isDragging = isDragging;
+            return {x, y, panX, panY, scaleFactor, color, isDragging};
         };
     }());
- 
+    
+
+
+
     document.querySelector('#draw').addEventListener('click', function (e){
         currentAction = "draw"
     });
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move"
     });
+    document.querySelector('#move2').addEventListener('click', function (e){
+        api.createLobby(addIncommingPoints);
+    });
+
+    document.querySelector('#connectbtn').addEventListener('click', function (e){
+        let id = document.querySelector('#peerId').value
+        api.connectToBoard(id, addIncommingPoints);
+    });
     
-    let addClick = function(x, y, dragging){
-        points.push(new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
+    let addPoint = function(x, y, dragging){
+        let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging)
+        points.push(singlePoint);
+        strokes.push(singlePoint);
     };
 
+    let addIncommingPoints = function(data){
+        data.forEach(function (pt) {
+            let {x, y, isDragging} = pt
+            addPoint(x, y, isDragging);
+        })
+        redraw();
+    }
     let prepareCanvas = function(){
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas = document.querySelector('#whiteBoard > canvas');
@@ -52,7 +67,7 @@ window.onload = (function() {
             let newY = e.pageY - this.offsetTop;
             if (currentAction === "draw"){
                 paint = true;
-                addClick(newX , newY, false);
+                addPoint(newX , newY, false);
             } else if (currentAction === "move"){
                 lastClick = {x:newX, y: newY}
                 prevPan = {panX, panY}
@@ -65,7 +80,7 @@ window.onload = (function() {
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
             if(paint){
-                addClick(newX, newY, true);
+                addPoint(newX, newY, true);
                 redraw();
             } else if (move){
                 panCanvas(lastClick, {x: newX, y: newY})
@@ -74,13 +89,16 @@ window.onload = (function() {
         };
 
         canvas.onmouseup = function(e){
-          paint = false;
-          move = false;
+            paint = false;
+            move = false;
+            console.log(strokes)
+            api.sendStrokes(strokes)
+            strokes = []
         };
 
         canvas.onmouseleave = function(e){
-          paint = false;
-          move = false;
+            paint = false;
+            move = false;
         };
 
         canvas.addEventListener("wheel", function(e){
@@ -94,7 +112,6 @@ window.onload = (function() {
                 currentScale =  1/SCALEFACTOR * currentScale
                 redraw();
             }
-  
 
             redraw();
         });
@@ -140,10 +157,7 @@ window.onload = (function() {
         canvas.width = canvasWrapper.clientWidth;
         redraw();
     });
-
-    window.addEventListener('load', function(){
-        prepareCanvas();
-  
-    });
+ 
+    prepareCanvas();
 
 }());

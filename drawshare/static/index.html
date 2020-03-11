@@ -7,17 +7,25 @@
 
 </head>
 <body>
+     
     <div id= "toolBar">
         <button id = "draw"> Draw Icon</button>
         <button id = "move"> Move Icon </button>
         <button id = "move2"> bakMove Icon </button>
+        <textarea id="peerId"></textarea>
+        <button id = "connectbtn"> connect button </button>
     </div>
     <div id= "whiteBoard">
         <canvas></canvas>
+    
+
     </div>
      
 </body>
  <footer>
-      <script src="js/controller.js"></script>
+        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+        <script src="js/api.js"></script>
+        <script src="js/controller.js"></script>
+        
 </footer>
 </html>

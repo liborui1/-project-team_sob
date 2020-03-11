@@ -3,7 +3,6 @@ const session = require('express-session');
 const crypto = require('crypto');
 const cookie = require('cookie');
 const express = require('express');
-import Peer from 'peerjs';
 const app = express();
 let multer  = require('multer');
 let fs  = require('fs');
@@ -26,6 +25,10 @@ app.use(function (req, res, next){
     next();
 });
 
+
+app.post('/', function (req, res, next) {
+     
+});
 
 app.post('/ConnectPeer/:id', function (req, res, next) {
     allPeers.push();
