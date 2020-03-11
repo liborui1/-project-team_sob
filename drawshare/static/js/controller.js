@@ -8,8 +8,8 @@ window.onload = (function() {
     let paint = false;
     let move = false;
     let lastClick = null;
-    let prevPan = {panX: 0, panY: 0}
-    let panX = 0
+    let prevPan = {panX: 0, panY: 0};
+    let panX = 0;
     let panY = 0;
     let currentAction = "draw";
     let currentColor = "#000000";
@@ -28,28 +28,30 @@ window.onload = (function() {
     }());
  
     document.querySelector('#draw').addEventListener('click', function (e){
-        currentAction = "draw"
+        currentAction = "draw";
     });
     document.querySelector('#move').addEventListener('click', function (e){
-        currentAction = "move"
+        currentAction = "move";
     });
     document.querySelector('#move2').addEventListener('click', function (e){
-        console.log(points)
+        console.log(points);
     });
 
-    document.querySelector('#save').addEventListener('click', function (){
-        let dataURI = canvas.toDataURL();
+    document.querySelector('#dload').addEventListener('click', function (){
+        let dataURI = canvas.toDataURL('image/png', 0.5);
         console.log(dataURI);
         var element = document.createElement('a');
         element.setAttribute('href', dataURI);
         element.setAttribute('download', "Image");
-
         element.style.display = 'none';
         document.body.appendChild(element);
-
         element.click();
-
         document.body.removeChild(element);
+    });
+
+    document.querySelector('#save').addEventListener('click', function (e){
+        let dataURI = canvas.toDataURL('image/png', 0.5);
+        api.storeImageURI(dataURI);
     });
 
     let addClick = function(x, y, dragging){
@@ -73,8 +75,8 @@ window.onload = (function() {
                 paint = true;
                 addClick(newX , newY, false);
             } else if (currentAction === "move"){
-                lastClick = {x:newX, y: newY}
-                prevPan = {panX, panY}
+                lastClick = {x:newX, y: newY};
+                prevPan = {panX, panY};
                 move = true;
             }
             redraw();
@@ -87,7 +89,7 @@ window.onload = (function() {
                 addClick(newX, newY, true);
                 redraw();
             } else if (move){
-                panCanvas(lastClick, {x: newX, y: newY})
+                panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
             }
         };
@@ -104,11 +106,11 @@ window.onload = (function() {
 
         canvas.addEventListener("wheel", function(e){
             if (event.deltaY < 0){
-                context.scale(SCALEFACTOR, SCALEFACTOR)
-                currentScale =  SCALEFACTOR * currentScale
+                context.scale(SCALEFACTOR, SCALEFACTOR);
+                currentScale =  SCALEFACTOR * currentScale;
             }else if (event.deltaY > 0) {
-                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR)
-                currentScale =  1/SCALEFACTOR * currentScale
+                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
+                currentScale =  1/SCALEFACTOR * currentScale;
             }
              redraw();
         });
@@ -123,8 +125,8 @@ window.onload = (function() {
         for(let i=0; i < points.length; i++){
             context.beginPath();
           
-            let pointA = points[i]
-            let pointB = points[i - 1]
+            let pointA = points[i];
+            let pointB = points[i - 1];
             if(pointA.isDragging){
                 context.moveTo(pointB.x - panX, pointB.y - panY);
                 context.lineTo(pointA.x - panX, pointA.y - panY);
@@ -143,10 +145,9 @@ window.onload = (function() {
     };
 
     let panCanvas = function(panFrom, panTo){
-        panX = prevPan.panX + panFrom.x - panTo.x
-        panY = prevPan.panY + panFrom.y - panTo.y
-    }
-
+        panX = prevPan.panX + panFrom.x - panTo.x;
+        panY = prevPan.panY + panFrom.y - panTo.y;
+    };
 
     window.addEventListener('load', function(){
         prepareCanvas();

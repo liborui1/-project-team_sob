@@ -4,20 +4,12 @@ let api = (function(){
     /*  ******* Data types *******
         image objects must have at least the following attributes:
             - (String) imageId 
-            - (String) title
-            - (String) author
-            - (String) url
-            - (Date) date
-    
-        comment objects must have the following attributes
-            - (String) commentId
-            - (String) imageId
-            - (String) author
-            - (String) content
+            - (String) GroupId
+            - (String) ImageURI
             - (Date) date
     
     ****************************** */ 
-   
+   let localData = {groupName:"testGroup1"};
   
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
@@ -49,7 +41,32 @@ let api = (function(){
         }
     }
 
-   
+    module.storeImageURI = function(imageURI, groupName = "testGroup1") {
+        localData.groupName = groupName;
+        send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err){
+            if (err) return notifyErrorListeners("Image was unable to be added");
+            notifySaveListeners(imageURI);
+        });
+    };
+
+    let getImageURI = function(groupName, callback) {
+        send("Get", "/api/imageURI/" + groupName + "/", null, callback);
+    };
+
+    let saveListeners = [];
+
+    function notifySaveListeners(save){
+        saveListeners.forEach(function(handler){
+            handler(save);
+        });
+    }
+
+    module.onSaveUpdate = function(handler){
+        saveListeners.push(handler);
+        getImageURI(localData.groupName, function(err, image){
+            handler(image);
+        });
+    };
 
     return module;
 })();
