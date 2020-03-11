@@ -33,12 +33,9 @@ window.onload = (function() {
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move"
     });
-    document.querySelector('#move2').addEventListener('click', function (e){
-        console.log(points)
-    });
-
+    
     let addClick = function(x, y, dragging){
-        points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
+        points.push(new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
     };
 
     let prepareCanvas = function(){
@@ -90,15 +87,21 @@ window.onload = (function() {
             if (event.deltaY < 0){
                 context.scale(SCALEFACTOR, SCALEFACTOR)
                 currentScale =  SCALEFACTOR * currentScale
+                redraw();
+                
             }else if (event.deltaY > 0) {
                 context.scale(1/SCALEFACTOR, 1/SCALEFACTOR)
                 currentScale =  1/SCALEFACTOR * currentScale
+                redraw();
             }
-             redraw();
+  
+
+            redraw();
         });
     };
 
     let redraw = function(){
+       
         clearCanvas();
         context.lineJoin = "round";
         context.lineCap = "round";
@@ -106,7 +109,6 @@ window.onload = (function() {
     
         for(let i=0; i < points.length; i++){
             context.beginPath();
-          
             let pointA = points[i]
             let pointB = points[i - 1]
             if(pointA.isDragging){
@@ -123,18 +125,14 @@ window.onload = (function() {
     };
 
     let clearCanvas = function(){
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width/currentScale , canvas.height/currentScale );
     };
 
     let panCanvas = function(panFrom, panTo){
-        panX = prevPan.panX + panFrom.x - panTo.x
-        panY = prevPan.panY + panFrom.y - panTo.y
+        panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
+        panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
 
-
-    window.addEventListener('load', function(){
-        prepareCanvas();
-    });
     window.addEventListener('resize', function(){
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas = document.querySelector('#whiteBoard > canvas');
@@ -145,6 +143,7 @@ window.onload = (function() {
 
     window.addEventListener('load', function(){
         prepareCanvas();
+  
     });
 
 }());
