@@ -143,8 +143,6 @@ window.onload = (function() {
         redraw();
     });
 
-
-
     window.addEventListener('load', function(){
         prepareCanvas();
     });

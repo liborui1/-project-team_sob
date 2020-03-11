@@ -1,15 +1,17 @@
 const path = require('path');
+const session = require('express-session');
+const crypto = require('crypto');
+const cookie = require('cookie');
 const express = require('express');
+import Peer from 'peerjs';
 const app = express();
 let multer  = require('multer');
 let fs  = require('fs');
 let upload = multer({ dest: path.join(__dirname, 'uploads')});
 let bodyParser = require('body-parser');
 let Datastore = require('nedb');
-const session = require('express-session');
-const crypto = require('crypto');
-const cookie = require('cookie');
-
+ 
+let allPeers = [];
 
 app.use(bodyParser.json());
 app.use(express.static('static'));
@@ -22,6 +24,11 @@ app.use(session({
 app.use(function (req, res, next){
     console.log("HTTP request", req.method, req.url, req.body);
     next();
+});
+
+
+app.post('/ConnectPeer/:id', function (req, res, next) {
+    allPeers.push();
 });
 
 
