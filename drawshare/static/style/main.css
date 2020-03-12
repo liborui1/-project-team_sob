@@ -1,0 +1,26 @@
+body, html {
+    display:flex;
+    height: 100%;
+    width: 100%;
+    margin:  0 0 0 0;
+  }
+#whiteBoard{
+    height: 100%;
+    width: 100%;
+}
+
+#move34{
+    position: absolute;
+    top: 100px;
+    left:200px;
+}
+#toolBar{
+    width: 100px;
+}
+canvas{
+    height: 100%;
+    width: 100%;
+    background-color: whitesmoke;
+}
+
+ 
