@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // image object
 let Image = (function() {
     return function item(image) {
-        this.groupName = image.groupName;
+        this.group = image.group;
         this.imageURI = image.imageURI;
     };
 }());
@@ -130,7 +130,7 @@ app.post('/api/imageURI/', function(req,res, next){
 });
 
 app.get('/api/imageURI/:groupName/', function(req, res, next){
-    imageDB.find({groupName: req.params.groupName}, function (err, img){
+    imageDB.findOne({group: req.params.groupName}).sort({createdAt:-1}).exec(function (err, img){
         if (err) return res.status(500).end("unable to get image");
         
         return res.json(img);
