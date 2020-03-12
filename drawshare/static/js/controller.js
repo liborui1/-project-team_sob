@@ -119,7 +119,14 @@ window.onload = (function() {
             paint = false;
             move = false;
             // pushes a new empty stroke
-             
+            let lastStroke = strokes[ strokes.length - 1 ]
+            if (lastStroke.length !== 0){
+                let lastPoint = lastStroke[lastStroke.length-1]
+                // clone last point
+                lastStroke.push({...lastPoint})
+                // set last point dragging to false
+                lastStroke[lastStroke.length-1].isDragging = false
+            }
             api.sendStrokes([strokes[ strokes.length - 1 ]]);
             strokes.push([])
         };
