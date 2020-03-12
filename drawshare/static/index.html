@@ -1,17 +1,45 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8"/>
-    <title>BoardShare</title>
+    <title>DrawShare</title>
     <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <link href="style/tools.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="style/colour.css">
+    
+    <!-- <script src="js/api.js"></script> -->
+
 </head>
 <body>
-    <header>
-        <h3 id="title">BoardShare</h3>
-    </header>
+     
+    <div id= "toolBar">
+        <div class="draw-icon icon" id="draw" ></div>
+        
+        <div class="move-icon icon" id="move" ></div>
+        <button id = "move2"> bakMove Icon </button>
+        <textarea id="peerId"></textarea>
+        <button id = "connectbtn"> connect button </button>
+        <div class="color-icon icon" id="colorId"></div>
+        <div class="palette" id="colorPalette"></div>
+        <div class="icon-large" id="color" ></div>
+        <p id="peerIddisplay"></p>
+        <div class="download-icon icon" id="dload" ></div>
+        <div class="upload-icon icon" id="upload" ></div>
+        <div class="save-icon icon" id="save" ></div>
+        <a href="/history.html"> <div class="load-icon icon" id="load"></div></a>
+        
+    </div>
+    <div id= "whiteBoard">
+        <canvas></canvas>
+    
 
-    <a href="/login.html" id="signin_button" class="img_btn show_hide_btn">Sign in or Sign up</a>
-
+    </div>
+     
 </body>
+ <footer>
+        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+        <script src="js/api.js"></script>
+        <script src="js/controller.js"></script>
+        <script src="js/color.js"></script>
+</footer>
 </html>
