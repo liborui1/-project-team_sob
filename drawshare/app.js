@@ -10,13 +10,22 @@ let fs  = require('fs');
 let upload = multer({ dest: path.join(__dirname, 'uploads')});
 let bodyParser = require('body-parser');
 let Datastore = require('nedb');
-const { PeerServer } = require('peer');
+
 const options = {
     debug: true,
     path: '/peerjs'
 }
  
+let imageDB = new Datastore({ filename: './db/images.db', autoload: true, timestampData : true });
 let allPeers = [];
+
+// image object
+let Image = (function() {
+    return function item(image) {
+        this.group = image.group;
+        this.imageURI = image.imageURI;
+    };
+}());
 
 app.use(bodyParser.json());
 app.use(express.static('static'));
@@ -40,6 +49,20 @@ app.post('/ConnectPeer/:id', function (req, res, next) {
     allPeers.push();
 });
 
+app.post('/api/imageURI/', function(req,res, next){
+    imageDB.insert(new Image(req.body), function (err, img) {
+        if (err) return res.status(500).end("unable to post image");
+        return res.json(img);
+    });
+});
+
+app.get('/api/imageURI/:groupName/', function(req, res, next){
+    imageDB.findOne({group: req.params.groupName}).sort({createdAt:-1}).exec(function (err, img){
+        if (err) return res.status(500).end("unable to get image");
+        
+        return res.json(img);
+    });
+});
 
  
  
