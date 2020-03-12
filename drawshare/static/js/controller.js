@@ -120,7 +120,11 @@ window.onload = (function() {
         canvas.onmouseup = function(e){
             paint = false;
             move = false;
-       
+            // prevent strokes from sticking to eacher other 
+            if (strokes.length > 0){
+                let firstPoint = strokes[0]
+                firstPoint.isDragging = false;
+            }
             api.sendStrokes(strokes)
             strokes = []
         };
@@ -147,7 +151,6 @@ window.onload = (function() {
     };
 
     let redraw = function(){
-       
         clearCanvas();
         context.lineJoin = "round";
         context.lineCap = "round";
