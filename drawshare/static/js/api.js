@@ -37,6 +37,52 @@ let api = (function(){
         }
     }
 
+    let userListeners = [];
+    
+    let getUsername = function(){
+        return document.cookie.replace(/(?:(?:^|.*;\s*)username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    };
+    
+    function notifyUserListeners(username){
+        userListeners.forEach(function(listener){
+            listener(username);
+        });
+    }
+    
+    module.onUserUpdate = function(listener){
+        userListeners.push(listener);
+        listener(getUsername());
+    };
+    
+    module.signin = function(username, password){
+        send("POST", "/signin/", {username, password}, function(err, res){
+             if (err) return notifyErrorListeners(err);
+             notifyUserListeners(getUsername());
+             api.showUsers(0);
+        });
+    };
+    
+    module.signup = function(username, password){
+        send("POST", "/signup/", {username, password}, function(err, res){
+             if (err) return notifyErrorListeners(err);
+             notifyUserListeners(getUsername());
+             api.showUsers(0);
+        });
+    };
+
+    let errorListeners = [];
+    
+    function notifyErrorListeners(err){
+        errorListeners.forEach(function(listener){
+            listener(err);
+        });
+    }
+    
+    module.onError = function(listener){
+        errorListeners.push(listener);
+    };
+
+
     module.createLobby = function(addStrokes, syncData) {
     
         peer.on('open', function(id) {

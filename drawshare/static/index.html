@@ -1,36 +1,18 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>DrawShare</title>
+    <title>BoardShare</title>
     <link href="style/main.css" rel="stylesheet" type="text/css"/>
-    <link href="style/tools.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-     
-    <div id= "toolBar">
-        <div class="draw-icon icon" id="draw" ></div>
-        <div class="move-icon icon" id="move" ></div>
-        <button id = "move2"> bakMove Icon </button>
-        <textarea id="peerId"></textarea>
-        <button id = "connectbtn"> connect button </button>
-        <textarea id="colorId"></textarea>
-        <button id = "colorbtn"> color </button>
-        <p id="peerIddisplay"></p>
-        <div class="download-icon icon" id="dload" ></div>
-        <div class="upload-icon icon" id="upload" ></div>
-        <div class="save-icon icon" id="save" ></div>
-        <div class="load-icon icon" id="load" ></div>
-    </div>
-    <div id= "whiteBoard">
-        <canvas></canvas>
-    </div>
-     
+    <header>
+        <h3 id="title">BoardShare</h3>
+    </header>
+
+    <a href="/login.html" id="signin_button" class="img_btn show_hide_btn">Sign in or Sign up</a>
+
+
 </body>
- <footer>
-        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
-        <script src="js/api.js"></script>
-        <script src="js/controller.js"></script>
-        
-</footer>
 </html>
