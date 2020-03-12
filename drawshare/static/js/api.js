@@ -2,7 +2,7 @@ let api = (function(){
  
     let module = {};
    
-    let peer = new Peer();
+    let peer = new Peer( {host: 'localhost', port:'3000', path: '/peerjs'});
     let connectedPeer = [];
   
     function sendFiles(method, url, data, callback){

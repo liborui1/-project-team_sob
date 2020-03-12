@@ -3,12 +3,18 @@ const session = require('express-session');
 const crypto = require('crypto');
 const cookie = require('cookie');
 const express = require('express');
+const { ExpressPeerServer } = require('peer');
 const app = express();
 let multer  = require('multer');
 let fs  = require('fs');
 let upload = multer({ dest: path.join(__dirname, 'uploads')});
 let bodyParser = require('body-parser');
 let Datastore = require('nedb');
+const { PeerServer } = require('peer');
+const options = {
+    debug: true,
+    path: '/peerjs'
+}
  
 let allPeers = [];
 
@@ -41,7 +47,9 @@ app.post('/ConnectPeer/:id', function (req, res, next) {
 const http = require('http');
 const PORT = 3000;
 
-http.createServer(app).listen(PORT, function (err) {
+const server = http.createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTP server on http://localhost:%s", PORT);
 });
+const peerserver = ExpressPeerServer(server, options);
+app.use(options.path, peerserver);
