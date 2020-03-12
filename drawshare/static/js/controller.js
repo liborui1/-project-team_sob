@@ -48,7 +48,7 @@ window.onload = (function() {
         points.push(singlePoint);
         strokes.push(singlePoint);
         console.log(points);
-    });
+    };
 
     document.querySelector('#dload').addEventListener('click', function (){
         let dataURI = canvas.toDataURL('image/png', 0.5);
@@ -73,10 +73,7 @@ window.onload = (function() {
         });
     });
 
-    let addClick = function(x, y, dragging){
-        points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
-    };
-
+ 
     let addIncommingPoints = function(data){
         data.forEach(function (pt) {
             let {x, y, panX, panY, scaleFactor, color, isDragging} = pt
