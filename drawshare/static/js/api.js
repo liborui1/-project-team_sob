@@ -57,7 +57,6 @@ let api = (function(){
                 connectedPeer.forEach(function(con){
                     allUserId.push(con.peer)
                 })
-          
                 dataConnection.send({users:allUserId, strokes: syncData})
                 // keep track of all the current connected peers -- api suggested to do it by ourselves
                 connectedPeer.push(dataConnection);
@@ -71,12 +70,11 @@ let api = (function(){
 
 
     module.connectToBoard = function(res, addStrokes) {
-    
         // connect to peer
         let board = peer.connect(res.trim());
         connectedPeer.push(board);
         // When finished connecting wait for peer to send strokes
-        peer.on('connect', function (newConnection){
+        peer.on('connection', function (newConnection){
             console.log("new connection")
             newConnection.on('data', function(data) {
                 let strokes = data.strokes || []
@@ -85,41 +83,35 @@ let api = (function(){
             connectedPeer.push(newConnection);
         });
 
-        board.on('open', function (te){
-            board.on('data', function (data){
-                let users = data.users || [];
-                let strokes = data.strokes || [];
-                // initial sync of strokes
-                addStrokes(strokes);
-                // connect to all the new users
-                console.log("users : ", users)
-                // users is empty when we're done initilizing
-                users.forEach(function(usrId){
-
-                    let newPeer = peer.connect(usrId)    
-                    connectedPeer.push(newPeer);
-                    // all new peers can disconnect
-                    newPeer.on('disconnect', function (){
-                        removePeer(newPeer);
-                    });
-                
+        board.on('data', function (data){
+            let users = data.users || [];
+            let strokes = data.strokes || [];
+            // initial sync of strokes
+            addStrokes(strokes);
+            // connect to all the new users
+    
+            // users is empty when we're done initilizing
+            users.forEach(function(usrId){
+                console.log(usrId)
+                let newPeer = peer.connect(usrId)    
+                connectedPeer.push(newPeer);
+                // all new peers can disconnect
+                newPeer.on('open', function (){
                     // all new peers can add to the local board
                     newPeer.on('data', function (newPeerdata){
                         let strokes = newPeerdata.strokes || []
-                        console.log("test2")
                         addStrokes(strokes);
                     });
-                    
                 });
-                console.log("new datsdfdsfa: " + strokes)
-            });
-            
-        
-                board.on('disconnect', function (){
-                    removePeer(board);
+                newPeer.on('disconnect', function (){
+                    removePeer(newPeer);
                 });
             });
+        });
         
+        board.on('disconnect', function (){
+            removePeer(board);
+        });
     }
 
     let removePeer = function (peer){

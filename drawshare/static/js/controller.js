@@ -22,8 +22,6 @@ window.onload = (function() {
     }());
     
 
-
-
     document.querySelector('#draw').addEventListener('click', function (e){
         currentAction = "draw"
     });
@@ -32,12 +30,16 @@ window.onload = (function() {
     });
     document.querySelector('#move2').addEventListener('click', function (e){
         api.createLobby(addIncommingPoints, points);
-       
+      
     });
 
     document.querySelector('#connectbtn').addEventListener('click', function (e){
         let id = document.querySelector('#peerId').value
         api.connectToBoard(id, addIncommingPoints);
+    });
+    document.querySelector('#colorbtn').addEventListener('click', function (e){
+        let id = document.querySelector('#colorId').value.trim()
+         currentColor = id;
     });
     
     let addPoint = function(x, y, dragging){
@@ -92,7 +94,7 @@ window.onload = (function() {
         canvas.onmouseup = function(e){
             paint = false;
             move = false;
-            console.log(strokes)
+       
             api.sendStrokes(strokes)
             strokes = []
         };
