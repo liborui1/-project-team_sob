@@ -4,6 +4,7 @@ let api = (function(){
    
     let peer = new Peer();
     let connectedPeer = [];
+    let localData = {groupName:"testGroup1"};
   
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
@@ -130,6 +131,25 @@ let api = (function(){
             connPeer.send({strokes: data})
         });
     }
+
+    module.storeImageURI = function(imageURI, groupName = "testGroup1") {
+        localData.groupName = groupName;
+        send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err){
+            if (err) return notifyErrorListeners("Image was unable to be added");
+        });
+    };
+
+    module.getImageURI = function(groupName = null) {
+        if (groupName == null) {
+            groupName = localData.groupName;
+        }
+        send("GET", "/api/imageURI/" + groupName + "/", function (err, img){
+            if (err) return notifyErrorListeners("Image was unable to get Image");
+            return res.json(img);
+        });
+    };
+
+
 
     return module;
 

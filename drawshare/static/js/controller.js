@@ -9,8 +9,8 @@ window.onload = (function() {
     let paint = false;
     let move = false;
     let lastClick = null;
-    let prevPan = {panX: 0, panY: 0}
-    let panX = 0
+    let prevPan = {panX: 0, panY: 0};
+    let panX = 0;
     let panY = 0;
     let currentAction = "draw";
     let currentColor = "#00FF00";
@@ -23,12 +23,13 @@ window.onload = (function() {
     
 
     document.querySelector('#draw').addEventListener('click', function (e){
-        currentAction = "draw"
+        currentAction = "draw";
     });
     document.querySelector('#move').addEventListener('click', function (e){
-        currentAction = "move"
+        currentAction = "move";
     });
     document.querySelector('#move2').addEventListener('click', function (e){
+
         api.createLobby(addIncommingPoints, points);
       
     });
@@ -46,6 +47,34 @@ window.onload = (function() {
         let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging)
         points.push(singlePoint);
         strokes.push(singlePoint);
+        console.log(points);
+    });
+
+    document.querySelector('#dload').addEventListener('click', function (){
+        let dataURI = canvas.toDataURL('image/png', 0.5);
+        console.log(dataURI);
+        var element = document.createElement('a');
+        element.setAttribute('href', dataURI);
+        element.setAttribute('download', "Image");
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    });
+
+    document.querySelector('#save').addEventListener('click', function (e){
+        let dataURI = canvas.toDataURL('image/png', 0.5);
+        api.storeImageURI(dataURI);
+    });
+
+    document.querySelector('#load').addEventListener('click', function (e){
+        api.getImageURI("testGroup1", function (err, image) {
+            console.log(image.imageURI);
+        });
+    });
+
+    let addClick = function(x, y, dragging){
+        points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
     };
 
     let addIncommingPoints = function(data){
@@ -72,8 +101,8 @@ window.onload = (function() {
                 paint = true;
                 addPoint(newX , newY, false);
             } else if (currentAction === "move"){
-                lastClick = {x:newX, y: newY}
-                prevPan = {panX, panY}
+                lastClick = {x:newX, y: newY};
+                prevPan = {panX, panY};
                 move = true;
             }
             redraw();
@@ -86,7 +115,7 @@ window.onload = (function() {
                 addPoint(newX, newY, true);
                 redraw();
             } else if (move){
-                panCanvas(lastClick, {x: newX, y: newY})
+                panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
             }
         };

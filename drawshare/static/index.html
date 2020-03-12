@@ -4,19 +4,26 @@
     <meta charset="utf-8"/>
     <title>DrawShare</title>
     <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <link href="style/tools.css" rel="stylesheet" type="text/css"/>
+    
+    <script src="js/api.js"></script>
 
 </head>
 <body>
      
     <div id= "toolBar">
-        <button id = "draw"> Draw Icon</button>
-        <button id = "move"> Move Icon </button>
+        <div class="draw-icon icon" id="draw" ></div>
+        <div class="move-icon icon" id="move" ></div>
         <button id = "move2"> bakMove Icon </button>
         <textarea id="peerId"></textarea>
         <button id = "connectbtn"> connect button </button>
         <textarea id="colorId"></textarea>
         <button id = "colorbtn"> color </button>
         <p id="peerIddisplay"></p>
+        <div class="download-icon icon" id="dload" ></div>
+        <div class="upload-icon icon" id="upload" ></div>
+        <div class="save-icon icon" id="save" ></div>
+        <div class="load-icon icon" id="load" ></div>
     </div>
     <div id= "whiteBoard">
         <canvas></canvas>
