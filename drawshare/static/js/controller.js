@@ -4,8 +4,8 @@ window.onload = (function() {
     const SCALEFACTOR = 1.1;
     let canvas;
     let context;
-    let points = []; // xy pan zoom
-    let strokes = [];
+    let strokes = [[]]; // xy pan zoom
+    let points = [];
     let paint = false;
     let move = false;
     let lastClick = null;
@@ -30,7 +30,7 @@ window.onload = (function() {
     });
     document.querySelector('#move2').addEventListener('click', function (e){
 
-        api.createLobby(addIncommingPoints, points);
+        api.createLobby(addIncommingPoints, strokes);
       
     });
 
@@ -45,9 +45,9 @@ window.onload = (function() {
     
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging)
-        points.push(singlePoint);
-        strokes.push(singlePoint);
-        console.log(points);
+     
+        strokes[strokes.length - 1].push(singlePoint);
+
     };
 
     document.querySelector('#dload').addEventListener('click', function (){
@@ -75,10 +75,8 @@ window.onload = (function() {
 
  
     let addIncommingPoints = function(data){
-        data.forEach(function (pt) {
-            let {x, y, panX, panY, scaleFactor, color, isDragging} = pt
-            let singlePoint = new Point(x, y, panX, panY, scaleFactor, color, isDragging)
-            points.push(singlePoint)
+        data.forEach(function (stroke) {
+            strokes.push(stroke)
         })
         redraw();
     }
@@ -89,7 +87,7 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         context = canvas.getContext("2d");
-        points = []; 
+        strokes = [[]]; 
 
         canvas.onmousedown = function(e){
             let newX = e.pageX - this.offsetLeft;
@@ -120,13 +118,10 @@ window.onload = (function() {
         canvas.onmouseup = function(e){
             paint = false;
             move = false;
-            // prevent strokes from sticking to eacher other 
-            if (strokes.length > 0){
-                let firstPoint = strokes[0]
-                firstPoint.isDragging = false;
-            }
-            api.sendStrokes(strokes)
-            strokes = []
+            // pushes a new empty stroke
+            strokes.push([])
+            api.sendStrokes([points])
+            points = []
         };
 
         canvas.onmouseleave = function(e){
@@ -155,21 +150,25 @@ window.onload = (function() {
         context.lineJoin = "round";
         context.lineCap = "round";
         context.lineWidth = 5;
-    
-        for(let i=0; i < points.length; i++){
-            context.beginPath();
-            let pointA = points[i]
-            let pointB = points[i - 1]
-            if(pointA.isDragging){
-                context.moveTo(pointB.x - panX, pointB.y - panY);
-                context.lineTo(pointA.x - panX, pointA.y - panY);
-            } else {
-                context.moveTo(pointA.x - panX, pointA.y - panY);
-                context.lineTo(pointA.x - panX, pointA.y - panY);
+   
+        for(let i=0; i < strokes.length; i++){
+            let currentStroke = strokes[i];
+
+            for(let j=0; j < currentStroke.length; j++){
+                context.beginPath();
+                let pointA = currentStroke[j]
+                let pointB = currentStroke[j - 1]
+                if(pointA.isDragging){
+                    context.moveTo(pointB.x - panX, pointB.y - panY);
+                    context.lineTo(pointA.x - panX, pointA.y - panY);
+                } else {
+                    context.moveTo(pointA.x - panX, pointA.y - panY);
+                    context.lineTo(pointA.x - panX, pointA.y - panY);
+                }
+                context.closePath();
+                context.strokeStyle = pointA.color;
+                context.stroke();
             }
-            context.closePath();
-            context.strokeStyle = pointA.color;
-            context.stroke();
         }
     };
 
