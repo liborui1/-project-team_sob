@@ -12,7 +12,8 @@ window.onload = (function() {
     let panX = 0;
     let panY = 0;
     let currentAction = "draw";
-    let currentColor = "#00FF00";
+    let currentColor = "#000000";
+    document.querySelector('#color').style.background = currentColor;
     let currentScale = 1;
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, isDragging){
@@ -34,12 +35,16 @@ window.onload = (function() {
     });
 
     document.querySelector('#connectbtn').addEventListener('click', function (e){
-        let id = document.querySelector('#peerId').value
+        let id = document.querySelector('#peerId').value;
         api.connectToBoard(id, addIncommingPoints);
     });
-    document.querySelector('#colorbtn').addEventListener('click', function (e){
-        let id = document.querySelector('#colorId').value.trim()
-         currentColor = id;
+    document.querySelector('#colorPalette').addEventListener('click', function (e){
+        let id = document.querySelector('#colorId').value.trim();
+        currentColor = id;
+         if (id == "") {
+             id = '#000000';
+         }
+         document.querySelector('#color').style.background = id;
     });
     
     let addPoint = function(x, y, dragging){
@@ -62,15 +67,12 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        let dataURI = canvas.toDataURL('image/png', 0.5);
-        api.storeImageURI(dataURI);
+        canvas.scale(1/100, 1/100);
+        canvas.stroke();
+        let dataURI = canvas.toDataURL('image/jepg', 1.0);
+        api.storeImageURI(dataURI, "testGroup1");
     });
 
-    document.querySelector('#load').addEventListener('click', function (e){
-        api.getImageURI("testGroup1", function (err, image) {
-            console.log(image.imageURI);
-        });
-    });
 
  
     let addIncommingPoints = function(data){
@@ -78,7 +80,7 @@ window.onload = (function() {
             strokes.splice(strokes.length - 1, 0 , stroke )
         })
         redraw();
-    }
+    };
     let prepareCanvas = function(){
         canvas = document.querySelector('#whiteBoard > canvas');
         let canvasWrapper = document.querySelector('#whiteBoard');
@@ -138,13 +140,13 @@ window.onload = (function() {
 
         canvas.addEventListener("wheel", function(e){
             if (event.deltaY < 0){
-                context.scale(SCALEFACTOR, SCALEFACTOR)
-                currentScale =  SCALEFACTOR * currentScale
+                context.scale(SCALEFACTOR, SCALEFACTOR);
+                currentScale =  SCALEFACTOR * currentScale;
                 redraw();
                 
             }else if (event.deltaY > 0) {
-                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR)
-                currentScale =  1/SCALEFACTOR * currentScale
+                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
+                currentScale =  1/SCALEFACTOR * currentScale;
                 redraw();
             }
 
@@ -157,7 +159,6 @@ window.onload = (function() {
         context.lineJoin = "round";
         context.lineCap = "round";
         context.lineWidth = 5;
-   
         for(let i=0; i < strokes.length; i++){
             let currentStroke = strokes[i];
 
@@ -186,17 +187,17 @@ window.onload = (function() {
     };
 
     let panCanvas = function(panFrom, panTo){
-        panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
-        panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
-    }
+        panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale;
+        panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale;
+    };
     window.addEventListener("resize", function(e){
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas = document.querySelector('#whiteBoard > canvas');
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
-        context.scale(currentScale, currentScale)
+        context.scale(currentScale, currentScale);
         redraw();
-    })
+    });
     prepareCanvas();
 
 }());
