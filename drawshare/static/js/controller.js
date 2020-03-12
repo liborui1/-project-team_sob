@@ -13,9 +13,8 @@ window.onload = (function() {
     let panX = 0
     let panY = 0;
     let currentAction = "draw";
-    let currentColor = "#000000";
+    let currentColor = "#00FF00";
     let currentScale = 1;
-    
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, isDragging){
             return {x, y, panX, panY, scaleFactor, color, isDragging};
@@ -32,7 +31,8 @@ window.onload = (function() {
         currentAction = "move"
     });
     document.querySelector('#move2').addEventListener('click', function (e){
-        api.createLobby(addIncommingPoints);
+        api.createLobby(addIncommingPoints, points);
+       
     });
 
     document.querySelector('#connectbtn').addEventListener('click', function (e){
@@ -48,17 +48,18 @@ window.onload = (function() {
 
     let addIncommingPoints = function(data){
         data.forEach(function (pt) {
-            let {x, y, isDragging} = pt
-            addPoint(x, y, isDragging);
+            let {x, y, panX, panY, scaleFactor, color, isDragging} = pt
+            let singlePoint = new Point(x, y, panX, panY, scaleFactor, color, isDragging)
+            points.push(singlePoint)
         })
         redraw();
     }
     let prepareCanvas = function(){
+        canvas = document.querySelector('#whiteBoard > canvas');
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas = document.querySelector('#whiteBoard > canvas');
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
-        
         context = canvas.getContext("2d");
         points = []; 
 
@@ -149,15 +150,14 @@ window.onload = (function() {
         panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
         panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
-
-    window.addEventListener('resize', function(){
+    window.addEventListener("resize", function(e){
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas = document.querySelector('#whiteBoard > canvas');
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
+        context.scale(currentScale, currentScale)
         redraw();
-    });
- 
+    })
     prepareCanvas();
 
 }());
