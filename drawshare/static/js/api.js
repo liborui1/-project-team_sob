@@ -79,7 +79,7 @@ let api = (function(){
         peer.on('connection', function (newConnection){
             console.log("new connection")
             newConnection.on('data', function(data) {
-                let strokes = data.strokes || []
+                let strokes = data.strokes || [[]]
                 addStrokes(strokes);
             })
             connectedPeer.push(newConnection);
@@ -87,7 +87,7 @@ let api = (function(){
 
         board.on('data', function (data){
             let users = data.users || [];
-            let strokes = data.strokes || [];
+            let strokes = data.strokes || [[]];
             // initial sync of strokes
             addStrokes(strokes);
             // connect to all the new users
@@ -126,7 +126,7 @@ let api = (function(){
     }
 
     module.sendStrokes = function(data) {
- 
+        console.log("sdasd ", data)
         connectedPeer.forEach( function (connPeer){
             console.log("sneding Strokes to:", connPeer)
             connPeer.send({strokes: data})

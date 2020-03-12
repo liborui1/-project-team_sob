@@ -5,7 +5,6 @@ window.onload = (function() {
     let canvas;
     let context;
     let strokes = [[]]; // xy pan zoom
-    let points = [];
     let paint = false;
     let move = false;
     let lastClick = null;
@@ -45,7 +44,7 @@ window.onload = (function() {
     
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging)
-     
+       
         strokes[strokes.length - 1].push(singlePoint);
 
     };
@@ -75,6 +74,7 @@ window.onload = (function() {
 
  
     let addIncommingPoints = function(data){
+       
         data.forEach(function (stroke) {
             strokes.push(stroke)
         })
@@ -119,9 +119,9 @@ window.onload = (function() {
             paint = false;
             move = false;
             // pushes a new empty stroke
+             
+            api.sendStrokes([strokes[ strokes.length - 1 ]]);
             strokes.push([])
-            api.sendStrokes([points])
-            points = []
         };
 
         canvas.onmouseleave = function(e){
