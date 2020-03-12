@@ -45,28 +45,19 @@ let api = (function(){
         localData.groupName = groupName;
         send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err){
             if (err) return notifyErrorListeners("Image was unable to be added");
-            notifySaveListeners(imageURI);
         });
     };
 
-    let getImageURI = function(groupName, callback) {
-        send("Get", "/api/imageURI/" + groupName + "/", null, callback);
-    };
-
-    let saveListeners = [];
-
-    function notifySaveListeners(save){
-        saveListeners.forEach(function(handler){
-            handler(save);
-        });
-    }
-
-    module.onSaveUpdate = function(handler){
-        saveListeners.push(handler);
-        getImageURI(localData.groupName, function(err, image){
-            handler(image);
+    module.getImageURI = function(groupName = null) {
+        if (groupName == null) {
+            groupName = localData.groupName;
+        }
+        send("GET", "/api/imageURI/" + groupName + "/", function (err, img){
+            if (err) return notifyErrorListeners("Image was unable to get Image");
+            return res.json(img);
         });
     };
+
 
     return module;
 })();

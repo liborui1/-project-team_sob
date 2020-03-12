@@ -54,6 +54,12 @@ window.onload = (function() {
         api.storeImageURI(dataURI);
     });
 
+    document.querySelector('#load').addEventListener('click', function (e){
+        api.getImageURI("testGroup1", function (err, image) {
+            console.log(image.imageURI);
+        });
+    });
+
     let addClick = function(x, y, dragging){
         points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));
     
@@ -158,10 +164,6 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         redraw();
-    });
-
-    window.addEventListener('load', function(){
-        prepareCanvas();
     });
 
 }());
