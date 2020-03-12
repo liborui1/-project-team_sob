@@ -129,6 +129,7 @@ window.onload = (function() {
             }
             api.sendStrokes([strokes[ strokes.length - 1 ]]);
             strokes.push([])
+            redraw();
         };
 
         canvas.onmouseleave = function(e){
@@ -166,14 +167,16 @@ window.onload = (function() {
                 let pointA = currentStroke[j]
                 let pointB = currentStroke[j - 1]
                 if(pointA.isDragging){
+                    context.strokeStyle = "#000000";
                     context.moveTo(pointB.x - panX, pointB.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
                 } else {
+                    context.strokeStyle = pointA.color;
                     context.moveTo(pointA.x - panX, pointA.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
                 }
                 context.closePath();
-                context.strokeStyle = pointA.color;
+                 
                 context.stroke();
             }
         }
