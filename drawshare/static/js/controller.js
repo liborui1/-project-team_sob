@@ -75,7 +75,7 @@ window.onload = (function() {
  
     let addIncommingPoints = function(data){
         data.forEach(function (stroke) {
-            strokes.unshift(stroke)
+            strokes.splice(strokes.length - 1, 0 , stroke )
         })
         redraw();
     }
