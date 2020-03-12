@@ -5,25 +5,29 @@
     <title>DrawShare</title>
     <link href="style/main.css" rel="stylesheet" type="text/css"/>
     <link href="style/tools.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="style/colour.css">
     
-    <script src="js/api.js"></script>
+    <!-- <script src="js/api.js"></script> -->
 
 </head>
 <body>
      
     <div id= "toolBar">
         <div class="draw-icon icon" id="draw" ></div>
+        <div class="icon" id="color" ></div>
         <div class="move-icon icon" id="move" ></div>
         <button id = "move2"> bakMove Icon </button>
         <textarea id="peerId"></textarea>
         <button id = "connectbtn"> connect button </button>
-        <textarea id="colorId"></textarea>
+        <input type="text" class="inp" id="colorId">
+        <div class="palette" id="colorPalette"></div>
         <button id = "colorbtn"> color </button>
         <p id="peerIddisplay"></p>
         <div class="download-icon icon" id="dload" ></div>
         <div class="upload-icon icon" id="upload" ></div>
         <div class="save-icon icon" id="save" ></div>
         <div class="load-icon icon" id="load" ></div>
+        
     </div>
     <div id= "whiteBoard">
         <canvas></canvas>
@@ -36,6 +40,6 @@
         <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
         <script src="js/api.js"></script>
         <script src="js/controller.js"></script>
-        
+        <script src="js/color.js"></script>
 </footer>
 </html>
