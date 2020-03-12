@@ -72,11 +72,6 @@ window.onload = (function() {
         api.storeImageURI(dataURI, "testGroup1");
     });
 
-    document.querySelector('#load').addEventListener('click', function (e){
-        api.getImageURI("testGroup1", function (err, image) {
-            console.log(image.imageURI);
-        });
-    });
 
     let addClick = function(x, y, dragging){
         points.push(new Point((x/ currentScale) + panX  , (y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging));

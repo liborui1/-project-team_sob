@@ -15,7 +15,7 @@ let allPeers = [];
 // image object
 let Image = (function() {
     return function item(image) {
-        this.group = image.group;
+        this.groupName = image.groupName;
         this.imageURI = image.imageURI;
     };
 }());
@@ -50,7 +50,7 @@ app.post('/api/imageURI/', function(req,res, next){
 });
 
 app.get('/api/imageURI/:groupName/', function(req, res, next){
-    imageDB.findOne({group: req.params.groupName}).sort({createdAt:-1}).exec(function (err, img){
+    imageDB.find({groupName: req.params.groupName}, function (err, img){
         if (err) return res.status(500).end("unable to get image");
         
         return res.json(img);
