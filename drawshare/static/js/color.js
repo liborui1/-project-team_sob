@@ -1,41 +1,26 @@
 /* code from : https://www.cssscript.com/demo/la-color-picker/ */
 let colorInput = document.getElementById('colorId');
 let colorPalette = document.getElementById('colorPalette');
-if (colorInput && colorPalette) {
 colorInput.addEventListener("click", showColorPalette);
 colorInput.addEventListener("focusout", hideColorPalette);
 colorPalette.mouseIsOver = false;
-colorInput.style.borderRight =  `10px solid ${colorInput.value}`;
 
 colorPalette.onmouseover = () => {
   colorPalette.mouseIsOver = true;
 };
 colorPalette.onmouseout = () => {
   colorPalette.mouseIsOver = false;
-}
-}
+};
 function hideColorPalette() {
   if(colorPalette.mouseIsOver === false) {
     colorPalette.style.display = 'none';
-    colorInput.style.borderRight =  `10px solid ${colorInput.value}`;
   }
 }
 
 function chooseColor(e) {
-  let color = rgbToHex(e.target.style.backgroundColor);
+  let color = e.target.style.backgroundColor;
   colorInput.value = color;
-  colorInput.style.borderRight =  `10px solid ${color}`;
   colorPalette.style.display = 'none';
-}
-
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
-}
-
-function rgbToHex(color) {
-  arr = color.replace('rgb', '').replace('(', '').replace(')', '').split(',');
-  return "#" + componentToHex(Number(arr[0])) + componentToHex(Number(arr[1])) + componentToHex(Number(arr[2]));
 }
 
 function showColorPalette() {

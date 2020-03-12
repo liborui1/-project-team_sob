@@ -24,14 +24,5 @@
     cursor:pointer;
     float: left;
   }
-  #colorId {
-    border-right: 10px solid #000000;
-  }
 
-  .inp {
-    border: 1px solid #949494;
-    border-radius: 3px;
-    width: 90px;
-    font-size: 110%;
-  }
   

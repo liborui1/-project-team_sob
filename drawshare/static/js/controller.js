@@ -39,9 +39,12 @@ window.onload = (function() {
         let id = document.querySelector('#peerId').value;
         api.connectToBoard(id, addIncommingPoints);
     });
-    document.querySelector('#colorbtn').addEventListener('click', function (e){
+    document.querySelector('#colorPalette').addEventListener('click', function (e){
         let id = document.querySelector('#colorId').value.trim();
-         currentColor = id;
+        currentColor = id;
+         if (id == "") {
+             id = '#000000';
+         }
          document.querySelector('#color').style.background = id;
     });
     
