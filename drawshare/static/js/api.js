@@ -2,7 +2,7 @@ let api = (function(){
  
     let module = {};
    
-    //let peer = new Peer();
+    let peer = new Peer();
     let connectedPeer = [];
     let localData = {groupName: ""};
     function sendFiles(method, url, data, callback){

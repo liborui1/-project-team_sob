@@ -68,7 +68,9 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        let dataURI = canvas.toDataURL('image/png', 1.0);
+        canvas.scale(1/100, 1/100);
+        canvas.stroke();
+        let dataURI = canvas.toDataURL('image/jepg', 1.0);
         api.storeImageURI(dataURI, "testGroup1");
     });
 
