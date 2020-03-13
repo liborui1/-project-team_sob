@@ -12,7 +12,8 @@ window.onload = (function() {
     let panX = 0;
     let panY = 0;
     let currentAction = "draw";
-    let currentColor = "#00FF00";
+    let currentColor = "#000000";
+    document.querySelector('#color').style.background = currentColor;
     let currentScale = 1;
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, isDragging){
@@ -37,9 +38,14 @@ window.onload = (function() {
         let id = document.querySelector('#peerId').value
         api.connectToBoard(id, addIncommingPoints);
     });
-    document.querySelector('#colorbtn').addEventListener('click', function (e){
+    document.querySelector('#colorPalette').addEventListener('click', function (e){
+        
         let id = document.querySelector('#colorId').value.trim()
-         currentColor = id;
+        currentColor = id;
+         if (id == "") {
+             id = '#000000';
+         }
+             document.querySelector('#color').style.background = id;
     });
     
     let addPoint = function(x, y, dragging){
@@ -62,16 +68,9 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        let dataURI = canvas.toDataURL('image/png', 0.5);
-        api.storeImageURI(dataURI);
+        let dataURI = canvas.toDataURL('image/png', 1.0);
+        api.storeImageURI(dataURI, "testGroup1");
     });
-
-    document.querySelector('#load').addEventListener('click', function (e){
-        api.getImageURI("testGroup1", function (err, image) {
-            console.log(image.imageURI);
-        });
-    });
-
  
     let addIncommingPoints = function(data){
         data.forEach(function (stroke) {
