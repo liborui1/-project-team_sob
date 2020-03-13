@@ -35,7 +35,7 @@ let Image = (function() {
 }());
 
 app.use(bodyParser.json());
-app.use(express.static('./drawshare/static'));
+app.use(express.static('static'));
  
 app.use(session({
     secret: 'peasandcarrots',  ////change this -----------------------------------------------------------
