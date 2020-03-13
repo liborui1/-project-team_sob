@@ -24,8 +24,6 @@ let lobbies = new Datastore({ filename: 'db/lobbies.db', autoload: true, timesta
 let userinlobbies = new Datastore({ filename: 'db/userinlobbies.db', autoload: true, timestampData : true });
  
 
-
-
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // image object
@@ -37,7 +35,7 @@ let Image = (function() {
 }());
 
 app.use(bodyParser.json());
-app.use(express.static('static'));
+app.use(express.static('./drawshare/static'));
  
 app.use(session({
     secret: 'peasandcarrots',  ////change this -----------------------------------------------------------
@@ -113,11 +111,6 @@ app.get('/signout/', function (req, res, next) {
     res.redirect('/');
 });
 
-
-
-app.post('/', function (req, res, next) {
-     
-});
 
 app.post('/createLobby/', function (req, res, next) {
     let peerId = req.body.peerId;

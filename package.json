@@ -2,7 +2,7 @@
   "name": "drawshare",
   "version": "1.0.0",
   "description": "A cool, image gallery where users can share images and comments",
-  "main": "app.js",
+  "main": "./drawshare/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
