@@ -12,12 +12,13 @@ window.onload = (function() {
     let panX = 0;
     let panY = 0;
     let currentAction = "draw";
+    let currentFont = 5;
     let currentColor = "#000000";
     document.querySelector('#color').style.background = currentColor;
     let currentScale = 1;
    let Point = (function(){
-        return function point(x, y, panX, panY, scaleFactor, color, isDragging){
-            return {x, y, panX, panY, scaleFactor, color, isDragging};
+        return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
+            return {x, y, panX, panY, scaleFactor, color, font, isDragging};
         };
     }());
     
@@ -49,8 +50,7 @@ window.onload = (function() {
     });
     
     let addPoint = function(x, y, dragging){
-        let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, dragging)
-       
+        let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
         strokes[strokes.length - 1].push(singlePoint);
 
     };
@@ -155,8 +155,8 @@ window.onload = (function() {
         clearCanvas();
         context.lineJoin = "round";
         context.lineCap = "round";
-        // Scale the font size with the screen
-        context.lineWidth = 5 / currentScale;
+   
+        context.lineWidth = 5 ;
    
         for(let i=0; i < strokes.length; i++){
             let currentStroke = strokes[i];
@@ -173,6 +173,7 @@ window.onload = (function() {
                     context.moveTo(pointA.x - panX, pointA.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
                 }
+                context.lineWidth = pointA.font;
                 context.closePath();
                 context.strokeStyle = pointA.color;
                 context.stroke();
