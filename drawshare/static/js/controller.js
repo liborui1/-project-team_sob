@@ -34,6 +34,16 @@ window.onload = (function() {
         api.createLobby(addIncommingPoints, strokes);
       
     });
+    document.querySelector('#home').addEventListener('click', function (e){
+        panX = 0;
+        panY = 0;
+        currentScale = 1;
+        let canvasWrapper = document.querySelector('#whiteBoard');
+        canvas.height = canvasWrapper.clientHeight;
+        canvas.width = canvasWrapper.clientWidth;
+        redraw();
+
+    });
 
     document.querySelector('#connectbtn').addEventListener('click', function (e){
         let id = document.querySelector('#peerId').value
