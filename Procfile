@@ -1,1 +1,1 @@
-web: node .\drawshare\app.js
+web: node ./drawshare/app.js
