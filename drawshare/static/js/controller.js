@@ -155,7 +155,8 @@ window.onload = (function() {
         clearCanvas();
         context.lineJoin = "round";
         context.lineCap = "round";
-        context.lineWidth = 5;
+        // Scale the font size with the screen
+        context.lineWidth = 5 / currentScale;
    
         for(let i=0; i < strokes.length; i++){
             let currentStroke = strokes[i];
@@ -169,7 +170,6 @@ window.onload = (function() {
                     context.moveTo(pointB.x - panX, pointB.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
                 } else {
-                   
                     context.moveTo(pointA.x - panX, pointA.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
                 }
