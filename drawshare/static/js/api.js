@@ -86,7 +86,7 @@ let api = (function(){
     module.createLobby = function(addStrokes, syncData) {
     
         peer.on('open', function(id) {
-            console.log(peer);
+       
             document.querySelector('#peerIddisplay').innerHTML = id
         });
         document.querySelector('#peerIddisplay').innerHTML = peer.id
@@ -95,7 +95,7 @@ let api = (function(){
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
                 let strokes = data.strokes || []
-                console.log(strokes)
+            
                 addStrokes(strokes)
             })
             // On the initial connect send a list of all other connected users and all the points in the lobby
@@ -123,7 +123,7 @@ let api = (function(){
         connectedPeer.push(board);
         // When finished connecting wait for peer to send strokes
         peer.on('connection', function (newConnection){
-            console.log("new connection")
+        
             newConnection.on('data', function(data) {
                 let strokes = data.strokes || [[]]
                 addStrokes(strokes);
@@ -140,7 +140,7 @@ let api = (function(){
     
             // users is empty when we're done initilizing
             users.forEach(function(usrId){
-                console.log(usrId)
+          
                 let newPeer = peer.connect(usrId)    
                 connectedPeer.push(newPeer);
                 // all new peers can disconnect
@@ -172,9 +172,8 @@ let api = (function(){
     }
 
     module.sendStrokes = function(data) {
-        console.log("sdasd ", data)
+      
         connectedPeer.forEach( function (connPeer){
-            console.log("sneding Strokes to:", connPeer)
             connPeer.send({strokes: data})
         });
     }
