@@ -18,8 +18,12 @@ const options = {
     path: '/peerjs'
 }
  
+let users = new Datastore({ filename: 'db/users.db', autoload: true, timestampData : true });
 let imageDB = new Datastore({ filename: './db/images.db', autoload: true, timestampData : true });
-let allPeers = [];
+let lobbies = new Datastore({ filename: 'db/lobbies.db', autoload: true, timestampData : true });
+let userinlobbies = new Datastore({ filename: 'db/userinlobbies.db', autoload: true, timestampData : true });
+ 
+
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,12 +36,9 @@ let Image = (function() {
     };
 }());
 
-
 app.use(bodyParser.json());
 app.use(express.static('static'));
-
-let users = new Datastore({ filename: 'db/users.db', autoload: true, timestampData : true });
-
+ 
 app.use(session({
     secret: 'peasandcarrots',  ////change this -----------------------------------------------------------
     resave: false,
@@ -118,9 +119,53 @@ app.post('/', function (req, res, next) {
      
 });
 
-app.post('/ConnectPeer/:id', function (req, res, next) {
-    allPeers.push();
+app.post('/createLobby/', function (req, res, next) {
+    let peerId = req.body.peerId;
+    let lobbyName = req.body.name;
+    let lobbyPassword = req.body.password;
+ 
+    lobbies.findOne({_id: lobbyName}, function(err, lobby){
+        if (err) return res.status(500).end(err);
+        if (lobby) return res.status(409).end("lobby " + lobby + " already exists");
+        let salt = crypto.randomBytes(16).toString('base64');
+        let hash = crypto.createHmac('sha512', salt);
+        hash.update(lobbyPassword);
+        let saltedHash = hash.digest('base64');
+        lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt}, {upsert: true}, function(err){
+            if (err) return res.status(500).end(err);
+            lobbies.findOne({_id: lobbyName}, function(err, user){
+                return res.json("lobby " + lobbyName + " created");
+            });
+        });
+    });
 });
+
+app.post('/joinLobby/', function (req, res, next) {
+    let peerId = req.body.peerId;
+    let lobbyName = req.body.name;
+    let lobbyPassword = req.body.password;
+   
+    // retrieve user from the database
+    lobbies.findOne({_id: lobbyName}, function(err, lobby){
+        if (err) return res.status(500).end(err);
+       
+        if (!lobby) return res.status(401).end("access denied");
+        let salt = lobby.salt;
+        console.log ("heheh" + salt)
+        let hash = crypto.createHmac('sha512', salt);
+        hash.update(lobbyPassword);
+        let saltedHash = hash.digest('base64');
+        if (lobby.password !== saltedHash) return res.status(401).end("access denied"); 
+        let newConnections = [...lobby.connectedPeers]
+        newConnections.push(peerId);
+        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt}, {upsert: true}, function(err){
+            if (err) return res.status(500).end(err);
+            return res.json(lobby.connectedPeers);
+        });
+    });
+});
+
+
 
 app.post('/api/imageURI/', function(req,res, next){
     imageDB.insert(new Image(req.body), function (err, img) {
@@ -148,4 +193,30 @@ const server = http.createServer(app).listen(PORT, function (err) {
     else console.log("HTTP server on http://localhost:%s", PORT);
 });
 const peerserver = ExpressPeerServer(server, options);
+peerserver.on('connection', (client) => { 
+
+});
+
+peerserver.on('disconnect', (client) => { 
+    lobbies.find({}, function(err, allLobbies){
+
+        allLobbies.forEach(function (lobby){
+            let newConnections = []
+            lobby.connectedPeers.forEach (function (connId){
+                if (connId !== client) newConnections.push(connId)
+            })
+            console.log(newConnections)
+            if (newConnections.length == 0){
+                //delete unused lobby
+                lobbies.remove({_id: lobby._id}, {},function(err, res){
+                });
+            } else {
+                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt}, {upsert: true}, function(err){
+                });
+            }
+        });
+    })
+    console.log(client)
+});
+
 app.use(options.path, peerserver);
