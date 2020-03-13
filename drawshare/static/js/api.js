@@ -5,7 +5,7 @@ let api = (function(){
     //{host: 'localhost', port:'3000', path: '/peerjs'}
     let peer = new Peer();
     let connectedPeer = [];
-    let localData = {groupName:"testGroup1"};
+    let localData = {groupName:""};
   
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
@@ -181,22 +181,38 @@ let api = (function(){
 
     module.storeImageURI = function(imageURI, groupName = "testGroup1") {
         localData.groupName = groupName;
-        send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err){
+        send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err,image){
             if (err) return notifyErrorListeners("Image was unable to be added");
+            localData.groupName = image.groupName;
         });
     };
 
-    module.getImageURI = function(groupName = null) {
-        if (groupName == null) {
-            groupName = localData.groupName;
-        }
-        send("GET", "/api/imageURI/" + groupName + "/", function (err, img){
-            if (err) return notifyErrorListeners("Image was unable to get Image");
-            return res.json(img);
-        });
+    //History
+
+    let getHistory = function(groupName, callback) {
+        send("GET", "/api/imageURI/" + groupName + "/", null, callback);
     };
+    let historyListeners = [];
 
+    function notifyHistoryListeners(groupName){
+        historyListeners.forEach(function(handler){
+            handler(groupName);
+        });
+    }
 
+    module.onHistoryUpdate = function(handler){
+        historyListeners.push(handler);
+       // if ((localData.groupName != "") && (localData.groupName != null)) {
+            getHistory("testGroup1",function(err, saves) {
+                if (err) return notifyErrorListeners(err);
+                if (saves) {
+                    handler(saves);
+                }
+            });
+        //} else {
+        //    handler([]);
+        //}
+    };
 
     return module;
 

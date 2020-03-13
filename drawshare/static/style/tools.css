@@ -1,6 +1,6 @@
 .icon{
-    width:30px;
-    height: 30px;
+    width:45px;
+    height: 45px;
     border-radius: 10px;
     border-style: solid;
     border-width: 2px;
@@ -8,6 +8,21 @@
     background-repeat: no-repeat;
     background-size:75%;
     
+}
+.icon-large{
+    width:90px;
+    height: 90px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+}
+.color-icon{
+    cursor: pointer;
+    background-image: url('../media/colour\ wheel.png');
+    background-size: cover;
 }
 
 .draw-icon{
