@@ -186,7 +186,7 @@ app.get('/api/imageURI/:groupName/', function(req, res, next){
  
  // Change to Https with certificate, ask how to get certificate
 const http = require('http');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
