@@ -18,7 +18,7 @@
         });
         
         function submit(){
-            console.log(document.querySelector("form").checkValidity());
+
             if (document.querySelector("form").checkValidity()){
                 let username = document.querySelector("form [name=username]").value;
                 let password =document.querySelector("form [name=password]").value;
