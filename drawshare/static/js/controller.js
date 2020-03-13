@@ -29,10 +29,15 @@ window.onload = (function() {
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move";
     });
-    document.querySelector('#move2').addEventListener('click', function (e){
-
-        api.createLobby(addIncommingPoints, strokes);
-      
+    document.querySelector('#createLobby').addEventListener('click', function (e){
+        let lobbyName = document.getElementById("lobbyName").value || ''
+        let lobbyPass = document.getElementById("lobbyPass").value || ''
+        if (lobbyName !== '') api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass);
+    });
+    document.querySelector('#connectbtn').addEventListener('click', function (e){
+        let lobbyName = document.getElementById("connectlobbyName").value || ''
+        let lobbyPass = document.getElementById("connectlobbyPass").value || ''
+        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
     });
     document.querySelector('#home').addEventListener('click', function (e){
         panX = 0;
@@ -42,13 +47,13 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         redraw();
-
     });
 
-    document.querySelector('#connectbtn').addEventListener('click', function (e){
-        let id = document.querySelector('#peerId').value
-        api.connectToBoard(id, addIncommingPoints);
-    });
+
+
+
+ 
+
     document.querySelector('#colorPalette').addEventListener('click', function (e){
         
         let id = document.querySelector('#colorId').value.trim()
@@ -59,6 +64,9 @@ window.onload = (function() {
              document.querySelector('#color').style.background = id;
     });
     
+
+
+
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
         strokes[strokes.length - 1].push(singlePoint);
@@ -88,6 +96,12 @@ window.onload = (function() {
         })
         redraw();
     }
+
+    let sendSyncData = function(){
+        return strokes
+    }
+
+
     let prepareCanvas = function(){
         canvas = document.querySelector('#whiteBoard > canvas');
         let canvasWrapper = document.querySelector('#whiteBoard');

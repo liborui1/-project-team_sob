@@ -3,7 +3,7 @@ let api = (function(){
     let module = {};
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
-    let peer = new Peer();
+    let peer = new Peer({host: 'localhost', port:'3000', path: '/peerjs'});
     let connectedPeer = [];
     let localData = {groupName:""};
   
@@ -82,32 +82,37 @@ let api = (function(){
         errorListeners.push(listener);
     };
 
+    let requestCreateLobby = function (id, lobbyName, lobbyPass){
+        send("POST", "/createLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
+            if (err) return notifyErrorListeners(err);
+            // returns a custom lobby or something idk
+            console.log(res)
 
-    module.createLobby = function(addStrokes, syncData) {
-    
+       });
+    }
+
+    module.createLobby = function(addStrokes, syncData, lobbyName, lobbyPass) {
+        let sentRequest = false;
+        if (peer.id !== null){
+            requestCreateLobby (peer.id, lobbyName, lobbyPass);
+            sentRequest = true;
+        }
         peer.on('open', function(id) {
-       
-            document.querySelector('#peerIddisplay').innerHTML = id
+            if (!sentRequest) requestCreateLobby (id, lobbyName, lobbyPass);
+            document.querySelector('#peerIddisplay').innerHTML = peer.id
         });
         document.querySelector('#peerIddisplay').innerHTML = peer.id
         // lobby created, waiting for connections
         peer.on('connection', function (dataConnection){
+            connectedPeer.push(dataConnection)
+            dataConnection.on('open', function (){
+                dataConnection.send({initialSync: syncData})
+            });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
                 let strokes = data.strokes || []
-            
+                console.log("recienigin strokes")
                 addStrokes(strokes)
-            })
-            // On the initial connect send a list of all other connected users and all the points in the lobby
-            dataConnection.on('open', function (){
-                let allUserId = []
-                //   collect all the currentIds to send to the new peer to connect to
-                connectedPeer.forEach(function(con){
-                    allUserId.push(con.peer)
-                })
-                dataConnection.send({users:allUserId, strokes: syncData})
-                // keep track of all the current connected peers -- api suggested to do it by ourselves
-                connectedPeer.push(dataConnection);
             })
             dataConnection.on('disconnect', function (){
                 // remove the peer that disconnected
@@ -117,49 +122,61 @@ let api = (function(){
     }
 
 
-    module.connectToBoard = function(res, addStrokes) {
-        // connect to peer
-        let board = peer.connect(res.trim());
-        connectedPeer.push(board);
+    let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
+        send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
+            if (err) return notifyErrorListeners(err);
+            let isSynced = false;
+
+            res.forEach( function(newPeerId) {
+                let newPeer = peer.connect(newPeerId)    
+                connectedPeer.push(newPeer);
+                // all new peers can disconnect
+                    // all new peers can add to the local board
+                newPeer.on('data', function (newPeerdata){
+                    let strokes = newPeerdata.strokes || []
+                    let initialSync = newPeerdata.initialSync;
+                    console.log(newPeerdata)
+                    if (!isSynced && initialSync){
+                        callback(initialSync)
+                        isSynced = true;
+                    }
+                    callback(strokes);
+                });
+                
+                newPeer.on('disconnect', function (){
+                    removePeer(newPeer);
+                });
+            });
+       });
+    }
+
+    module.connectToBoard = function(addStrokes, getSyncData ,lobbyName, lobbyPass) {
+   
+        let sentRequest = false;
+        if (peer.id !== null){
+            requestJoinLobby(peer.id, lobbyName, lobbyPass, addStrokes)
+            sentRequest = true;
+        }
+
+         // waiting for peer to be opened
+        peer.on('open', function (id){
+            if (!sentRequest) requestJoinLobby(id, lobbyName, lobbyPass, addStrokes);
+        });
         // When finished connecting wait for peer to send strokes
-        peer.on('connection', function (newConnection){
         
+        peer.on('connection', function (newConnection){
+            newConnection.on('open', function() {
+                newConnection.send({initialSync : getSyncData()})
+            });
             newConnection.on('data', function(data) {
                 let strokes = data.strokes || [[]]
                 addStrokes(strokes);
             })
             connectedPeer.push(newConnection);
         });
+   
 
-        board.on('data', function (data){
-            let users = data.users || [];
-            let strokes = data.strokes || [[]];
-            // initial sync of strokes
-            addStrokes(strokes);
-            // connect to all the new users
-    
-            // users is empty when we're done initilizing
-            users.forEach(function(usrId){
-          
-                let newPeer = peer.connect(usrId)    
-                connectedPeer.push(newPeer);
-                // all new peers can disconnect
-                newPeer.on('open', function (){
-                    // all new peers can add to the local board
-                    newPeer.on('data', function (newPeerdata){
-                        let strokes = newPeerdata.strokes || []
-                        addStrokes(strokes);
-                    });
-                });
-                newPeer.on('disconnect', function (){
-                    removePeer(newPeer);
-                });
-            });
-        });
-        
-        board.on('disconnect', function (){
-            removePeer(board);
-        });
+       
     }
 
     let removePeer = function (peer){
@@ -172,7 +189,6 @@ let api = (function(){
     }
 
     module.sendStrokes = function(data) {
-      
         connectedPeer.forEach( function (connPeer){
             connPeer.send({strokes: data})
         });
