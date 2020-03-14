@@ -5,6 +5,7 @@ window.onload = (function() {
     let canvas;
     let context;
     let strokes = [[]]; // xy pan zoom
+    let lastStrokes = []
     let paint = false;
     let move = false;
     let lastClick = null;
@@ -44,19 +45,20 @@ window.onload = (function() {
         let dataURI = canvas.toDataURL('image/png', 1.0);
         api.storeImageURI(dataURI, "testGroup1");
     });
- 
+    
    
     let onIncommingData = function(data){
+        let checkedData = data.strokes || [];
         if (data.action === "initialSync"){
             strokes = data.initialSync
         } else if (data.action === "removeStrokes"){
-            let index = strokes.findIndex(function (item){
-                return item === data.strokes
-            })
-            strokes.splice(index, 0 )
-    
+            
+            checkedData.forEach(function (stroke) {
+                removeStroke(stroke);
+            });
+
         } else if (data.action === "addStrokes"){
-            data.strokes.forEach(function (stroke) {
+            checkedData.forEach(function (stroke) {
                 strokes.splice(strokes.length - 1, 0 , stroke )
             })
         }
@@ -67,7 +69,24 @@ window.onload = (function() {
     let sendSyncData = function(){
         return strokes
     }
-
+ 
+    let removeStroke = function (stroke){
+        let index = strokes.findIndex( function (item) {
+            return  JSON.stringify(item) === JSON.stringify(stroke);
+        });
+        console.log(index)
+        strokes.splice(index, 1);
+        if (strokes.length === 0) strokes.push([])
+        redraw();
+    }
+    
+    let removeLastStroke = function(){
+        if (lastStrokes.length !== 0){
+            let mostRecentStroke = lastStrokes[lastStrokes.length - 1];
+            api.sendRemoveStrokes([mostRecentStroke]);
+            removeStroke(mostRecentStroke);
+        }
+    };
 
     let prepareCanvas = function(){
         canvas = document.querySelector('#whiteBoard > canvas');
@@ -77,7 +96,15 @@ window.onload = (function() {
         canvas.width = canvasWrapper.clientWidth;
         context = canvas.getContext("2d");
         strokes = [[]]; 
+   
+        // https://stackoverflow.com/questions/16006583/capturing-ctrlz-key-combination-in-javascript
+        function keyPressed(e) {
+            if (e.code == 'KeyZ' && e.ctrlKey) removeLastStroke();
+        }
 
+        canvas.addEventListener("keydown", function (e){
+            keyPressed(e)
+        })
         canvas.onmousedown = function(e){
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
@@ -108,7 +135,7 @@ window.onload = (function() {
             paint = false;
             move = false;
             // pushes a new empty stroke
-            let lastStroke = strokes[ strokes.length - 1 ]
+            let lastStroke = strokes[strokes.length - 1]
             if (lastStroke.length !== 0){
                 let lastPoint = lastStroke[lastStroke.length-1]
                 // clone last point
@@ -116,7 +143,10 @@ window.onload = (function() {
                 // set last point dragging to false
                 lastStroke[lastStroke.length-1].isDragging = false
             }
-            api.sendStrokes([strokes[ strokes.length - 1 ]]);
+            // send to all users the last stroke made
+            api.sendStrokes([lastStroke]);
+
+            lastStrokes.push(lastStroke)
             strokes.push([])
             redraw();
         };
@@ -184,6 +214,7 @@ window.onload = (function() {
         context.scale(currentScale, currentScale)
         redraw();
     })
+  
 
     prepareCanvas();
 
@@ -247,7 +278,6 @@ window.onload = (function() {
             alert(document.location.host + '/joinBoard/' + currentLobbyName)
         }
     });
-     
 
     document.querySelector('#colorPalette').addEventListener('click', function (e){
         let id = document.querySelector('#colorId').value.trim()
@@ -257,5 +287,7 @@ window.onload = (function() {
          }
              document.querySelector('#color').style.background = id;
     });
-    
+
+
+
 }());

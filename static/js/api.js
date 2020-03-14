@@ -135,11 +135,13 @@ let api = (function(){
                 newPeer.on('data', function (newPeerdata){
                     let initialSync = newPeerdata.initialSync;
                     // so that it only syncs with one user rather than all connecting users
-                    if (!isSynced && initialSync){
+                    if (!isSynced && newPeerdata.action === "initialSync"){
                         callback(newPeerdata)
                         isSynced = true;
-                    }
+                    } 
+
                     callback(newPeerdata);
+                    
                 });
                 newPeer.on('disconnect', function (){
                     removePeer(newPeer);
@@ -165,15 +167,13 @@ let api = (function(){
         
         peer.on('connection', function (newConnection){
             newConnection.on('open', function() {
-                newConnection.send({action: "addStrokes", initialSync : getSyncData()})
+                newConnection.send({action: "initialSync", initialSync : getSyncData()})
             });
             newConnection.on('data', function(data) {
                 callBack(data);
             })
             connectedPeer.push(newConnection);
         });
-   
-
        
     }
 
@@ -188,9 +188,18 @@ let api = (function(){
 
     module.sendStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
+            console.log("sending Add" + connPeer.peer)
             connPeer.send({action: "addStrokes", strokes: data})
         });
-    }
+    };
+
+    module.sendRemoveStrokes = function(data) {
+        connectedPeer.forEach( function (connPeer){
+            console.log("sending remove" + connPeer.peer)
+            connPeer.send({action: "removeStrokes", strokes: data})
+        });
+    };
+
 
     module.storeImageURI = function(imageURI, groupName = "testGroup1") {
         localData.groupName = groupName;
