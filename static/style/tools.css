@@ -60,3 +60,7 @@
     background-image: url('../media/load.png');
     background-size: cover;
 }
+
+.tool-bar{
+    user-select: none;
+}

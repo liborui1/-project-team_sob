@@ -14,15 +14,14 @@ window.onload = (function() {
     let currentAction = "draw";
     let currentFont = 5;
     let currentColor = "#000000";
-    document.querySelector('#color').style.background = currentColor;
+ 
     let currentScale = 1;
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
             return {x, y, panX, panY, scaleFactor, color, font, isDragging};
         };
     }());
-    
-
+    document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
         currentAction = "draw";
     });
@@ -50,12 +49,7 @@ window.onload = (function() {
     });
 
 
-
-
- 
-
     document.querySelector('#colorPalette').addEventListener('click', function (e){
-        
         let id = document.querySelector('#colorId').value.trim()
         currentColor = id;
          if (id == "") {
@@ -64,8 +58,6 @@ window.onload = (function() {
              document.querySelector('#color').style.background = id;
     });
     
-
-
 
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(x/currentScale + panX, y/currentScale + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
