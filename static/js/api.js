@@ -235,7 +235,12 @@ let api = (function(){
         //    handler([]);
         //}
     };
+    let serverListeners = [];
 
+    module.onServerUpdate = function (handler) {
+        serverListeners.push(handler);
+        handler(getUsername());
+    };
     return module;
 
 })();

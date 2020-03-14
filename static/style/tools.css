@@ -61,6 +61,8 @@
     background-size: cover;
 }
 
-.tool-bar{
-    user-select: none;
+.share-icon{
+    cursor: pointer;
+    background-image: url('../media/share.png');
+    background-size: cover;
 }
