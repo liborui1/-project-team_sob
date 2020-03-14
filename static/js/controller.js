@@ -21,43 +21,7 @@ window.onload = (function() {
             return {x, y, panX, panY, scaleFactor, color, font, isDragging};
         };
     }());
-    document.querySelector('#color').style.background = currentColor;
-    document.querySelector('#draw').addEventListener('click', function (e){
-        currentAction = "draw";
-    });
-    document.querySelector('#move').addEventListener('click', function (e){
-        currentAction = "move";
-    });
-    document.querySelector('#createLobby').addEventListener('click', function (e){
-        let lobbyName = document.getElementById("lobbyName").value || ''
-        let lobbyPass = document.getElementById("lobbyPass").value || ''
-        if (lobbyName !== '') api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass);
-    });
-    document.querySelector('#connectbtn').addEventListener('click', function (e){
-        let lobbyName = document.getElementById("connectlobbyName").value || ''
-        let lobbyPass = document.getElementById("connectlobbyPass").value || ''
-        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
-    });
-    document.querySelector('#home').addEventListener('click', function (e){
-        panX = 0;
-        panY = 0;
-        currentScale = 1;
-        let canvasWrapper = document.querySelector('#whiteBoard');
-        canvas.height = canvasWrapper.clientHeight;
-        canvas.width = canvasWrapper.clientWidth;
-        redraw();
-    });
-
-
-    document.querySelector('#colorPalette').addEventListener('click', function (e){
-        let id = document.querySelector('#colorId').value.trim()
-        currentColor = id;
-         if (id == "") {
-             id = '#000000';
-         }
-             document.querySelector('#color').style.background = id;
-    });
-    
+ 
 
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(x/currentScale + panX, y/currentScale + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
@@ -212,6 +176,60 @@ window.onload = (function() {
         context.scale(currentScale, currentScale)
         redraw();
     })
+
     prepareCanvas();
 
+    // https://html-online.com/articles/get-url-parameters-javascript/
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+    }
+    // Try connecting using URL
+    if (getUrlVars()["lobby"]){
+        let lobbyName = getUrlVars()["lobby"]; 
+        // prompt user to give pass or something
+        let lobbyPass = "";
+        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+    }
+     
+    document.querySelector('#color').style.background = currentColor;
+    document.querySelector('#draw').addEventListener('click', function (e){
+        currentAction = "draw";
+    });
+    document.querySelector('#move').addEventListener('click', function (e){
+        currentAction = "move";
+    });
+    document.querySelector('#createLobby').addEventListener('click', function (e){
+        let lobbyName = document.getElementById("lobbyName").value || ''
+        let lobbyPass = document.getElementById("lobbyPass").value || ''
+        if (lobbyName !== '') api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass);
+    });
+    document.querySelector('#connectbtn').addEventListener('click', function (e){
+        let lobbyName = document.getElementById("connectlobbyName").value || ''
+        let lobbyPass = document.getElementById("connectlobbyPass").value || ''
+        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+    });
+    document.querySelector('#home').addEventListener('click', function (e){
+        panX = 0;
+        panY = 0;
+        currentScale = 1;
+        let canvasWrapper = document.querySelector('#whiteBoard');
+        canvas.height = canvasWrapper.clientHeight;
+        canvas.width = canvasWrapper.clientWidth;
+        redraw();
+    });
+
+
+    document.querySelector('#colorPalette').addEventListener('click', function (e){
+        let id = document.querySelector('#colorId').value.trim()
+        currentColor = id;
+         if (id == "") {
+             id = '#000000';
+         }
+             document.querySelector('#color').style.background = id;
+    });
+    
 }());

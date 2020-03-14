@@ -123,7 +123,6 @@ let api = (function(){
         })
     }
 
-
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
         send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
