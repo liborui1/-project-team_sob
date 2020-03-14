@@ -32,7 +32,7 @@ window.onload = (function() {
     document.querySelector('#dload').addEventListener('click', function (){
         let dataURI = canvas.toDataURL('image/png', 0.5);
         console.log(dataURI);
-        var element = document.createElement('a');
+        let element = document.createElement('a');
         element.setAttribute('href', dataURI);
         element.setAttribute('download', "Image");
         element.style.display = 'none';
@@ -44,6 +44,26 @@ window.onload = (function() {
     document.querySelector('#save').addEventListener('click', function (e){
         let dataURI = canvas.toDataURL('image/png', 1.0);
         api.storeImageURI(dataURI, "testGroup1");
+    });
+    
+    document.querySelector('#move2').addEventListener('click',function(e) {
+        document.querySelector('#newLobby').style.display = 'block';
+    });
+
+    document.querySelector('#exit').addEventListener('click',function(e) {
+        document.querySelector('#newLobby').style.display = 'none';
+    });
+    
+    document.querySelector("#Sboard").addEventListener('click', function(e) {
+        let lobbyName = document.getElementById("boardName").value;
+        let lobbyPass = '';
+        document.querySelector('#newLobby').style.display = 'none';
+        document.querySelector("#lobbyName").innerHTML = lobbyName;
+        if (lobbyName !== '') {
+            currentLobbyName = lobbyName;
+            api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass);
+        }
+        
     });
     
    
@@ -219,8 +239,8 @@ window.onload = (function() {
 
     // https://html-online.com/articles/get-url-parameters-javascript/
     function getUrlVars() {
-        var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        let vars = {};
+        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
             vars[key] = value;
         });
         return vars;
@@ -244,24 +264,6 @@ window.onload = (function() {
     });
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move";
-    });
-    document.querySelector('#createLobby').addEventListener('click', function (e){
-        let lobbyName = document.getElementById("lobbyName").value || ''
-        let lobbyPass = document.getElementById("lobbyPass").value || ''
-        if (lobbyName !== '') {
-            currentLobbyName = lobbyName
-            api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass)
-        };
-    });
-    document.querySelector('#connectbtn').addEventListener('click', function (e){
-        let lobbyName = document.getElementById("connectlobbyName").value || ''
-        // reset Canvas
-        clearCanvas();
-        strokes = [[]];
-        if (lobbyName !== '') {
-            // direct page with lobby name to connect to other lobby
-            window.location.href = '/drawshare.html?lobby=' + lobbyName;
-        }
     });
     document.querySelector('#home').addEventListener('click', function (e){
         panX = 0;
