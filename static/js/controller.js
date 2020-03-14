@@ -68,9 +68,8 @@ window.onload = (function() {
 
 
     let addPoint = function(x, y, dragging){
-        let singlePoint = new Point(Math.floor(x/currentScale) + panX, Math.floor(y/currentScale) + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
+        let singlePoint = new Point(x/currentScale + panX, y/currentScale + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
         strokes[strokes.length - 1].push(singlePoint);
-
     };
 
     document.querySelector('#dload').addEventListener('click', function (){
