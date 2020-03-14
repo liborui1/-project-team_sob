@@ -3,7 +3,7 @@ let api = (function(){
     let module = {};
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
-    let peer = new Peer({       secure: true, host: 'draw-share.herokuapp.com', port: 443});
+    let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
     let localData = {groupName:""};
   
