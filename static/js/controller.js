@@ -74,7 +74,9 @@ window.onload = (function() {
         let index = strokes.findIndex( function (item) {
             return  JSON.stringify(item) === JSON.stringify(stroke);
         });
+        console.log(index)
         if (index !== -1) strokes.splice(index, 1);
+
         if (strokes.length === 0) strokes.push([])
         redraw();
     }
@@ -82,7 +84,9 @@ window.onload = (function() {
     let removeLastStroke = function(){
         if (lastStrokes.length !== 0){
             let mostRecentStroke = lastStrokes[lastStrokes.length - 1];
+            lastStrokes.splice(lastStrokes.length - 1, 1)
             api.sendRemoveStrokes([mostRecentStroke]);
+            
             removeStroke(mostRecentStroke);
         }
     };
