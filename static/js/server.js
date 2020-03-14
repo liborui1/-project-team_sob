@@ -26,8 +26,8 @@
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
                 let id = document.querySelector('#serverKey').value;
-                localStorage.setItem("boardKey", id);
-                window.location.href = '/drawshare.html';
+                alert(id);
+                window.location.href = '/drawshare.html?lobby=' + id;
             });
         });
     });
