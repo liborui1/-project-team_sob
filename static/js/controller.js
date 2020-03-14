@@ -74,8 +74,7 @@ window.onload = (function() {
         let index = strokes.findIndex( function (item) {
             return  JSON.stringify(item) === JSON.stringify(stroke);
         });
-        console.log(index)
-        strokes.splice(index, 1);
+        if (index !== -1) strokes.splice(index, 1);
         if (strokes.length === 0) strokes.push([])
         redraw();
     }
