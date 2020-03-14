@@ -45,12 +45,24 @@ window.onload = (function() {
         api.storeImageURI(dataURI, "testGroup1");
     });
  
-    let addIncommingPoints = function(data){
-        data.forEach(function (stroke) {
-            strokes.splice(strokes.length - 1, 0 , stroke )
-        })
+   
+    let onIncommingData = function(data){
+        if (data.action === "initialSync"){
+            strokes = data.initialSync
+        } else if (data.action === "removeStrokes"){
+            let index = strokes.findIndex(function (item){
+                return item === data.strokes
+            })
+            strokes.splice(index, 0 )
+    
+        } else if (data.action === "addStrokes"){
+            data.strokes.forEach(function (stroke) {
+                strokes.splice(strokes.length - 1, 0 , stroke )
+            })
+        }
         redraw();
     }
+
 
     let sendSyncData = function(){
         return strokes
@@ -118,14 +130,10 @@ window.onload = (function() {
             if (event.deltaY < 0){
                 context.scale(SCALEFACTOR, SCALEFACTOR)
                 currentScale =  SCALEFACTOR * currentScale
-                redraw();
-                
             }else if (event.deltaY > 0) {
                 context.scale(1/SCALEFACTOR, 1/SCALEFACTOR)
                 currentScale =  1/SCALEFACTOR * currentScale
-                redraw();
             }
-
             redraw();
         });
     };
@@ -196,7 +204,7 @@ window.onload = (function() {
         strokes = [[]];
         if (lobbyName !== '') {
             currentLobbyName = lobbyName
-            api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+            api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
         }
     }
      
@@ -212,7 +220,7 @@ window.onload = (function() {
         let lobbyPass = document.getElementById("lobbyPass").value || ''
         if (lobbyName !== '') {
             currentLobbyName = lobbyName
-            api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass)
+            api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass)
         };
     });
     document.querySelector('#connectbtn').addEventListener('click', function (e){

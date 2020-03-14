@@ -91,7 +91,7 @@ let api = (function(){
        });
     }
 
-    module.createLobby = function(addStrokes, syncData, lobbyName, lobbyPass) {
+    module.createLobby = function(callBack, syncData, lobbyName, lobbyPass) {
         lobbyPass = "";
  
          let sentRequest = false;
@@ -108,13 +108,11 @@ let api = (function(){
         peer.on('connection', function (dataConnection){
             connectedPeer.push(dataConnection)
             dataConnection.on('open', function (){
-                dataConnection.send({initialSync: syncData})
+                dataConnection.send({action: "initialSync", initialSync: syncData})
             });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
-                let strokes = data.strokes || []
-                console.log("recienigin strokes")
-                addStrokes(strokes)
+                callBack(data)
             })
             dataConnection.on('disconnect', function (){
                 // remove the peer that disconnected
@@ -135,16 +133,14 @@ let api = (function(){
                 // all new peers can disconnect
                     // all new peers can add to the local board
                 newPeer.on('data', function (newPeerdata){
-                    let strokes = newPeerdata.strokes || []
                     let initialSync = newPeerdata.initialSync;
-                     
+                    // so that it only syncs with one user rather than all connecting users
                     if (!isSynced && initialSync){
-                        callback(initialSync)
+                        callback(newPeerdata)
                         isSynced = true;
                     }
-                    callback(strokes);
+                    callback(newPeerdata);
                 });
-                
                 newPeer.on('disconnect', function (){
                     removePeer(newPeer);
                 });
@@ -152,28 +148,27 @@ let api = (function(){
        });
     }
 
-    module.connectToBoard = function(addStrokes, getSyncData ,lobbyName, lobbyPass) {
+    module.connectToBoard = function(callBack, getSyncData ,lobbyName, lobbyPass) {
         lobbyPass = "";
    
         let sentRequest = false;
         if (peer.id){
-            requestJoinLobby(peer.id, lobbyName, lobbyPass, addStrokes)
+            requestJoinLobby(peer.id, lobbyName, lobbyPass, callBack)
             sentRequest = true;
         }
 
          // waiting for peer to be opened
         peer.on('open', function (id){
-            if (!sentRequest) requestJoinLobby(id, lobbyName, lobbyPass, addStrokes);
+            if (!sentRequest) requestJoinLobby(id, lobbyName, lobbyPass, callBack);
         });
         // When finished connecting wait for peer to send strokes
         
         peer.on('connection', function (newConnection){
             newConnection.on('open', function() {
-                newConnection.send({initialSync : getSyncData()})
+                newConnection.send({action: "addStrokes", initialSync : getSyncData()})
             });
             newConnection.on('data', function(data) {
-                let strokes = data.strokes || [[]]
-                addStrokes(strokes);
+                callBack(data);
             })
             connectedPeer.push(newConnection);
         });
@@ -193,7 +188,7 @@ let api = (function(){
 
     module.sendStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
-            connPeer.send({strokes: data})
+            connPeer.send({action: "addStrokes", strokes: data})
         });
     }
 

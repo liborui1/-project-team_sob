@@ -42,6 +42,15 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+
+
+let isAuthenticated = function(req, res, next) {
+    let id = (req.session.user)? req.session.user._id: null;
+    users.findOne({_id: id}, function(err, user){
+        if (err) return res.status(500).end(err);
+        return (!user)? res.status(401).end("access denied") : next();  
+    });
+};
  
 app.use(function (req, res, next){
     req.user = ('user' in req.session)? req.session.user : null;
@@ -102,7 +111,7 @@ app.post('/signin/', function (req, res, next) {
     });
 });
 
-app.get('/signout/', function (req, res, next) {
+app.get('/signout/',  function (req, res, next) {
     req.session.destroy();
     res.setHeader('Set-Cookie', cookie.serialize('username', '', {
           path : '/', 
@@ -112,7 +121,7 @@ app.get('/signout/', function (req, res, next) {
 });
 
 
-app.post('/createLobby/', function (req, res, next) {
+app.post('/createLobby/', isAuthenticated, function (req, res, next) {
     let peerId = req.body.peerId;
     let lobbyName = req.body.name;
     let lobbyPassword = req.body.password;
@@ -142,13 +151,13 @@ app.post('/joinLobby/', function (req, res, next) {
     lobbies.findOne({_id: lobbyName}, function(err, lobby){
         if (err) return res.status(500).end(err);
        
-        if (!lobby) return res.status(401).end("access denied");
+        if (!lobby) return res.status(404).end("Lobby not found");
         let salt = lobby.salt;
-        console.log ("heheh" + salt)
+ 
         let hash = crypto.createHmac('sha512', salt);
         hash.update(lobbyPassword);
         let saltedHash = hash.digest('base64');
-        if (lobby.password !== saltedHash) return res.status(401).end("access denied"); 
+        if (lobby.password !== saltedHash) return res.status(401).end("access denied inccorect password "); 
         let newConnections = [...lobby.connectedPeers]
         newConnections.push(peerId);
         lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt}, {upsert: true}, function(err){
@@ -159,6 +168,7 @@ app.post('/joinLobby/', function (req, res, next) {
 });
 
 app.get('/joinBoard/:id', function (req, res, next) {
+    // just a simpler way of joining the board
     res.redirect('/drawshare.html?lobby=' + req.params.id)
 });
 
