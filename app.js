@@ -158,7 +158,9 @@ app.post('/joinLobby/', function (req, res, next) {
     });
 });
 
-
+app.get('/joinBoard/:id', function (req, res, next) {
+    res.redirect('/drawshare.html?lobby=' + req.params.id)
+});
 
 app.post('/api/imageURI/', function(req,res, next){
     imageDB.insert(new Image(req.body), function (err, img) {

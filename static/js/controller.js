@@ -14,7 +14,7 @@ window.onload = (function() {
     let currentAction = "draw";
     let currentFont = 5;
     let currentColor = "#000000";
- 
+    let currentLobbyName = '';
     let currentScale = 1;
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
@@ -192,7 +192,12 @@ window.onload = (function() {
         let lobbyName = getUrlVars()["lobby"]; 
         // prompt user to give pass or something
         let lobbyPass = "";
-        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+        clearCanvas();
+        strokes = [[]];
+        if (lobbyName !== '') {
+            currentLobbyName = lobbyName
+            api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+        }
     }
      
     document.querySelector('#color').style.background = currentColor;
@@ -205,12 +210,20 @@ window.onload = (function() {
     document.querySelector('#createLobby').addEventListener('click', function (e){
         let lobbyName = document.getElementById("lobbyName").value || ''
         let lobbyPass = document.getElementById("lobbyPass").value || ''
-        if (lobbyName !== '') api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass);
+        if (lobbyName !== '') {
+            currentLobbyName = lobbyName
+            api.createLobby(addIncommingPoints, strokes, lobbyName,lobbyPass)
+        };
     });
     document.querySelector('#connectbtn').addEventListener('click', function (e){
         let lobbyName = document.getElementById("connectlobbyName").value || ''
-        let lobbyPass = document.getElementById("connectlobbyPass").value || ''
-        if (lobbyName !== '') api.connectToBoard(addIncommingPoints, sendSyncData, lobbyName, lobbyPass);
+        // reset Canvas
+        clearCanvas();
+        strokes = [[]];
+        if (lobbyName !== '') {
+            // direct page with lobby name to connect to other lobby
+            window.location.href = '/drawshare.html?lobby=' + lobbyName;
+        }
     });
     document.querySelector('#home').addEventListener('click', function (e){
         panX = 0;
@@ -221,7 +234,12 @@ window.onload = (function() {
         canvas.width = canvasWrapper.clientWidth;
         redraw();
     });
-
+    document.querySelector('#shareBoard').addEventListener('click', function (e){
+        if (currentLobbyName != ""){
+            alert(document.location.host + '/joinBoard/' + currentLobbyName)
+        }
+    });
+     
 
     document.querySelector('#colorPalette').addEventListener('click', function (e){
         let id = document.querySelector('#colorId').value.trim()

@@ -93,9 +93,9 @@ let api = (function(){
 
     module.createLobby = function(addStrokes, syncData, lobbyName, lobbyPass) {
         lobbyPass = "";
-        
-        let sentRequest = false;
-        if (peer.id !== null){
+ 
+         let sentRequest = false;
+        if (peer.id){
             requestCreateLobby (peer.id, lobbyName, lobbyPass);
             sentRequest = true;
         }
@@ -131,12 +131,13 @@ let api = (function(){
             res.forEach( function(newPeerId) {
                 let newPeer = peer.connect(newPeerId)    
                 connectedPeer.push(newPeer);
+                console.log(newPeerId)
                 // all new peers can disconnect
                     // all new peers can add to the local board
                 newPeer.on('data', function (newPeerdata){
                     let strokes = newPeerdata.strokes || []
                     let initialSync = newPeerdata.initialSync;
-                    console.log(newPeerdata)
+                     
                     if (!isSynced && initialSync){
                         callback(initialSync)
                         isSynced = true;
@@ -155,7 +156,7 @@ let api = (function(){
         lobbyPass = "";
    
         let sentRequest = false;
-        if (peer.id !== null){
+        if (peer.id){
             requestJoinLobby(peer.id, lobbyName, lobbyPass, addStrokes)
             sentRequest = true;
         }
