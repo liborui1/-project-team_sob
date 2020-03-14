@@ -3,7 +3,8 @@ let api = (function(){
     let module = {};
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
-    let peer = new Peer({host: 'localhost', port:'3000', path: '/peerjs'});
+    const PORT = process.env.PORT || 3000;
+    let peer = new Peer({ port: PORT, path: '/peerjs'});
     let connectedPeer = [];
     let localData = {groupName:""};
   
