@@ -324,6 +324,12 @@ window.onload = (function() {
      
     document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
+        let id = document.querySelector('#colorId').value;
+        
+         if ((id == "") || (id == null)) {
+             id = '#000000';
+         }
+         currentColor = id;
         currentAction = "draw";
     });
     document.querySelector('#erase').addEventListener('click', function (e){
@@ -350,7 +356,7 @@ window.onload = (function() {
     document.querySelector('#colorPalette').addEventListener('click', function (e){
         let id = document.querySelector('#colorId').value.trim()
         currentColor = id;
-         if (id == "") {
+        if ((id == "") || (id == null)) {
              id = '#000000';
          }
              document.querySelector('#color').style.background = id;
