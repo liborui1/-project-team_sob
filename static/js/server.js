@@ -5,6 +5,8 @@
         api.onServerUpdate(function(username){
             if (username) {
                 localStorage.setItem("signedIn", "");
+            } else {
+                localStorage.setItem("signedIn", "not signed in");
             }
             let header = document.querySelector("header");
             let userInfo = document.createElement("div");
@@ -38,13 +40,13 @@
             
 
             document.querySelector("#genBoard").addEventListener('click', function(e){
-                if (username) {
+                // if (username) {
                     window.location.href = '/drawshare.html';
-                    localStorage.setItem("signedIn", "");
-                } else {
-                    localStorage.setItem("signedIn", "**You must be signed in to generate board**");
-                    window.location.href = '/login.html';
-                }
+                //     localStorage.setItem("signedIn", "");
+                // } else {
+                //     localStorage.setItem("signedIn", "**You must be signed in to generate board**");
+                //     window.location.href = '/login.html';
+                // }
             });
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
