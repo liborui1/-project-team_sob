@@ -374,7 +374,16 @@ window.onload = (function() {
              document.querySelector('#color').style.background = id;
     });
 
-
+    let header = document.getElementById("toolBar");
+    let icons = header.getElementsByClassName("icon");
+    console.log(icons.length);
+    for (var i = 0; i < icons.length; i++) {
+    icons[i].addEventListener("click", function() {
+        var current = document.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+        });
+    }
 
 
 
