@@ -14,7 +14,7 @@
         });
         
         api.onUserUpdate(function(username){
-            if (username) window.location.href = '/server.html';
+            if (username) window.location.href = '/index.html';
         });
         
         function submit(){

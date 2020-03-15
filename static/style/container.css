@@ -77,7 +77,7 @@ header #title{
 }
 
 .btn {
-    height: 35px;
+    height: 30px;
     display: flex;
     text-align: center;
     padding-left: 20px;
@@ -185,4 +185,26 @@ a:hover {
   /* selected link */
   a:active {
     color: rgb(83, 132, 224);
+
+  .headerbtn {
+    height: 20px;
+    font-size: 18px;
+    display: flex;
+    text-align: center;
+    padding: 5px 15px 5px 15px;
+    border-radius: 5px;
+    border:2px solid #000000;
+  }
+
+  .headerbtn:hover {
+    background-color: gray;
+    cursor: pointer;
+  }
+
+  .userInfo {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 15px;
+    right: 15px;
   }
