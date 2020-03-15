@@ -10,6 +10,12 @@
     margin-bottom: 5px;
     
 }
+
+.active, .icon:hover {
+    background-color: #666;
+    color: white;
+}
+
 .icon-large{
     width:90px;
     height: 90px;
