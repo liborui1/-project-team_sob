@@ -3,6 +3,7 @@ body, html {
     height: 100%;
     width: 100%;
     margin:  0 0 0 0;
+    touch-action: none;
   }
 #whiteBoard{
     height: 100%;
@@ -14,10 +15,17 @@ body, html {
     top: 100px;
     left:200px;
 }
+
 #toolBar{
+    user-select: none;
     width: 100px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
+
 canvas{
+    user-select: none;
     height: 100%;
     width: 100%;
     background-color: whitesmoke;
