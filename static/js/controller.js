@@ -43,12 +43,14 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        
+        if ((localStorage.getItem("signedIn") == "") || (localStorage.getItem("signedIn") == null)) {
+            localStorage.setItem("signedIn", "**You must be signed in to create save**");
+            window.location.href = '/login.html';
+        }
         let name = document.querySelector("#saveName").value || "";
         if (name !== ""){
             api.saveBoard(strokes, name);
         }
-
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {

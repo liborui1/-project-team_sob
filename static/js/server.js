@@ -44,7 +44,7 @@
             });
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
-                let id = document.querySelector('#serverKey').value;
+                let id = document.querySelector('#serverKey').value.trim();
                 alert(id);
                 window.location.href = '/drawshare.html?lobby=' + id;
             });
