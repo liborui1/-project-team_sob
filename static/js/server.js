@@ -8,6 +8,7 @@
             userInfo.className = "userInfo";
             let headerbtn = document.createElement("div");
             if (username) {
+                headerbtn.className = "headerbtn";
                 headerbtn.innerHTML = "Welcome " + username;
             } else {
                 headerbtn.className = "headerbtn";
