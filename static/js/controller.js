@@ -118,6 +118,7 @@ window.onload = (function() {
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
+        console.log(data)
         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
