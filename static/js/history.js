@@ -1,7 +1,7 @@
 (function(){
     "use strict";
     window.addEventListener('load', function() {
-        if ((localStorage.getItem("signedIn") == "") || (localStorage.getItem("signedIn") == null)) {
+        if ((localStorage.getItem("signedIn") != "")) {
             localStorage.setItem("signedIn", "**You must be signed in to load save**");
             window.location.href = '/login.html';
         }

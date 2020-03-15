@@ -18,6 +18,13 @@ window.onload = (function() {
     let currentLobbyName = '';
     let currentScale = 1;
     localStorage.removeItem('lobby');
+    api.onUserUpdate(function(username){
+        if (username) {
+            localStorage.setItem("signedIn", "");
+        } else {
+            localStorage.setItem("signedIn", "not signed in");
+        }
+    });
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
             return {x, y, panX, panY, scaleFactor, color, font, isDragging};
@@ -43,7 +50,7 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        if ((localStorage.getItem("signedIn") == "") || (localStorage.getItem("signedIn") == null)) {
+        if ((localStorage.getItem("signedIn") != "")) {
             localStorage.setItem("signedIn", "**You must be signed in to create save**");
             window.location.href = '/login.html';
         }

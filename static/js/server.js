@@ -37,6 +37,7 @@
             document.querySelector("#genBoard").addEventListener('click', function(e){
                 if (username) {
                     window.location.href = '/drawshare.html';
+                    localStorage.setItem("signedIn", "");
                 } else {
                     localStorage.setItem("signedIn", "**You must be signed in to generate board**");
                     window.location.href = '/login.html';
