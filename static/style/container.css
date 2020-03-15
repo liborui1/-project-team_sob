@@ -185,7 +185,8 @@ a:hover {
   /* selected link */
   a:active {
     color: rgb(83, 132, 224);
-
+  }
+  
   .headerbtn {
     height: 20px;
     font-size: 18px;
