@@ -86,8 +86,6 @@ let api = (function(){
         send("POST", "/createLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
             // returns a custom lobby or something idk
-            console.log(res)
-
        });
     }
 
@@ -129,7 +127,6 @@ let api = (function(){
             res.forEach( function(newPeerId) {
                 let newPeer = peer.connect(newPeerId)    
                 connectedPeer.push(newPeer);
-                console.log(newPeerId)
                 // all new peers can disconnect
                     // all new peers can add to the local board
                 newPeer.on('data', function (newPeerdata){
@@ -137,11 +134,11 @@ let api = (function(){
                     // so that it only syncs with one user rather than all connecting users
                     if (!isSynced && newPeerdata.action === "initialSync"){
                         callback(newPeerdata)
-                        isSynced = true;
-                    } 
 
-                    callback(newPeerdata);
-                    
+                        isSynced = true;
+                    } else if (newPeerdata.action !== "initialSync"){
+                        callback(newPeerdata);
+                    }
                 });
                 newPeer.on('disconnect', function (){
                     removePeer(newPeer);
@@ -200,8 +197,7 @@ let api = (function(){
     };
     module.sendResyncBoard = function(data) {
         connectedPeer.forEach( function (connPeer){
-            console.log("sending reSync" + connPeer.peer)
-            connPeer.send({action: "initialSync", strokes: data})
+            connPeer.send({action: "reSync", reSync: data})
         });
     };
 

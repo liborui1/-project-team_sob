@@ -7,8 +7,6 @@
         }
         api.onHistoryUpdate(function(saves) {
             document.querySelector('#saved_list').innerHTML = '';
-            console.log(saves)
-            
             if(saves) {
                 saves.forEach(function(save, index) {
                     let box = document.createElement('button');
