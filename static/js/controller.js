@@ -52,14 +52,23 @@ window.onload = (function() {
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
+        if (currentLobbyName != "") {
+            document.querySelector("#lobbyInfo").style.visibility = "visible";
+            document.querySelector("#lobbylink").value = document.location.host + '/joinBoard/' + currentLobbyName;
+        } else {
+            document.querySelector("#lobbyInfo").style.visibility = "hidden";
+            document.querySelector("#lobbylink").value = "";
+        }
         document.querySelector('#newLobby').style.display = 'block';
     });
 
     document.querySelector('#exit').addEventListener('click',function(e) {
         document.querySelector('#newLobby').style.display = 'none';
+        document.querySelector('#copied').style.visibility = "hidden";
     });
     
     document.querySelector("#Sboard").addEventListener('click', function(e) {
+        document.querySelector('#copied').style.visibility = "hidden";
         let lobbyName = document.getElementById("boardName").value;
         let lobbyPass = '';
         document.querySelector('#newLobby').style.display = 'none';
@@ -71,6 +80,14 @@ window.onload = (function() {
         }
     });
     
+    document.querySelector('#copyLink').addEventListener('click', function(e) {
+        //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard
+        let copyText = document.querySelector("#lobbylink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        document.querySelector('#copied').style.visibility = "visible";
+    });
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
@@ -300,11 +317,11 @@ window.onload = (function() {
         canvas.width = canvasWrapper.clientWidth;
         redraw();
     });
-    document.querySelector('#shareBoard').addEventListener('click', function (e){
-        if (currentLobbyName != ""){
-            alert(document.location.host + '/joinBoard/' + currentLobbyName)
-        }
-    });
+    // document.querySelector('#shareBoard').addEventListener('click', function (e){
+    //     if (currentLobbyName != ""){
+    //         alert(document.location.host + '/joinBoard/' + currentLobbyName)
+    //     }
+    // });
 
     document.querySelector('#colorPalette').addEventListener('click', function (e){
         let id = document.querySelector('#colorId').value.trim()

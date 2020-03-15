@@ -3,6 +3,9 @@
     
     window.addEventListener('load', function(){
         api.onServerUpdate(function(username){
+            if (username) {
+                localStorage.setItem("signedIn", "");
+            }
             let header = document.querySelector("header");
             let userInfo = document.createElement("div");
             userInfo.className = "userInfo";
@@ -12,7 +15,7 @@
                 headerbtn.innerHTML = "Welcome " + username;
             } else {
                 headerbtn.className = "headerbtn";
-                headerbtn.innerHTML = "SignIn / SignOut";
+                headerbtn.innerHTML = "Sign In / Sign Up";
             }
             userInfo.append(headerbtn);
             header.append(userInfo);
@@ -32,7 +35,12 @@
             
 
             document.querySelector("#genBoard").addEventListener('click', function(e){
-                window.location.href = '/drawshare.html';
+                if (username) {
+                    window.location.href = '/drawshare.html';
+                } else {
+                    localStorage.setItem("signedIn", "**You must be signed in to generate board**");
+                    window.location.href = '/login.html';
+                }
             });
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
@@ -42,6 +50,7 @@
             });
 
             headerbtn.addEventListener('click', function (e) {
+                localStorage.setItem("signedIn", "");
                 window.location.href = '/login.html';
             });
         });

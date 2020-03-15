@@ -42,6 +42,9 @@
         document.querySelector('form').addEventListener('submit', function(e){
             e.preventDefault();
         });
+        if (localStorage.getItem("signedIn") != "") {
+            this.document.querySelector("#warning").innerHTML = localStorage.getItem("signedIn");
+        }
     });
 }());
 
