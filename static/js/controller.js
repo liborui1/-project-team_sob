@@ -200,6 +200,7 @@ window.onload = (function() {
             let newY = e.pageY - this.offsetTop;
             if (currentAction === "draw"){
                 paint = true;
+                currentFont = 5;
                 addPoint(newX , newY, false);
             } else if (currentAction === "move"){
                 lastClick = {x:newX, y: newY};
@@ -208,6 +209,7 @@ window.onload = (function() {
             } else if (currentAction === "erase") {
                 paint = true;
                 currentColor = "#F5F5F5";
+                currentFont = 50;
                 addPoint(newX , newY, false);
             }
             redraw();
