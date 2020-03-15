@@ -62,6 +62,10 @@ window.onload = (function() {
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
+        if ((localStorage.getItem("signedIn") != "")) {
+            localStorage.setItem("signedIn", "**You must be signed in to create lobby**");
+            window.location.href = '/login.html';
+        }
         if (currentLobbyName != "") {
             document.querySelector("#lobbyInfo").style.visibility = "visible";
             document.querySelector("#lobbylink").value = document.location.host + '/joinBoard/' + currentLobbyName;
@@ -92,11 +96,12 @@ window.onload = (function() {
     
     document.querySelector('#copyLink').addEventListener('click', function(e) {
         //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard
+        document.querySelector('#copied').style.visibility = "visible";
         let copyText = document.querySelector("#lobbylink");
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        document.querySelector('#copied').style.visibility = "visible";
+        
     });
    
     let onIncommingData = function(data){
