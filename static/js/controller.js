@@ -55,10 +55,11 @@ window.onload = (function() {
             localStorage.setItem("signedIn", "**You must be signed in to create save**");
             window.location.href = '/login.html';
         }
-        let name = document.querySelector("#saveName").value || "";
-        if (name !== ""){
-            api.saveBoard(strokes, name);
-        }
+        // let name = document.querySelector("#saveName").value || "";
+        // if (name !== ""){
+        //     api.saveBoard(strokes, name);
+        // }
+        document.querySelector('#newSave').style.display = 'block';
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
@@ -94,6 +95,17 @@ window.onload = (function() {
         }
     });
     
+    document.querySelector('#exitS').addEventListener('click',function(e) {
+        document.querySelector('#newSave').style.display = 'none';
+    });
+    
+    document.querySelector("#saveB").addEventListener('click', function(e) {
+        document.querySelector('#newSave').style.display = 'none';
+        let name = document.querySelector("#saveName").value || "";
+        if (name !== ""){
+            api.saveBoard(strokes, name);
+        }
+    });
     document.querySelector('#copyLink').addEventListener('click', function(e) {
         //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard
         document.querySelector('#copied').style.visibility = "visible";
