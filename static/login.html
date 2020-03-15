@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <title>Drawshare</title>
-    <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <link href="style/container.css" rel="stylesheet" type="text/css"/>
  
 </head>
 <body>
@@ -13,18 +13,15 @@
     
     <p id="error_box"></p>
     
-    <form class="addimage_form">
-      <input type="text" name="username" class="form_element" placeholder="Enter a username" required/>
-      <input type="password" name="password" class="form_element" placeholder="Enter a password" required/>
-      <div>
+    <form class="login_form">
+      <input type="text" name="username" class="login_input" placeholder="Enter a username" required/>
+      <input type="password" name="password" class="login_input" placeholder="Enter a password" required/>
+      <div class="login_buttons">
           <button id="signin" name="action" class="btn">Sign in</button>
-           <button id="signup" name="action" class="btn">Sign up</button>
-        </div>
+          <button id="signup" name="action" class="btn">Sign up</button>
+      </div>
     </form>
     
-    <footer>
-        <a class="credits" href='/credits.html'>Credits</a>
-    </footer>
     <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/login.js"></script>
