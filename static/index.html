@@ -3,17 +3,33 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>BoardShare</title>
-    <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <title>Drawshare</title>
+    <link href="style/container.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-    <header>
-        <h3 id="title">BoardShare</h3>
+    <header id="header">
+        <a href="/" id="title">Drawshare</a>
     </header>
+        
+    <div id = "serverBox">
+        <form class="large_container" id="user_input">
+            <!-- <div class = "twin_container" id="generate">
+                <div class="btn" id="genBoard">Generate Board</div>
+            </div>
+            <div class = "twin_container" id="join">
+                <input class="desplay_container" id="serverKey">
+                <div class="btn" id="joinBoard">Join</div>
+            </div> -->
+        </form>
+    </div>
 
-    <a href="/login.html" id="signin_button" class="img_btn show_hide_btn">Sign in or Sign up</a>
-    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
-    <script src="js/api.js"></script>
+
 
 </body>
+<footer>
+    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+    <script src="js/server.js"></script>
+    <script src="js/api.js"></script>
+    
+</footer>
 </html>
