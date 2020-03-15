@@ -232,7 +232,6 @@ peerserver.on('disconnect', (client) => {
             lobby.connectedPeers.forEach (function (connId){
                 if (connId !== client) newConnections.push(connId)
             })
-            console.log(newConnections)
             if (newConnections.length == 0){
                 //delete unused lobby
                 lobbies.remove({_id: lobby._id}, {},function(err, res){
@@ -243,7 +242,6 @@ peerserver.on('disconnect', (client) => {
             }
         });
     })
-    console.log(client)
 });
 
 app.use(options.path, peerserver);

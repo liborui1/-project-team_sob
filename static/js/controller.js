@@ -18,11 +18,12 @@ window.onload = (function() {
     let currentLobbyName = '';
     let currentScale = 1;
     localStorage.removeItem('lobby');
-   let Point = (function(){
-        return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
-            return {x, y, panX, panY, scaleFactor, color, font, isDragging};
-        };
-    }());
+    let isLoad = false;
+    let Point = (function(){
+            return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
+                return {x, y, panX, panY, scaleFactor, color, font, isDragging};
+            };
+        }());
  
 
     let addPoint = function(x, y, dragging){
@@ -48,7 +49,6 @@ window.onload = (function() {
         if (name !== ""){
             api.saveBoard(strokes, name);
         }
-
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
@@ -74,14 +74,19 @@ window.onload = (function() {
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        if (data.action === "initialSync"){
+        if (isLoad){
+            isLoad = false
+            // if we want to load in strokes to everyone else, then wait for the initialsync and reload
+            api.sendResyncBoard(strokes)
+        } else if (data.action === "initialSync"){
             strokes = data.initialSync
+        } else if (data.action === "reSync"){
+            strokes = data.reSync
         } else if (data.action === "removeStrokes"){
             
             checkedData.forEach(function (stroke) {
                 removeStroke(stroke);
             });
-
         } else if (data.action === "addStrokes"){
             checkedData.forEach(function (stroke) {
                 strokes.splice(strokes.length - 1, 0 , stroke )
@@ -99,7 +104,6 @@ window.onload = (function() {
         let index = strokes.findIndex( function (item) {
             return  JSON.stringify(item) === JSON.stringify(stroke);
         });
-        console.log(index)
         if (index !== -1) strokes.splice(index, 1);
 
         if (strokes.length === 0) strokes.push([])
@@ -111,7 +115,6 @@ window.onload = (function() {
             let mostRecentStroke = lastStrokes[lastStrokes.length - 1];
             lastStrokes.splice(lastStrokes.length - 1, 1)
             api.sendRemoveStrokes([mostRecentStroke]);
-            
             removeStroke(mostRecentStroke);
         }
     };
@@ -124,8 +127,7 @@ window.onload = (function() {
                 strokes = save.boardData
                 redraw();
             });
-            // 
-            api.sendResyncBoard(save.boardData);
+            isLoad = true;
             localStorage.removeItem('loadSave');
             localStorage.removeItem('lobby');
         }
