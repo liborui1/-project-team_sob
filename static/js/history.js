@@ -1,7 +1,10 @@
 (function(){
     "use strict";
     window.addEventListener('load', function() {
-
+        if ((localStorage.getItem("signedIn") != "")) {
+            localStorage.setItem("signedIn", "**You must be signed in to load save**");
+            window.location.href = '/login.html';
+        }
         api.onHistoryUpdate(function(saves) {
             document.querySelector('#saved_list').innerHTML = '';
             if(saves) {

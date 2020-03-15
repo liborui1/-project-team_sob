@@ -14,14 +14,19 @@
         });
         
         api.onUserUpdate(function(username){
-            if (username) window.location.href = '/index.html';
+            if (username) {
+                window.location.href = '/index.html';
+                localStorage.setItem("username", username);
+            } else {
+                localStorage.setItem("username", "");
+            }
         });
         
         function submit(){
 
             if (document.querySelector("form").checkValidity()){
-                let username = document.querySelector("form [name=username]").value;
-                let password =document.querySelector("form [name=password]").value;
+                let username = document.querySelector("form [name=username]").value.trim();
+                let password =document.querySelector("form [name=password]").value.trim();
                 let action =document.querySelector("form [name=action]").value;
                 api[action](username, password, function(err){
                     if (err) document.querySelector('.error_box').innerHTML = err;
@@ -42,6 +47,9 @@
         document.querySelector('form').addEventListener('submit', function(e){
             e.preventDefault();
         });
+        if (localStorage.getItem("signedIn") != "") {
+            this.document.querySelector("#warning").innerHTML = localStorage.getItem("signedIn");
+        }
     });
 }());
 

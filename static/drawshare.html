@@ -13,36 +13,37 @@
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
         <div class="draw-icon icon" id="draw" ></div>
-       
+        <div class="erase-icon icon" id="erase" ></div>
         <div class="move-icon icon" id="move" ></div>
         <div class="share-icon icon" id = "move2"></div>
         <div class="popup" id="newLobby">
-            <p>Create Name of Board:</p>
-            <input id ="boardName">
+            <div id = "lobbyInfo">
+                <p>Current Lobby Link:</p> <p id="copied" class="inform">Copied</p>
+                <div class ="row">
+                    <input id="lobbylink" class="textBox" disabled>
+                    <div class="copy-icon icon-small" id="copyLink"></div>
+                </div>
+            </div>
+            <p>Create New Lobby:</p>
+            <input id ="boardName" class ="textBox">
             <div class ="confirm">
-            <div class = "smlbtn" id="Sboard">Share Board</div>
-            <div class = "smlbtn" id="exit">Cancel</div>
+                <div class = "smlbtn" id="Sboard">Share Board</div>
+                <div class = "smlbtn" id="exit">Cancel</div>
             </div>
         </div>
+        <!-- <p id="peerIddisplay"></p> -->
+        <!-- <button id = "shareBoard"> Link Button </button> -->
         <p id="peerIddisplay"></p>
-        <button id = "shareBoard"> Link Button </button>
-        <!-- <textarea id="lobbyName"></textarea>
-        <textarea id="lobbyPass"></textarea>
-        <button id = "createLobby"> CreateLobby </button> -->
-        
-        <!-- <textarea id="connectlobbyName"></textarea>
-        <textarea id="connectlobbyPass"></textarea>
-        <button id = "connectbtn"> connectToLobby </button> -->
         <div class="download-icon icon" id="dload" ></div>
         <div class="upload-icon icon" id="upload" ></div>
         <textarea id="saveName"></textarea>
         <div class="save-icon icon" id="save" ></div>
-        <a href="/history.html" class="load-icon icon" id="load"></a>
+        <a href="/history.html"><div class="load-icon icon" id="load"> </div></a>
         <div class="color-icon icon" id="colorId"></div>
         <div class="palette" id="colorPalette"></div>
         <div class="icon-large" id="color"></div>
         <div class="home-icon icon" id="home"></div>
-        <a href="/signout/" id="signout_button" class="signout-icon icon"></a>
+        <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
     </div>
     <div id= "whiteBoard">
         <canvas  tabindex='1'></canvas>
