@@ -17,6 +17,7 @@ window.onload = (function() {
     let currentColor = "#000000";
     let currentLobbyName = '';
     let currentScale = 1;
+    localStorage.removeItem('lobby');
    let Point = (function(){
         return function point(x, y, panX, panY, scaleFactor, color, font, isDragging){
             return {x, y, panX, panY, scaleFactor, color, font, isDragging};
@@ -47,6 +48,7 @@ window.onload = (function() {
         if (name !== ""){
             api.saveBoard(strokes, name);
         }
+
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
@@ -67,7 +69,6 @@ window.onload = (function() {
             localStorage.setItem('lobby', lobbyName);
             api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass);
         }
-        
     });
     
    
@@ -114,17 +115,19 @@ window.onload = (function() {
             removeStroke(mostRecentStroke);
         }
     };
-
+    
     let loadSave = function (){
         if (localStorage.getItem('loadSave')){
             let loadIndex = localStorage.getItem('loadSave');
+            //get saved strijes
             api.onLoadSave( loadIndex, function (save){
                 strokes = save.boardData
                 redraw();
             });
+            // 
             api.sendResyncBoard(save.boardData);
-            localStorage.removeItem('loadSave')
-            localStorage.removeItem('lobby')
+            localStorage.removeItem('loadSave');
+            localStorage.removeItem('lobby');
         }
     }
 
