@@ -9,15 +9,18 @@
             let header = document.querySelector("header");
             let userInfo = document.createElement("div");
             userInfo.className = "userInfo";
-            let headerbtn = document.createElement("div");
             if (username) {
-                headerbtn.className = "headerbtn";
-                headerbtn.innerHTML = "Welcome " + username;
+                userInfo.innerHTML = "Welcome " + username;
+                let signout = document.createElement("div");
+                signout.className = "signout";
+                signout.innerHTML = "Sign Out";
+                signout.addEventListener("click", function (e) {
+                    window.location.href = '/signout/';
+                });
+                header.append(signout);
             } else {
-                headerbtn.className = "headerbtn";
-                headerbtn.innerHTML = "Sign In / Sign Up";
+                userInfo.innerHTML = "Sign In / Sign Up";
             }
-            userInfo.append(headerbtn);
             header.append(userInfo);
             document.querySelector("#user_input").innerHTML = "";
             let createJ = document.createElement('div');
@@ -50,7 +53,7 @@
                 window.location.href = '/drawshare.html?lobby=' + id;
             });
 
-            headerbtn.addEventListener('click', function (e) {
+            userInfo.addEventListener('click', function (e) {
                 localStorage.setItem("signedIn", "");
                 window.location.href = '/login.html';
             });

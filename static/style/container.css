@@ -201,15 +201,7 @@ a:link {
 /* selected link */
 /* a:active {
     color: rgb(83, 132, 224);
-} */ */
-
-.headerbtn {
-    height: 20px;
-    font-size: 18px;
-    display: flex;
-    text-align: center;
-}
-
+} */ 
 .userInfo:hover {
     background-color: gray;
     cursor: pointer;
@@ -224,6 +216,23 @@ a:link {
     padding: 5px 15px 5px 15px;
     border-radius: 5px;
     border:2px solid #000000;
+}
+
+.signout:hover {
+    background-color: gray;
+    cursor: pointer;
+}
+
+.signout {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 45px;
+    right: 15px;
+    padding: 5px 15px 5px 15px;
+    border-radius: 5px;
+    border:2px solid #000000;
+    margin-top: 5px;
 }
 
 .warning {
