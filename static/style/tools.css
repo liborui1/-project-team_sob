@@ -95,3 +95,8 @@
     background-image: url('../media/copy.png');
     background-size: cover;
 }
+.erase-icon{
+    cursor: pointer;
+    background-image: url('../media/eraser.png');
+    background-size: cover;
+}

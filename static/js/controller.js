@@ -178,6 +178,10 @@ window.onload = (function() {
                 lastClick = {x:newX, y: newY};
                 prevPan = {panX, panY};
                 move = true;
+            } else if (currentAction === "erase") {
+                paint = true;
+                currentColor = "#F5F5F5";
+                addPoint(newX , newY, false);
             }
             redraw();
         };
@@ -306,6 +310,9 @@ window.onload = (function() {
     document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
         currentAction = "draw";
+    });
+    document.querySelector('#erase').addEventListener('click', function (e){
+        currentAction = "erase";
     });
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move";
