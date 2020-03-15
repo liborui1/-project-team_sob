@@ -188,44 +188,67 @@ let api = (function(){
 
     module.sendStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
-            console.log("sending Add" + connPeer.peer)
             connPeer.send({action: "addStrokes", strokes: data})
         });
     };
 
     module.sendRemoveStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
-            console.log("sending remove" + connPeer.peer)
+
             connPeer.send({action: "removeStrokes", strokes: data})
         });
     };
-
-
-    module.storeImageURI = function(imageURI, groupName = "testGroup1") {
-        localData.groupName = groupName;
-        send("POST", "/api/imageURI/", {imageURI: imageURI, groupName: groupName}, function (err,image){
-            if (err) return notifyErrorListeners("Image was unable to be added");
-            localData.groupName = image.groupName;
+    module.sendResyncBoard = function(data) {
+        connectedPeer.forEach( function (connPeer){
+            console.log("sending reSync" + connPeer.peer)
+            connPeer.send({action: "initialSync", strokes: data})
         });
     };
 
-    //History
 
-    let getHistory = function(groupName, callback) {
-        send("GET", "/api/imageURI/" + groupName + "/", null, callback);
+    module.saveBoard = function(boardData, boardName) {
+        send("POST", "/api/saveboard/", {boardData, name: boardName}, function (err,res){
+            if (err) return notifyErrorListeners("Board was unable to be added");
+            alert(res);
+        });
     };
+    let loadSaveListener = [];
+
+    function notifyLoadSaveListeners(){
+        loadSaveListener.forEach(function(handler){
+            getSave(handler);
+        });
+    }
+
+    let getSave = function(index, callback){
+        send("GET", "/api/saveboard/" + index, null, callback);
+    } 
+ 
+    module.onLoadSave = function(index, handler){
+        historyListeners.push(handler);
+        getSave(index, function (err, save){
+            if (err) return notifyErrorListeners(err);
+            handler(save);
+        });
+    }
+ 
+    let getAllSaves= function(callback) {
+        send("GET", "/api/boadnames/", null, callback);
+    };
+
     let historyListeners = [];
 
-    function notifyHistoryListeners(groupName){
+    function notifyHistoryListeners(){
         historyListeners.forEach(function(handler){
-            handler(groupName);
+            
+            handler();
         });
     }
 
     module.onHistoryUpdate = function(handler){
         historyListeners.push(handler);
        // if ((localData.groupName != "") && (localData.groupName != null)) {
-            getHistory("testGroup1",function(err, saves) {
+        getAllSaves(function(err, saves) {
                 if (err) return notifyErrorListeners(err);
                 if (saves) {
                     handler(saves);

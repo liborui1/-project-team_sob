@@ -42,8 +42,11 @@ window.onload = (function() {
     });
 
     document.querySelector('#save').addEventListener('click', function (e){
-        let dataURI = canvas.toDataURL('image/png', 1.0);
-        api.storeImageURI(dataURI, "testGroup1");
+        
+        let name = document.querySelector("#saveName").value || "";
+        if (name !== ""){
+            api.saveBoard(strokes, name);
+        }
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
@@ -61,6 +64,7 @@ window.onload = (function() {
         document.querySelector("#lobbyName").innerHTML = lobbyName;
         if (lobbyName !== '') {
             currentLobbyName = lobbyName;
+            localStorage.setItem('lobby', lobbyName);
             api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass);
         }
         
@@ -110,6 +114,20 @@ window.onload = (function() {
             removeStroke(mostRecentStroke);
         }
     };
+
+    let loadSave = function (){
+        if (localStorage.getItem('loadSave')){
+            let loadIndex = localStorage.getItem('loadSave');
+            api.onLoadSave( loadIndex, function (save){
+                strokes = save.boardData
+                redraw();
+            });
+            api.sendResyncBoard(save.boardData);
+            localStorage.removeItem('loadSave')
+            localStorage.removeItem('lobby')
+        }
+    }
+
 
     let prepareCanvas = function(){
         canvas = document.querySelector('#whiteBoard > canvas');
@@ -238,7 +256,7 @@ window.onload = (function() {
         redraw();
     })
   
-
+    loadSave();
     prepareCanvas();
 
     // https://html-online.com/articles/get-url-parameters-javascript/
@@ -258,6 +276,7 @@ window.onload = (function() {
         strokes = [[]];
         if (lobbyName !== '') {
             currentLobbyName = lobbyName
+            localStorage.setItem('lobby', lobbyName);
             api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
         }
     }
@@ -292,6 +311,9 @@ window.onload = (function() {
          }
              document.querySelector('#color').style.background = id;
     });
+
+
+
 
 
 

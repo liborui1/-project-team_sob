@@ -21,7 +21,7 @@ const options = {
 let users = new Datastore({ filename: 'db/users.db', autoload: true, timestampData : true });
 let imageDB = new Datastore({ filename: './db/images.db', autoload: true, timestampData : true });
 let lobbies = new Datastore({ filename: 'db/lobbies.db', autoload: true, timestampData : true });
-let userinlobbies = new Datastore({ filename: 'db/userinlobbies.db', autoload: true, timestampData : true });
+let userSaves = new Datastore({ filename: 'db/userSaves.db', autoload: true, timestampData : true });
  
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -74,6 +74,9 @@ app.post('/signup/', function (req, res, next) {
         let hash = crypto.createHmac('sha512', salt);
         hash.update(password);
         let saltedHash = hash.digest('base64');
+        userSaves.update({_id: username},{_id: username,  savedBoards: []}, {upsert: true}, function(err){
+            if (err) return res.status(500).end(err);
+        });
         users.update({_id: username},{_id: username, password: saltedHash, salt: salt}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             res.setHeader('Set-Cookie', cookie.serialize('username', username, {
@@ -172,21 +175,40 @@ app.get('/joinBoard/:id', function (req, res, next) {
     res.redirect('/drawshare.html?lobby=' + req.params.id)
 });
 
-app.post('/api/imageURI/', function(req,res, next){
-    imageDB.insert(new Image(req.body), function (err, img) {
-        if (err) return res.status(500).end("unable to post image");
-        return res.json(img);
+app.post('/api/saveboard/', isAuthenticated, function (req, res, next) {
+    console.log(req.session.user._id)
+    let username = req.session.user._id;
+    userSaves.findOne({_id: username}, function(err, user){
+        if (err) return res.status(500).end(err);
+
+            // boards saved with names
+        user.savedBoards.push({name : req.body.name, boardData: req.body.boardData});
+
+        userSaves.update({_id: username},{_id: username,  savedBoards: user.savedBoards}, function(err){
+            if (err) return res.status(500).end(err);
+            res.json("Board saved")
+        });
     });
 });
 
-app.get('/api/imageURI/:groupName/', function(req, res, next){
-    imageDB.find({groupName: req.params.groupName}, function (err, img){
-        if (err) return res.status(500).end("unable to get image");
-        
-        return res.json(img);
+app.get('/api/saveboard/:index', isAuthenticated, function (req, res, next) {
+    userSaves.findOne({_id: req.session.user._id}, function(err, user){
+        if (err) return res.status(500).end(err);
+        console.log(parseInt(req.params.index))
+        res.json(user.savedBoards[parseInt(req.params.index)])
     });
 });
 
+app.get('/api/boadnames/', isAuthenticated, function (req, res, next) {
+    userSaves.findOne({_id: req.session.user._id}, function(err, user){
+        if (err) return res.status(500).end(err);
+        let bname = [];
+        user.savedBoards.forEach(function (item){
+            bname.push(item.name);
+        });
+        res.json(bname)
+    });
+});
  
  
  // Change to Https with certificate, ask how to get certificate
