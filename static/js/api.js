@@ -122,9 +122,8 @@ let api = (function(){
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
         send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
-            let isSynced = false;
-
-            res.forEach( function(newPeerId) {
+ 
+            res.forEach( function(newPeerId, index) {
                 let newPeer = peer.connect(newPeerId)    
                 connectedPeer.push(newPeer);
                 // all new peers can disconnect
@@ -132,18 +131,21 @@ let api = (function(){
                 newPeer.on('data', function (newPeerdata){
                     let initialSync = newPeerdata.initialSync;
                     // so that it only syncs with one user rather than all connecting users
-                    if (!isSynced && newPeerdata.action === "initialSync"){
+                    
+                    if (index === res.length - 1 && newPeerdata.action === "initialSync"){
                         callback(newPeerdata)
-
-                        isSynced = true;
+                      
                     } else if (newPeerdata.action !== "initialSync"){
                         callback(newPeerdata);
                     }
+                    console.log(newPeerdata.action)
                 });
                 newPeer.on('disconnect', function (){
                     removePeer(newPeer);
                 });
             });
+
+            
        });
     }
 
