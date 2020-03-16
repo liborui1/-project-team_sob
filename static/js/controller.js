@@ -280,9 +280,13 @@ window.onload = (function() {
                 let pointA = currentStroke[j]
                 let pointB = currentStroke[j - 1]
                 if(pointA.isDragging){
-                   
+                   if (pointB){
                     context.moveTo(pointB.x - panX, pointB.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
+                   } else{
+                       console.log()
+                   }
+               
                 } else {
                     context.moveTo(pointA.x - panX, pointA.y - panY);
                     context.lineTo(pointA.x - panX, pointA.y - panY);
