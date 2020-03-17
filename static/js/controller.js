@@ -223,9 +223,11 @@ window.onload = (function() {
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
             if(paint){
-               addPoint(newX, newY, true);
-               draw(strokes[strokes.length - 1])
-               api.sendStrokes([strokes[strokes.length - 1]]);
+                let lastStroke = strokes[strokes.length - 1];
+                let lastPoint = lastStroke[lastStroke.length - 1];
+                let newPoint = addPoint(newX, newY, true);
+               draw([lastPoint, newPoint])
+               api.sendStrokes([[lastPoint, newPoint]]);
             } else if (move){
                 panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
