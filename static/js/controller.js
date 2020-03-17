@@ -36,6 +36,7 @@ window.onload = (function() {
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(x/currentScale + panX, y/currentScale + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
         strokes[strokes.length - 1].push(singlePoint);
+        return singlePoint;
     };
 
     document.querySelector('#dload').addEventListener('click', function (){
@@ -118,26 +119,29 @@ window.onload = (function() {
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        console.log(data)
+        console.log(data) 
         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
             api.sendResyncBoard(strokes)
         } else if (data.action === "initialSync"){
             strokes = data.initialSync
+            redraw();
         } else if (data.action === "reSync"){
             strokes = data.reSync
+            redraw();
         } else if (data.action === "removeStrokes"){
-            
             checkedData.forEach(function (stroke) {
                 removeStroke(stroke);
+                redraw();
             });
         } else if (data.action === "addStrokes"){
             checkedData.forEach(function (stroke) {
-                strokes.splice(strokes.length - 1, 0 , stroke )
+                strokes.splice(strokes.length - 1, 0 , stroke );
+            
+                draw(stroke);
             })
         }
-        redraw();
     }
 
 
@@ -220,8 +224,8 @@ window.onload = (function() {
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
             if(paint){
-                addPoint(newX, newY, true);
-                redraw();
+               addPoint(newX, newY, true);
+               draw(strokes[strokes.length - 1])
             } else if (move){
                 panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
@@ -245,7 +249,7 @@ window.onload = (function() {
 
             lastStrokes.push(lastStroke)
             strokes.push([])
-            redraw();
+          
         };
 
         canvas.onmouseleave = function(e){
@@ -269,7 +273,6 @@ window.onload = (function() {
         clearCanvas();
         context.lineJoin = "round";
         context.lineCap = "round";
-   
         context.lineWidth = 5 ;
    
         for(let i=0; i < strokes.length; i++){
@@ -296,6 +299,35 @@ window.onload = (function() {
                 context.strokeStyle = pointA.color;
                 context.stroke();
             }
+        }
+    };
+    let draw = function(stroke){
+  
+        context.lineJoin = "round";
+        context.lineCap = "round";
+        context.lineWidth = 5 ;
+        let currentStroke = stroke;
+
+        for(let j=0; j < currentStroke.length; j++){
+            context.beginPath();
+            let pointA = currentStroke[j]
+            let pointB = currentStroke[j - 1]
+            if(pointA.isDragging){
+               if (pointB){
+                context.moveTo(pointB.x - panX, pointB.y - panY);
+                context.lineTo(pointA.x - panX, pointA.y - panY);
+               } else{
+                   console.log()
+               }
+           
+            } else {
+                context.moveTo(pointA.x - panX, pointA.y - panY);
+                context.lineTo(pointA.x - panX, pointA.y - panY);
+            }
+            context.lineWidth = pointA.font;
+            context.closePath();
+            context.strokeStyle = pointA.color;
+            context.stroke();
         }
     };
 
