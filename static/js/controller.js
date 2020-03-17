@@ -138,7 +138,6 @@ window.onload = (function() {
         } else if (data.action === "addStrokes"){
             checkedData.forEach(function (stroke) {
                 strokes.splice(strokes.length - 1, 0 , stroke );
-            
                 draw(stroke);
             })
         }
@@ -226,6 +225,7 @@ window.onload = (function() {
             if(paint){
                addPoint(newX, newY, true);
                draw(strokes[strokes.length - 1])
+               api.sendStrokes([strokes[strokes.length - 1]]);
             } else if (move){
                 panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
