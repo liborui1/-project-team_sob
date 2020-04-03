@@ -2,6 +2,8 @@ window.onload = (function() {
     "use strict";
 
     const SCALEFACTOR = 1.1;
+    const MAXSCALEFACTOR = 100*SCALEFACTOR;
+    const MINSCALEFACTOR =  SCALEFACTOR/100;
     let canvas;
     let context;
     let strokes = [[]]; // xy pan zoom
@@ -119,7 +121,9 @@ window.onload = (function() {
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        console.log(data) 
+        console.log( "------------------Incomming----------------- "   ) 
+        console.log( "Incomming data Length: " + (checkedData.length)  ) 
+        console.log( "Incomming data : " +  (data)) 
         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
@@ -132,7 +136,7 @@ window.onload = (function() {
             redraw();
         } else if (data.action === "removeStrokes"){
             checkedData.forEach(function (stroke) {
-                removeStroke(stroke);
+                removeIncommingStroke(stroke);
                 redraw();
             });
         } else if (data.action === "addStrokes"){
@@ -147,13 +151,38 @@ window.onload = (function() {
     let sendSyncData = function(){
         return strokes
     }
+    // Incomming data is formatted different than local data therefore to parse it we use a different remove function
+    let removeIncommingStroke = function (stroke){
+        let i = 0;
+        while (i < strokes.length){
+            // find the stroke and delete it
+             if (stroke.length === 0){
+                break;
+            // if the segment of the stroke is found then remove it and continue
+             } else if ( JSON.stringify(strokes[i]) === JSON.stringify(stroke[0])){
+                strokes.splice(i, 1);
+                stroke.splice(0, 1);
+                // accomidate for shift after splicing
+                i--;
+             }
+            i++;
+        }
+        if (strokes.length === 0) strokes.push([])
+        redraw();
+    }
  
-    let removeStroke = function (stroke){
-        let index = strokes.findIndex( function (item) {
-            return  JSON.stringify(item) === JSON.stringify(stroke);
-        });
-        if (index !== -1) strokes.splice(index, 1);
-
+    let removeStrokeLocal = function (stroke){
+        let i = 0;
+        while (i < strokes.length){
+            // find the stroke and delete it
+             if (stroke.length === 0){
+                break;
+            // if the segment of the stroke is found then remove it and continue
+             } else if ( strokes[i] === stroke){
+                strokes.splice(i, 1);
+             }
+             i++;
+        }
         if (strokes.length === 0) strokes.push([])
         redraw();
     }
@@ -162,8 +191,15 @@ window.onload = (function() {
         if (lastStrokes.length !== 0){
             let mostRecentStroke = lastStrokes[lastStrokes.length - 1];
             lastStrokes.splice(lastStrokes.length - 1, 1)
-            api.sendRemoveStrokes([mostRecentStroke]);
-            removeStroke(mostRecentStroke);
+            // package Local Stroke into expected stroke for the peer
+            let packagedStroke = []
+            for (let i = 0; i < mostRecentStroke.length; i++){
+                if (mostRecentStroke[i+1] !== null){
+                    packagedStroke.push([mostRecentStroke[i],  mostRecentStroke[i+1]]);
+                }
+            }
+            api.sendRemoveStrokes([packagedStroke]);
+            removeStrokeLocal(mostRecentStroke);
         }
     };
     
@@ -205,7 +241,9 @@ window.onload = (function() {
             if (currentAction === "draw"){
                 paint = true;
                 currentFont = 5;
-                addPoint(newX , newY, false);
+                // send dot
+                api.sendStrokes([[addPoint(newX , newY, false), addPoint(newX , newY, false)]]);
+
             } else if (currentAction === "move"){
                 lastClick = {x:newX, y: newY};
                 prevPan = {panX, panY};
@@ -223,8 +261,9 @@ window.onload = (function() {
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
             if(paint){
-                let lastStroke = strokes[strokes.length - 1];
-                let lastPoint = lastStroke[lastStroke.length - 1];
+                // send bit by bit
+                let prevStroke = strokes[strokes.length - 1];
+                let lastPoint = prevStroke[prevStroke.length - 1];
                 let newPoint = addPoint(newX, newY, true);
                draw([lastPoint, newPoint])
                api.sendStrokes([[lastPoint, newPoint]]);
@@ -237,20 +276,12 @@ window.onload = (function() {
         canvas.onmouseup = function(e){
             paint = false;
             move = false;
-            // pushes a new empty stroke
             let lastStroke = strokes[strokes.length - 1]
-            if (lastStroke.length !== 0){
-                let lastPoint = lastStroke[lastStroke.length-1]
-                // clone last point
-                lastStroke.push({...lastPoint})
-                // set last point dragging to false
-                lastStroke[lastStroke.length-1].isDragging = false
+            // only add last stroke if we're drawing
+            if (currentAction === "draw"){
+                lastStrokes.push(lastStroke)
+                strokes.push([]);
             }
-            // send to all users the last stroke made
-            api.sendStrokes([lastStroke]);
-
-            lastStrokes.push(lastStroke)
-            strokes.push([])
           
         };
 
@@ -260,17 +291,20 @@ window.onload = (function() {
         };
 
         canvas.addEventListener("wheel", function(e){
-            if (event.deltaY < 0){
-                context.scale(SCALEFACTOR, SCALEFACTOR)
-                currentScale =  SCALEFACTOR * currentScale
-            }else if (event.deltaY > 0) {
-                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR)
-                currentScale =  1/SCALEFACTOR * currentScale
+            // Zoom out
+            if (event.deltaY < 0 && currentScale < MAXSCALEFACTOR){
+                context.scale(SCALEFACTOR, SCALEFACTOR);
+                currentScale =  SCALEFACTOR * currentScale;
+            //Zoom In
+            }else if (event.deltaY > 0 && currentScale > MINSCALEFACTOR) {
+                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
+                currentScale =  1/SCALEFACTOR * currentScale;
             }
+ 
             redraw();
         });
     };
-
+    // Redraw is constly operation to do everytime we draw, therefore we use draw instead of redraw to add on to the current canvas rather than redrawing the entire canvas
     let redraw = function(){
         clearCanvas();
         context.lineJoin = "round";
@@ -303,8 +337,8 @@ window.onload = (function() {
             }
         }
     };
+
     let draw = function(stroke){
-  
         context.lineJoin = "round";
         context.lineCap = "round";
         context.lineWidth = 5 ;
@@ -321,7 +355,6 @@ window.onload = (function() {
                } else{
                    console.log()
                }
-           
             } else {
                 context.moveTo(pointA.x - panX, pointA.y - panY);
                 context.lineTo(pointA.x - panX, pointA.y - panY);
@@ -425,8 +458,5 @@ window.onload = (function() {
         this.className += " active";
         });
     }
-
-
-
 
 }());
