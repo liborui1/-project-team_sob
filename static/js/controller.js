@@ -118,6 +118,14 @@ window.onload = (function() {
         document.execCommand("copy");
         
     });
+    document.querySelector('#clearBoard').addEventListener('click', function(e) {
+        //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard
+        // empty data
+        strokes = [[]]
+        //send new empty data
+        api.sendResyncBoard(strokes)
+        redraw();
+    });
    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
