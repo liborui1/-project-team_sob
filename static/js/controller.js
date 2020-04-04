@@ -166,7 +166,7 @@ window.onload = (function() {
         } else if (data.action === "mouseData"){
             let user = data.mouseData;
             //replace mousePosition
-            console.log( "Incomming data : " +  (JSON.stringify(user)) )
+
             userMice[user.userName] = user;
             topLayerRedraw();
         }
