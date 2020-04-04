@@ -42,7 +42,7 @@ let api = (function(){
     let getUsername = function(){
         return document.cookie.replace(/(?:(?:^|.*;\s*)username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
     };
-    
+
     function notifyUserListeners(username){
         userListeners.forEach(function(listener){
             listener(username);
@@ -191,6 +191,14 @@ let api = (function(){
         });
     };
 
+    module.sendMouseData = function(mouseDataHandler) {
+        connectedPeer.forEach( function (connPeer){
+            let userName = (getUsername() !== "")? getUsername() : peer.id;
+            let data = mouseDataHandler(userName)
+            connPeer.send({action: "mouseData", mouseData: data})
+        });
+    };
+
     module.sendRemoveStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
 
@@ -238,7 +246,6 @@ let api = (function(){
 
     function notifyHistoryListeners(){
         historyListeners.forEach(function(handler){
-            
             handler();
         });
     }
@@ -262,6 +269,7 @@ let api = (function(){
         serverListeners.push(handler);
         handler(getUsername());
     };
+ 
     return module;
 
 })();

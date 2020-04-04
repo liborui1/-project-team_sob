@@ -4,8 +4,17 @@ window.onload = (function() {
     const SCALEFACTOR = 1.1;
     const MAXSCALEFACTOR = 100*SCALEFACTOR;
     const MINSCALEFACTOR =  SCALEFACTOR/100;
+    // Top layer canvas for isolating drawing mousemovement vs drawings for better performace
+    // Redrawing all points everytime a user moves their mouse is taxing therefore layering the canvas
+    // only updates the top layer canvas while the users move their mouse
     let canvas;
     let context;
+    // TopLayers responsibilities are to pass any mouse interaction to bottom layer from localside e.g. draw action should be 
+    // drawen in the bottom layer
+    //Toplayer should also be responsible for drwaing mouse movements for users in the lobby
+    let drawingCanvasLayer;
+    let drawingContext;
+
     let strokes = [[]]; // xy pan zoom
     let lastStrokes = []
     let paint = false;
@@ -19,6 +28,8 @@ window.onload = (function() {
     let currentColor = "#000000";
     let currentLobbyName = '';
     let currentScale = 1;
+    let userMice = {};
+
     localStorage.removeItem('lobby');
     api.onUserUpdate(function(username){
         if (username) {
@@ -33,16 +44,16 @@ window.onload = (function() {
                 return {x, y, panX, panY, scaleFactor, color, font, isDragging};
             };
         }());
- 
+        
 
     let addPoint = function(x, y, dragging){
         let singlePoint = new Point(x/currentScale + panX, y/currentScale + panY, panX, panY, currentScale, currentColor, currentFont / currentScale, dragging)
         strokes[strokes.length - 1].push(singlePoint);
         return singlePoint;
     };
-
+ 
     document.querySelector('#dload').addEventListener('click', function (){
-        let dataURI = canvas.toDataURL('image/png', 0.5);
+        let dataURI = drawingCanvasLayer.toDataURL('image/png', 0.5);
         console.log(dataURI);
         let element = document.createElement('a');
         element.setAttribute('href', dataURI);
@@ -126,12 +137,12 @@ window.onload = (function() {
         api.sendResyncBoard(strokes)
         redraw();
     });
-   
+    
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        console.log( "------------------Incomming----------------- "   ) 
-        console.log( "Incomming data Length: " + (checkedData.length)  ) 
-        console.log( "Incomming data : " +  (data)) 
+        //console.log( "------------------Incomming----------------- "   ) 
+        //console.log( "Incomming data Length: " + (checkedData.length)  ) 
+       // console.log( "Incomming data : " +  (JSON.stringify(data))) 
         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
@@ -152,7 +163,14 @@ window.onload = (function() {
                 strokes.splice(strokes.length - 1, 0 , stroke );
                 draw(stroke);
             })
+        } else if (data.action === "mouseData"){
+            let user = data.mouseData;
+            //replace mousePosition
+            console.log( "Incomming data : " +  (JSON.stringify(user)) )
+            userMice[user.userName] = user;
+            topLayerRedraw();
         }
+        // MouseData
     }
 
 
@@ -227,11 +245,16 @@ window.onload = (function() {
 
 
     let prepareCanvas = function(){
-        canvas = document.querySelector('#whiteBoard > canvas');
+        canvas = document.querySelector('#whiteBoard > #canvasMouseMovements');
+        drawingCanvasLayer = document.querySelector('#whiteBoard > #canvasdrawing');
         let canvasWrapper = document.querySelector('#whiteBoard');
-        canvas = document.querySelector('#whiteBoard > canvas');
+ 
+        drawingCanvasLayer.height = canvasWrapper.clientHeight;
+        drawingCanvasLayer.width = canvasWrapper.clientWidth;
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
+        // draw on bottom layer and detect mouse activity on top layer
+        drawingContext = drawingCanvasLayer.getContext("2d");
         context = canvas.getContext("2d");
         strokes = [[]]; 
    
@@ -266,8 +289,15 @@ window.onload = (function() {
         };
 
         canvas.onmousemove = function(e){
-            let newX = e.pageX - this.offsetLeft;
-            let newY = e.pageY - this.offsetTop;
+            let newX = e.pageX - canvas.offsetLeft;
+            let newY = e.pageY - canvas.offsetTop;
+
+            let sendMouseData = function(userName){
+                return {userName: userName, mouseX:newX/currentScale + panX, mouseY: newY/currentScale + panY }
+            }
+            // give mouse data to other users so that they can track them on their end
+            api.sendMouseData(sendMouseData)
+
             if(paint){
                 // send bit by bit
                 let prevStroke = strokes[strokes.length - 1];
@@ -301,80 +331,98 @@ window.onload = (function() {
         canvas.addEventListener("wheel", function(e){
             // Zoom out
             if (event.deltaY < 0 && currentScale < MAXSCALEFACTOR){
-                context.scale(SCALEFACTOR, SCALEFACTOR);
+                drawingContext.scale(SCALEFACTOR, SCALEFACTOR);
+                
                 currentScale =  SCALEFACTOR * currentScale;
             //Zoom In
             }else if (event.deltaY > 0 && currentScale > MINSCALEFACTOR) {
-                context.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
+                drawingContext.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
+             
                 currentScale =  1/SCALEFACTOR * currentScale;
             }
  
             redraw();
         });
     };
+
+    let topLayerRedraw = function(){
+        clearCanvasTopLayer();
+        context.font = "20px Verdana";
+         for (let userName in userMice){
+            let user = userMice[userName];
+            context.beginPath();
+            context.arc(user.mouseX*currentScale, user.mouseY*currentScale, 50, 0, 2 * Math.PI);
+            context.stroke();
+            context.fillText(user.userName, user.mouseX*currentScale, user.mouseY*currentScale);
+        };
+    }
+
     // Redraw is constly operation to do everytime we draw, therefore we use draw instead of redraw to add on to the current canvas rather than redrawing the entire canvas
     let redraw = function(){
         clearCanvas();
-        context.lineJoin = "round";
-        context.lineCap = "round";
-        context.lineWidth = 5 ;
+        drawingContext.lineJoin = "round";
+        drawingContext.lineCap = "round";
+        drawingContext.lineWidth = 5 ;
    
         for(let i=0; i < strokes.length; i++){
             let currentStroke = strokes[i];
 
             for(let j=0; j < currentStroke.length; j++){
-                context.beginPath();
+                drawingContext.beginPath();
                 let pointA = currentStroke[j]
                 let pointB = currentStroke[j - 1]
                 if(pointA.isDragging){
                    if (pointB){
-                    context.moveTo(pointB.x - panX, pointB.y - panY);
-                    context.lineTo(pointA.x - panX, pointA.y - panY);
+                    drawingContext.moveTo(pointB.x - panX, pointB.y - panY);
+                    drawingContext.lineTo(pointA.x - panX, pointA.y - panY);
                    } else{
                        console.log()
                    }
                
                 } else {
-                    context.moveTo(pointA.x - panX, pointA.y - panY);
-                    context.lineTo(pointA.x - panX, pointA.y - panY);
+                    drawingContext.moveTo(pointA.x - panX, pointA.y - panY);
+                    drawingContext.lineTo(pointA.x - panX, pointA.y - panY);
                 }
-                context.lineWidth = pointA.font;
-                context.closePath();
-                context.strokeStyle = pointA.color;
-                context.stroke();
+                drawingContext.lineWidth = pointA.font;
+                drawingContext.closePath();
+                drawingContext.strokeStyle = pointA.color;
+                drawingContext.stroke();
             }
         }
     };
 
     let draw = function(stroke){
-        context.lineJoin = "round";
-        context.lineCap = "round";
-        context.lineWidth = 5 ;
+        drawingContext.lineJoin = "round";
+        drawingContext.lineCap = "round";
+        drawingContext.lineWidth = 5 ;
         let currentStroke = stroke;
 
         for(let j=0; j < currentStroke.length; j++){
-            context.beginPath();
+            drawingContext.beginPath();
             let pointA = currentStroke[j]
             let pointB = currentStroke[j - 1]
             if(pointA.isDragging){
                if (pointB){
-                context.moveTo(pointB.x - panX, pointB.y - panY);
-                context.lineTo(pointA.x - panX, pointA.y - panY);
+                drawingContext.moveTo(pointB.x - panX, pointB.y - panY);
+                drawingContext.lineTo(pointA.x - panX, pointA.y - panY);
                } else{
                    console.log()
                }
             } else {
-                context.moveTo(pointA.x - panX, pointA.y - panY);
-                context.lineTo(pointA.x - panX, pointA.y - panY);
+                drawingContext.moveTo(pointA.x - panX, pointA.y - panY);
+                drawingContext.lineTo(pointA.x - panX, pointA.y - panY);
             }
-            context.lineWidth = pointA.font;
-            context.closePath();
-            context.strokeStyle = pointA.color;
-            context.stroke();
+            drawingContext.lineWidth = pointA.font;
+            drawingContext.closePath();
+            drawingContext.strokeStyle = pointA.color;
+            drawingContext.stroke();
         }
     };
 
     let clearCanvas = function(){
+        drawingContext.clearRect(0, 0, drawingCanvasLayer.width/currentScale , drawingCanvasLayer.height/currentScale );
+    };
+    let clearCanvasTopLayer = function(){
         context.clearRect(0, 0, canvas.width/currentScale , canvas.height/currentScale );
     };
 
@@ -384,10 +432,15 @@ window.onload = (function() {
     }
     window.addEventListener("resize", function(e){
         let canvasWrapper = document.querySelector('#whiteBoard');
-        canvas = document.querySelector('#whiteBoard > canvas');
+        drawingCanvasLayer = document.querySelector('#whiteBoard > #canvasdrawing');
+        canvas = document.querySelector('#whiteBoard > #canvasMouseMovements');
+
+        drawingCanvasLayer.height = canvasWrapper.clientHeight;
+        drawingCanvasLayer.width = canvasWrapper.clientWidth;
+
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
-        context.scale(currentScale, currentScale)
+        drawingContext.scale(currentScale, currentScale)
         redraw();
     })
   
@@ -439,6 +492,8 @@ window.onload = (function() {
         let canvasWrapper = document.querySelector('#whiteBoard');
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
+        drawingCanvasLayer.height = canvasWrapper.clientHeight;
+        drawingCanvasLayer.width = canvasWrapper.clientWidth;
         redraw();
     });
     // document.querySelector('#shareBoard').addEventListener('click', function (e){
