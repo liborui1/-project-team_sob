@@ -425,7 +425,7 @@ window.onload = (function() {
         drawingContext.clearRect(0, 0, drawingCanvasLayer.width/currentScale , drawingCanvasLayer.height/currentScale );
     };
     let clearCanvasTopLayer = function(){
-        context.clearRect(0, 0, canvas.width/currentScale , canvas.height/currentScale );
+        context.clearRect(0, 0, canvas.width , canvas.height );
     };
 
     let panCanvas = function(panFrom, panTo){
@@ -443,6 +443,7 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         drawingContext.scale(currentScale, currentScale)
+      
         redraw();
     })
   
