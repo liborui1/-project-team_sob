@@ -350,10 +350,12 @@ window.onload = (function() {
         context.font = "20px Verdana";
          for (let userName in userMice){
             let user = userMice[userName];
+            let newX = (user.mouseX - panX)*currentScale
+            let newY = (user.mouseY - panY)*currentScale
             context.beginPath();
-            context.arc(user.mouseX*currentScale, user.mouseY*currentScale, 50, 0, 2 * Math.PI);
+            context.arc(newX, newY, 10, 0, 2 * Math.PI);
             context.stroke();
-            context.fillText(user.userName, user.mouseX*currentScale, user.mouseY*currentScale);
+            context.fillText(user.userName, newX, newY);
         };
     }
 
