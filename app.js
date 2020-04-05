@@ -51,11 +51,24 @@ let isAuthenticated = function(req, res, next) {
         return (!user)? res.status(401).end("access denied") : next();  
     });
 };
+let isLobbyOwner = function(req, res, next) {
+    let id = (req.session.user)? req.session.user._id: null;
+    lobbies.findOne({_id: id}, function(err, user){
+        if (err) return res.status(500).end(err);
+        return (!user)? res.status(401).end("access denied") : next();  
+    });
+};
+let isPartOfLobby = function(req, res, next) {
+    let lobbyName = req.params.id;
+    return (lobbyName in req.session.currentLobbies) ? res.status(401).end("access denied") : next();  
+};
+ 
  
 app.use(function (req, res, next){
     req.user = ('user' in req.session)? req.session.user : null;
     let username = (req.user)? req.user._id : '';
     req.username = username;
+    req.session.currentLobbies = req.session.currentLobbies || [];
     res.setHeader('Set-Cookie', cookie.serialize('username', username, {
           path : '/', 
           maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
@@ -128,7 +141,7 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
     let peerId = req.body.peerId;
     let lobbyName = req.body.name;
     let lobbyPassword = req.body.password;
- 
+
     lobbies.findOne({_id: lobbyName}, function(err, lobby){
         if (err) return res.status(500).end(err);
         if (lobby) return res.status(409).end("lobby " + lobby + " already exists");
@@ -140,7 +153,10 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
         peerIdtoUser.update( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
         });
-        lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt}, {upsert: true}, function(err){
+
+        req.session.currentLobbies.push(lobbyName);
+
+        lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt, owner:req.username }, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             lobbies.findOne({_id: lobbyName}, function(err, user){
                 return res.json("lobby " + lobbyName + " created");
@@ -153,14 +169,12 @@ app.post('/joinLobby/', function (req, res, next) {
     let peerId = req.body.peerId;
     let lobbyName = req.body.name;
     let lobbyPassword = req.body.password;
-   
+    
     // retrieve user from the database
     lobbies.findOne({_id: lobbyName}, function(err, lobby){
         if (err) return res.status(500).end(err);
-       
         if (!lobby) return res.status(404).end("Lobby not found");
         let salt = lobby.salt;
- 
         let hash = crypto.createHmac('sha512', salt);
         hash.update(lobbyPassword);
         let saltedHash = hash.digest('base64');
@@ -171,7 +185,8 @@ app.post('/joinLobby/', function (req, res, next) {
         peerIdtoUser.update( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
         });
-        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt}, {upsert: true}, function(err){
+        req.session.currentLobbies.push(lobbyName) ;
+        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             return res.json(lobby.connectedPeers);
         });
@@ -226,9 +241,54 @@ app.get('/api/boadnames/', isAuthenticated, function (req, res, next) {
         res.json(bname)
     });
 });
- 
- 
- // Change to Https with certificate, ask how to get certificate
+
+
+app.patch('/lobby/kick/:id', isAuthenticated, isPartOfLobby, function (req, res, next) {
+    let client = req.params.id
+    peerIdtoUser.remove( {_id: client}, {}, function(err){
+    });
+    let validated = false;
+   lobbies.find({}, function(err, allLobbies){
+        if (err) return res.status(500).end(err);
+        // find lobby with unique peerid -- garenteed thers only one peerid in all popssible lobbies
+       allLobbies.forEach(function (lobby){
+           let newConnections = []
+           // filter out all 
+           lobby.connectedPeers.forEach (function (connId){
+               if (connId !== client){
+                    newConnections.push(connId)
+                } else {
+                    // peerid found in lobby
+                    validated = (lobby.owner === req.username)
+                }
+           })
+           if (validated){
+            if (newConnections.length == 0){
+                //delete unused lobby
+                lobbies.remove({_id: lobby._id}, {},function(err, removedLobby){
+                    if (err) return res.status(500).end(err);
+                });
+            } else {
+                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner}, {upsert: true}, function(err){
+                    if (err) return res.status(500).end(err);
+                });
+            }
+           }  
+       });
+       return (validated)? res.json("kicked") : res.status(401).end("access denied");
+   });
+});
+
+app.get('/lobby/list/:id', isPartOfLobby, function (req, res, next) {
+    lobbies.findOne({_id: req.params.id}, function(err, lobby){
+        if (err) return res.status(500).end(err);
+        if (!lobby) return res.status(404).end("Lobby not found");
+        return res.json(lobby.connectedPeers)
+    });
+    
+});
+
+// Change to Https with certificate, ask how to get certificate
 const http = require('http');
 const PORT = process.env.PORT || 3000;
 
@@ -244,8 +304,7 @@ const peerserver = ExpressPeerServer(server, options);
 
 peerserver.on('disconnect', (client) => { 
     peerIdtoUser.remove( {_id: client}, {}, function(err){
-        if (err) return res.status(500).end(err);
-    });
+     });
 
     lobbies.find({}, function(err, allLobbies){
         allLobbies.forEach(function (lobby){
@@ -258,7 +317,7 @@ peerserver.on('disconnect', (client) => {
                 lobbies.remove({_id: lobby._id}, {},function(err, res){
                 });
             } else {
-                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt}, {upsert: true}, function(err){
+                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner}, {upsert: true}, function(err){
                 });
             }
         });

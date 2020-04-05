@@ -33,7 +33,7 @@ window.onload = (function() {
 
     localStorage.removeItem('lobby');
     api.onUserUpdate(function(username){
-        if (username) {
+        if (username && username !== "") {
             localStorage.setItem("signedIn", "");
         } else {
             localStorage.setItem("signedIn", "not signed in");
@@ -170,7 +170,10 @@ window.onload = (function() {
             userMice[user.peerId] = user;
             console.log(user.peerId)
             topLayerRedraw();
+        } else if (data.action === "updatePeerList"){
+           api.updatePeerList(currentLobbyName);
         }
+        
         // MouseData
     }
 

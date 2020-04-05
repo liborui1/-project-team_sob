@@ -12,9 +12,10 @@
         admin.addEventListener("click", function() {
             var popup = document.getElementById("myPopup");
             popup.classList.toggle("show");
-            });
+        });
 
         api.onConnectedUserUpdate(function(users){
+           
             document.getElementById('myPopup').innerHTML = '';
             for (let peerid in users) {
                 let username = users[peerid];
@@ -28,11 +29,11 @@
                     </div>
                 `;
 
+                cmnt_element.addEventListener("click", function(e){
+                    api.kickPeer(peerid);
+                });
                 document.querySelector('#myPopup').prepend(cmnt_element);
             }
         });
-
-        
-        
     });
 }());

@@ -4,7 +4,7 @@ let api = (function(){
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
     //{secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'}
-    let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
+    let peer = new Peer({host: 'localhost', port:'3000', path: '/peerjs'});
     let connectedPeer = [];
     let peerIdToUserName = {};
     let localData = {groupName:""};
@@ -105,10 +105,9 @@ let api = (function(){
         document.querySelector('#peerIddisplay').innerHTML = peer.id
         // lobby created, waiting for connections
         peer.on('connection', function (dataConnection){
- 
-            dataConnection.on('open', function (){
+            addPeer(dataConnection)
+             dataConnection.on('open', function (){
                 dataConnection.send({action: "initialSync", initialSync: syncData})
-                addPeer(dataConnection)
                 // changing to webrtc logic because peerjs destroy bug
                 let dataChannel =  dataConnection.dataChannel
                 let peerConnection =  dataConnection.peerConnection
@@ -132,6 +131,7 @@ let api = (function(){
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
         send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
+           
             res.forEach( function(newPeerId, index) {
                 let newPeer = peer.connect(newPeerId)    
                 // all new peers can disconnect
@@ -145,6 +145,7 @@ let api = (function(){
                         callback(newPeerdata);
                     }
                 });
+               
                 newPeer.on('open', function (){
                     addPeer(newPeer);
                     let dataChannel =  newPeer.dataChannel
@@ -178,9 +179,10 @@ let api = (function(){
         // When finished connecting wait for peer to send strokes
         
         peer.on('connection', function (newConnection){
+            addPeer(newConnection);
             newConnection.on('open', function() {
                 newConnection.send({action: "initialSync", initialSync : getSyncData()})
-                
+
                 let dataChannel =  newConnection.dataChannel
                 let peerConnection =  newConnection.peerConnection
                 dataChannel.onclose = function () {
@@ -199,7 +201,7 @@ let api = (function(){
             newConnection.on('close', function(data){
                 console.log("weetf")
             })
-            addPeer(newConnection);
+             
         });
     }
 
@@ -207,7 +209,7 @@ let api = (function(){
         connectedPeer.push(newConnection)
         send("GET", "/peerToUser/" + newConnection.peer , null, function(err, res){
             if (err) return notifyErrorListeners(err);
-            peerIdToUserName[peer] = (res !== "")?  res: newConnection.peer;
+            peerIdToUserName[newConnection.peer] = (res !== "")?  res: newConnection.peer;
             notifyConnectedUsersListeners();
         });
     }
@@ -232,12 +234,9 @@ let api = (function(){
         connectedPeer.forEach( function (connPeer){
             let userName = (getUsername() !== "")? getUsername() : peer.id;
             let data = mouseDataHandler(userName, peer.id)
-           
-            if (connPeer.open){
-                connPeer.send({action: "mouseData", mouseData: data})
-            } else {
-                removePeer(connPeer)
-            }
+       
+            connPeer.send({action: "mouseData", mouseData: data})
+    
         });
     };
 
@@ -250,6 +249,12 @@ let api = (function(){
     module.sendResyncBoard = function(data) {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "reSync", reSync: data})
+        });
+    };
+
+    sendUpdatePeerList = function() {
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "updatePeerList"})
         });
     };
 
@@ -314,10 +319,10 @@ let api = (function(){
     let getConnectedUsers = function(){
         let users = {};
         connectedPeer.forEach( function (connPeer){
-            if (connPeer.open){
-                let id = peerIdToUserName[connPeer.peer]
-                users[connPeer.peer] = ((id)? id:connPeer.peer);
-            }
+        
+            let id = peerIdToUserName[connPeer.peer]
+            users[connPeer.peer] = ((id)? id : connPeer.peer);
+    
         });
         return users
     }
@@ -325,7 +330,6 @@ let api = (function(){
 
     function notifyConnectedUsersListeners(){
         connectedUserListeners.forEach(function(handler){
-            
             handler(getConnectedUsers());
         });
     }
@@ -335,6 +339,33 @@ let api = (function(){
        // if ((localData.groupName != "") && (localData.groupName != null)) {
        handler(getConnectedUsers())
     };
+
+    // Server side kicking 
+    module.kickPeer = function (peerId){
+        send("PATCH", "/lobby/kick/" + peerId, null, function(err,res){
+            if (err) return notifyErrorListeners(err);
+            // after kicking the peer remove connection and signal every other peer to update their peerlist
+            let foundConnection = connectedPeer.find(function (connection) {return connection.peer === peerId})
+            if (foundConnection) removePeer(foundConnection);
+            sendUpdatePeerList();
+            notifyUserListeners();
+        });
+    }
+
+    module.updatePeerList= function(lobbyName){
+        send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
+            if (err) return notifyErrorListeners(err);
+            connectedPeer.forEach(function(connection){
+                // remove all connections not in 
+                if (!(connection.peer in peerIds)){
+                    // close Connections that are not in the list anymore
+                    connection.dataChannel.close();
+                    removePeer(connection);
+                }
+            })
+            notifyUserListeners();
+        });
+    }
 
     return module;
 })();
