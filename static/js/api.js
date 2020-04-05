@@ -3,8 +3,10 @@ let api = (function(){
     let module = {};
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
+    //{secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'}
     let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
+    let peerIdToUserName = {};
     let localData = {groupName:""};
   
     function sendFiles(method, url, data, callback){
@@ -85,7 +87,6 @@ let api = (function(){
     let requestCreateLobby = function (id, lobbyName, lobbyPass){
         send("POST", "/createLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
-            // returns a custom lobby or something idk
        });
     }
 
@@ -104,48 +105,60 @@ let api = (function(){
         document.querySelector('#peerIddisplay').innerHTML = peer.id
         // lobby created, waiting for connections
         peer.on('connection', function (dataConnection){
-            connectedPeer.push(dataConnection)
+ 
             dataConnection.on('open', function (){
                 dataConnection.send({action: "initialSync", initialSync: syncData})
+                addPeer(dataConnection)
+                // changing to webrtc logic because peerjs destroy bug
+                let dataChannel =  dataConnection.dataChannel
+                let peerConnection =  dataConnection.peerConnection
+                dataChannel.onclose = function () {
+                    removePeer(dataConnection);
+                };
+                peerConnection.oniceconnectionstatechange = function() {
+                    if(peerConnection.iceConnectionState == 'disconnected') {
+                        removePeer(dataConnection);
+                    }
+                }
             });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
                 callBack(data)
-            })
-            dataConnection.on('disconnect', function (){
-                // remove the peer that disconnected
-                removePeer(dataConnection);
             });
-        })
+        });
+        
     }
 
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
         send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
- 
             res.forEach( function(newPeerId, index) {
                 let newPeer = peer.connect(newPeerId)    
-                connectedPeer.push(newPeer);
                 // all new peers can disconnect
                     // all new peers can add to the local board
                 newPeer.on('data', function (newPeerdata){
-                    let initialSync = newPeerdata.initialSync;
                     // so that it only syncs with one user rather than all connecting users
-                    
                     if (index === res.length - 1 && newPeerdata.action === "initialSync"){
                         callback(newPeerdata)
                       
                     } else if (newPeerdata.action !== "initialSync"){
                         callback(newPeerdata);
                     }
-                    console.log(newPeerdata.action)
                 });
-                newPeer.on('disconnect', function (){
-                    removePeer(newPeer);
+                newPeer.on('open', function (){
+                    addPeer(newPeer);
+                    let dataChannel =  newPeer.dataChannel
+                    let peerConnection =  newPeer.peerConnection
+                    dataChannel.onclose = function () {
+                        removePeer(newPeer);
+                    };
+                    peerConnection.oniceconnectionstatechange = function() {
+                        if(peerConnection.iceConnectionState == 'disconnected') {
+                            removePeer(newPeer);
+                        }
+                    }
                 });
             });
-
-            
        });
     }
 
@@ -167,24 +180,48 @@ let api = (function(){
         peer.on('connection', function (newConnection){
             newConnection.on('open', function() {
                 newConnection.send({action: "initialSync", initialSync : getSyncData()})
+                
+                let dataChannel =  newConnection.dataChannel
+                let peerConnection =  newConnection.peerConnection
+                dataChannel.onclose = function () {
+                    removePeer(newConnection);
+                };
+                peerConnection.oniceconnectionstatechange = function() {
+                    if(peerConnection.iceConnectionState == 'disconnected') {
+                        removePeer(newConnection);
+                    }
+                }
+              
             });
             newConnection.on('data', function(data) {
                 callBack(data);
             })
-            connectedPeer.push(newConnection);
+            newConnection.on('close', function(data){
+                console.log("weetf")
+            })
+            addPeer(newConnection);
         });
-       
     }
 
-    let removePeer = function (peer){
+    let addPeer = function (newConnection){
+        connectedPeer.push(newConnection)
+        send("GET", "/peerToUser/" + newConnection.peer , null, function(err, res){
+            if (err) return notifyErrorListeners(err);
+            peerIdToUserName[peer] = (res !== "")?  res: newConnection.peer;
+            notifyConnectedUsersListeners();
+        });
+    }
+
+    let removePeer = function (newConnection){
         for (let i = 0; i < connectedPeer.length; i++){
-            if (connectedPeer[i] === peer){
+            if (connectedPeer[i].peer === newConnection.peer){
                 connectedPeer.splice(i, 1);
                 break;
             }
         }
+        notifyConnectedUsersListeners();
     }
-
+    
     module.sendStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "addStrokes", strokes: data})
@@ -194,23 +231,27 @@ let api = (function(){
     module.sendMouseData = function(mouseDataHandler) {
         connectedPeer.forEach( function (connPeer){
             let userName = (getUsername() !== "")? getUsername() : peer.id;
-            let data = mouseDataHandler(userName)
-            connPeer.send({action: "mouseData", mouseData: data})
+            let data = mouseDataHandler(userName, peer.id)
+           
+            if (connPeer.open){
+                connPeer.send({action: "mouseData", mouseData: data})
+            } else {
+                removePeer(connPeer)
+            }
         });
     };
 
     module.sendRemoveStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
-
             connPeer.send({action: "removeStrokes", strokes: data})
         });
     };
+ 
     module.sendResyncBoard = function(data) {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "reSync", reSync: data})
         });
     };
-
 
     module.saveBoard = function(boardData, boardName) {
         send("POST", "/api/saveboard/", {boardData, name: boardName}, function (err,res){
@@ -269,8 +310,34 @@ let api = (function(){
         serverListeners.push(handler);
         handler(getUsername());
     };
- 
-    return module;
 
+    let getConnectedUsers = function(){
+        let users = {};
+        connectedPeer.forEach( function (connPeer){
+            if (connPeer.open){
+                let id = peerIdToUserName[connPeer.peer]
+                users[connPeer.peer] = ((id)? id:connPeer.peer);
+            }
+        });
+        return users
+    }
+    let connectedUserListeners = [];
+
+    function notifyConnectedUsersListeners(){
+        connectedUserListeners.forEach(function(handler){
+            
+            handler(getConnectedUsers());
+        });
+    }
+
+    module.onConnectedUserUpdate = function(handler){
+        connectedUserListeners.push(handler);
+       // if ((localData.groupName != "") && (localData.groupName != null)) {
+       handler(getConnectedUsers())
+    };
+
+    return module;
 })();
 
+
+ 

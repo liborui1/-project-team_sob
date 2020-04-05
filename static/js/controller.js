@@ -29,6 +29,7 @@ window.onload = (function() {
     let currentLobbyName = '';
     let currentScale = 1;
     let userMice = {};
+  
 
     localStorage.removeItem('lobby');
     api.onUserUpdate(function(username){
@@ -166,8 +167,8 @@ window.onload = (function() {
         } else if (data.action === "mouseData"){
             let user = data.mouseData;
             //replace mousePosition
-
-            userMice[user.userName] = user;
+            userMice[user.peerId] = user;
+            console.log(user.peerId)
             topLayerRedraw();
         }
         // MouseData
@@ -266,6 +267,17 @@ window.onload = (function() {
         canvas.addEventListener("keydown", function (e){
             keyPressed(e)
         })
+
+        let sendMouseData = function (e){
+            let newX = e.pageX - canvas.offsetLeft;
+            let newY = e.pageY - canvas.offsetTop;
+            let packMouseData = function(userName, peerId){
+                return {userName: userName, peerId: peerId,  mouseX:newX/currentScale + panX, mouseY: newY/currentScale + panY }
+            }
+            // give mouse data to other users so that they can track them on their end
+            api.sendMouseData(packMouseData)
+        }
+
         canvas.onmousedown = function(e){
             let newX = e.pageX - this.offsetLeft;
             let newY = e.pageY - this.offsetTop;
@@ -288,16 +300,13 @@ window.onload = (function() {
             redraw();
         };
 
+
+
         canvas.onmousemove = function(e){
             let newX = e.pageX - canvas.offsetLeft;
             let newY = e.pageY - canvas.offsetTop;
-
-            let sendMouseData = function(userName){
-                return {userName: userName, mouseX:newX/currentScale + panX, mouseY: newY/currentScale + panY }
-            }
-            // give mouse data to other users so that they can track them on their end
-            api.sendMouseData(sendMouseData)
-
+            // send mousemovements to other users if in lobby
+            sendMouseData(e);
             if(paint){
                 // send bit by bit
                 let prevStroke = strokes[strokes.length - 1];
@@ -308,6 +317,7 @@ window.onload = (function() {
             } else if (move){
                 panCanvas(lastClick, {x: newX, y: newY});
                 redraw();
+                topLayerRedraw();
             }
         };
 
@@ -332,13 +342,17 @@ window.onload = (function() {
             // Zoom out
             if (event.deltaY < 0 && currentScale < MAXSCALEFACTOR){
                 drawingContext.scale(SCALEFACTOR, SCALEFACTOR);
-                
                 currentScale =  SCALEFACTOR * currentScale;
+                topLayerRedraw();
+                 // send mousemovements to other users if in lobby
+                sendMouseData(e);
             //Zoom In
             }else if (event.deltaY > 0 && currentScale > MINSCALEFACTOR) {
                 drawingContext.scale(1/SCALEFACTOR, 1/SCALEFACTOR);
-             
                 currentScale =  1/SCALEFACTOR * currentScale;
+                topLayerRedraw();
+                 // send mousemovements to other users if in lobby
+                sendMouseData(e);
             }
  
             redraw();
@@ -348,8 +362,8 @@ window.onload = (function() {
     let topLayerRedraw = function(){
         clearCanvasTopLayer();
         context.font = "20px Verdana";
-         for (let userName in userMice){
-            let user = userMice[userName];
+         for (let peerId in userMice){
+            let user = userMice[peerId];
             let newX = (user.mouseX - panX)*currentScale
             let newY = (user.mouseY - panY)*currentScale
             context.beginPath();
@@ -432,6 +446,7 @@ window.onload = (function() {
         panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
         panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
+
     window.addEventListener("resize", function(e){
         let canvasWrapper = document.querySelector('#whiteBoard');
         drawingCanvasLayer = document.querySelector('#whiteBoard > #canvasdrawing');
@@ -445,8 +460,9 @@ window.onload = (function() {
         drawingContext.scale(currentScale, currentScale)
       
         redraw();
-    })
-  
+    });
+ 
+
     loadSave();
     prepareCanvas();
 
@@ -524,5 +540,18 @@ window.onload = (function() {
         this.className += " active";
         });
     }
+
+    api.onConnectedUserUpdate(function (connectedUsers){
+        for (let peerId in userMice){
+            // if the user is not in our connected list of users
+            if (!(peerId in connectedUsers)){
+                //remove mouse data off the screen
+                // by deleteing mouse data for that user
+                console.log("deleted")
+                delete userMice[peerId]
+            }
+        }
+        topLayerRedraw();
+    });
 
 }());

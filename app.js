@@ -22,7 +22,7 @@ let users = new Datastore({ filename: 'db/users.db', autoload: true, timestampDa
 let imageDB = new Datastore({ filename: './db/images.db', autoload: true, timestampData : true });
 let lobbies = new Datastore({ filename: 'db/lobbies.db', autoload: true, timestampData : true });
 let userSaves = new Datastore({ filename: 'db/userSaves.db', autoload: true, timestampData : true });
- 
+let peerIdtoUser = new Datastore({ filename: 'db/peerIdtoUser.db', autoload: true, timestampData : true });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -136,6 +136,10 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
         let hash = crypto.createHmac('sha512', salt);
         hash.update(lobbyPassword);
         let saltedHash = hash.digest('base64');
+        let name = (req.username !== '')? req.username : peerId; 
+        peerIdtoUser.update( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
+            if (err) return res.status(500).end(err);
+        });
         lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             lobbies.findOne({_id: lobbyName}, function(err, user){
@@ -163,10 +167,23 @@ app.post('/joinLobby/', function (req, res, next) {
         if (lobby.password !== saltedHash) return res.status(401).end("access denied inccorect password "); 
         let newConnections = [...lobby.connectedPeers]
         newConnections.push(peerId);
+        let name = (req.username !== '')? req.username : peerId; 
+        peerIdtoUser.update( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
+            if (err) return res.status(500).end(err);
+        });
         lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             return res.json(lobby.connectedPeers);
         });
+    });
+});
+
+app.get('/peerToUser/:peerId', function (req, res, next) {
+    let peer = req.params.peerId;
+    peerIdtoUser.findOne({_id: peer}, function (err,user){
+        if (err) return res.status(500).end(err);
+        let result = (user)? user.userName: "";
+        return res.json(result);
     });
 });
 
@@ -219,14 +236,18 @@ const server = http.createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTP server on http://localhost:%s", PORT);
 });
-const peerserver = ExpressPeerServer(server, options);
-peerserver.on('connection', (client) => { 
 
-});
+const peerserver = ExpressPeerServer(server, options);
+    peerserver.on('connection', (client) => { 
+    
+    });
 
 peerserver.on('disconnect', (client) => { 
-    lobbies.find({}, function(err, allLobbies){
+    peerIdtoUser.remove( {_id: client}, {}, function(err){
+        if (err) return res.status(500).end(err);
+    });
 
+    lobbies.find({}, function(err, allLobbies){
         allLobbies.forEach(function (lobby){
             let newConnections = []
             lobby.connectedPeers.forEach (function (connId){
