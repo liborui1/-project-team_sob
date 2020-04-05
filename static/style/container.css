@@ -277,3 +277,70 @@ p {
     background-size: cover;
     opacity: 0.5;
 }
+
+.form_style {
+    position: absolute;
+  right: 0;
+  width: 100px;
+  height: 40px;
+}
+
+.user {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px 5px 5px 5px;
+}
+/* code taken from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_popup*/
+
+.admin_popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
+}
+
+.btn {
+    text-align:center;
+    font-size: 17px;
+    color: #0c0b0b;
+    margin: 5px;
+}
+
+.admin_popup .popuptext {
+    visibility: hidden;
+    width: 300px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    top: 30%;
+    right: 110%;
+    margin-left: -80px;
+  }
+
+/* Popup arrow */
+.admin_popup .popuptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  /* Toggle this class - hide and show the popup */
+  .admin_popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
