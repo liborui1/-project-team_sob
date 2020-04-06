@@ -326,6 +326,7 @@ p {
     right: 110%;
     margin-left: -80px;
   }
+  /* https://www.w3schools.com/howto/howto_css_notification_button.asp */
   .admin_popup .badge {
     visibility: hidden;
     position: absolute;

@@ -48,7 +48,6 @@ let isAuthenticated = function(req, res, next) {
     let id = (req.session.user)? req.session.user._id: null;
     users.findOne({_id: id}, function(err, user){
         if (err) return res.status(500).end(err);
-      
         return (!user)? res.status(401).end("access denied") : next();  
     });
 };
