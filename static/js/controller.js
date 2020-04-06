@@ -103,6 +103,20 @@ window.onload = (function() {
         let lobbyPass = document.getElementById("boardPass").value || "";
         document.querySelector('#newLobby').style.display = 'none';
         document.querySelector("#lobbyName").innerHTML = lobbyName;
+
+        let CreateLobbytxt = document.getElementById("CreateLobbytxt");
+        let LobbyNametxt = document.getElementById("LobbyNametxt");
+        let boardName = document.getElementById("boardName");
+        let Passwordtxt = document.getElementById("Passwordtxt");
+        let boardPass = document.getElementById("boardPass");
+        let Sboard = document.getElementById("Sboard");
+        CreateLobbytxt.style.visibility ="hidden";
+        LobbyNametxt.style.visibility ="hidden";
+        boardName.style.visibility ="hidden";
+        Passwordtxt.style.visibility ="hidden";
+        boardPass.style.visibility ="hidden";
+        Sboard.style.visibility ="hidden";
+
         if (lobbyName !== '') {
             currentLobbyName = lobbyName;
             localStorage.setItem('lobby', lobbyName);
