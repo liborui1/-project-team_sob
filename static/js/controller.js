@@ -85,6 +85,21 @@ window.onload = (function() {
         if (currentLobbyName != "") {
             document.querySelector("#lobbyInfo").style.visibility = "visible";
             document.querySelector("#lobbylink").value = document.location.host + '/joinBoard/' + currentLobbyName;
+            // hide all the lobby creation option
+            let CreateLobbytxt = document.getElementById("CreateLobbytxt");
+            let LobbyNametxt = document.getElementById("LobbyNametxt");
+            let boardName = document.getElementById("boardName");
+            let Passwordtxt = document.getElementById("Passwordtxt");
+            let boardPass = document.getElementById("boardPass");
+            let Sboard = document.getElementById("Sboard");
+            let newLobby = document.getElementById("newLobby");
+            CreateLobbytxt.style.visibility ="hidden";
+            LobbyNametxt.style.visibility ="hidden";
+            boardName.style.visibility ="hidden";
+            Passwordtxt.style.visibility ="hidden";
+            boardPass.style.visibility ="hidden";
+            Sboard.style.visibility ="hidden";
+            newLobby.style.height ="100px";
         } else {
             document.querySelector("#lobbyInfo").style.visibility = "hidden";
             document.querySelector("#lobbylink").value = "";
@@ -103,20 +118,6 @@ window.onload = (function() {
         let lobbyPass = document.getElementById("boardPass").value || "";
         document.querySelector('#newLobby').style.display = 'none';
         document.querySelector("#lobbyName").innerHTML = lobbyName;
-
-        let CreateLobbytxt = document.getElementById("CreateLobbytxt");
-        let LobbyNametxt = document.getElementById("LobbyNametxt");
-        let boardName = document.getElementById("boardName");
-        let Passwordtxt = document.getElementById("Passwordtxt");
-        let boardPass = document.getElementById("boardPass");
-        let Sboard = document.getElementById("Sboard");
-        CreateLobbytxt.style.visibility ="hidden";
-        LobbyNametxt.style.visibility ="hidden";
-        boardName.style.visibility ="hidden";
-        Passwordtxt.style.visibility ="hidden";
-        boardPass.style.visibility ="hidden";
-        Sboard.style.visibility ="hidden";
-
         if (lobbyName !== '') {
             currentLobbyName = lobbyName;
             localStorage.setItem('lobby', lobbyName);
