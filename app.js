@@ -51,16 +51,11 @@ let isAuthenticated = function(req, res, next) {
         return (!user)? res.status(401).end("access denied") : next();  
     });
 };
-let isLobbyOwner = function(req, res, next) {
-    let id = (req.session.user)? req.session.user._id: null;
-    lobbies.findOne({_id: id}, function(err, user){
-        if (err) return res.status(500).end(err);
-        return (!user)? res.status(401).end("access denied") : next();  
-    });
-};
+ 
 let isPartOfLobby = function(req, res, next) {
     let lobbyName = req.params.id;
-    return (lobbyName in req.session.currentLobbies) ? res.status(401).end("access denied") : next();  
+    console.log(req.session.currentLobbies)
+    return (req.session.currentLobbies.indexOf(lobbyName) === -1) ? res.status(401).end("access denied") : next();  
 };
  
  
@@ -243,7 +238,7 @@ app.get('/api/boadnames/', isAuthenticated, function (req, res, next) {
 });
 
 
-app.patch('/lobby/kick/:id', isAuthenticated, isPartOfLobby, function (req, res, next) {
+app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
     let client = req.params.id
     peerIdtoUser.remove( {_id: client}, {}, function(err){
     });
@@ -258,7 +253,7 @@ app.patch('/lobby/kick/:id', isAuthenticated, isPartOfLobby, function (req, res,
                if (connId !== client){
                     newConnections.push(connId)
                 } else {
-                    // peerid found in lobby
+                    // verify is lobby owner
                     validated = (lobby.owner === req.username)
                 }
            })

@@ -198,9 +198,7 @@ let api = (function(){
             newConnection.on('data', function(data) {
                 callBack(data);
             })
-            newConnection.on('close', function(data){
-                console.log("weetf")
-            })
+        
              
         });
     }
