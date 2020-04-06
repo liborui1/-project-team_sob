@@ -1,0 +1,42 @@
+.chat_header {
+	display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+	width: 300px;
+    height: 38px;
+    border: 2px solid #424242;
+  	background-color: #f1f1f1;
+    position: fixed;
+    bottom: 5px;
+    right: 20px;
+}
+.chat_title {
+    font-family: Arial;
+    font-weight: bold;
+    font-size:24px;
+    text-align: center;
+    padding-left: 40px;
+    width: 200px;
+}
+.collapsBtn{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    margin: 2px 2px 2px 2px;
+}
+.collapsBtn:hover {
+    background-color: #666;
+    color: white;
+}
+.up-icon{
+    cursor: pointer;
+    background-image: url('../media/up.png');
+    background-size: cover;
+}
