@@ -377,6 +377,12 @@ let api = (function(){
             notifyUserListeners();
         });
     }
+    module.isPasswordProtected = function(lobbyName, callback){
+        send("GET", "/lobby/passwordprotected/" + lobbyName , null, function(err, ispp){
+            if (err) return notifyErrorListeners(err);
+            callback(ispp)
+        });
+    }
 
     return module;
 })();

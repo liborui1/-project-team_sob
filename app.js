@@ -150,8 +150,8 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
         });
 
         req.session.currentLobbies.push(lobbyName);
-
-        lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt, owner:req.username }, {upsert: true}, function(err){
+        let pp = lobbyPassword === "";
+        lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt, owner:req.username, passwordProtected: pp }, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             lobbies.findOne({_id: lobbyName}, function(err, user){
                 return res.json("lobby " + lobbyName + " created");
@@ -181,7 +181,8 @@ app.post('/joinLobby/', function (req, res, next) {
             if (err) return res.status(500).end(err);
         });
         req.session.currentLobbies.push(lobbyName) ;
-        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner}, {upsert: true}, function(err){
+        let pp = lobbyPassword === "";
+        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner, passwordProtected: pp}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             return res.json(lobby.connectedPeers);
         });
@@ -264,7 +265,7 @@ app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
                     if (err) return res.status(500).end(err);
                 });
             } else {
-                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner}, {upsert: true}, function(err){
+                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner, passwordProtected: lobby.passwordProtected}, {upsert: true}, function(err){
                     if (err) return res.status(500).end(err);
                 });
             }
@@ -280,7 +281,13 @@ app.get('/lobby/list/:id', isPartOfLobby, function (req, res, next) {
         if (!lobby) return res.status(404).end("Lobby not found");
         return res.json(lobby.connectedPeers)
     });
-    
+});
+app.get('/lobby/passwordprotected/:id', function (req, res, next) {
+    lobbies.findOne({_id: req.params.id}, function(err, lobby){
+        if (err) return res.status(500).end(err);
+        if (!lobby) return res.status(404).end("Lobby not found");
+        return res.json(lobby.passwordProtected)
+    });
 });
 
 // Change to Https with certificate, ask how to get certificate
@@ -312,7 +319,7 @@ peerserver.on('disconnect', (client) => {
                 lobbies.remove({_id: lobby._id}, {},function(err, res){
                 });
             } else {
-                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner}, {upsert: true}, function(err){
+                lobbies.update({_id: lobby._id},{ _id: lobby._id, connectedPeers: newConnections, password: lobby.password, salt: lobby.salt,  owner:lobby.owner, passwordProtected: lobby.passwordProtected}, {upsert: true}, function(err){
                 });
             }
         });

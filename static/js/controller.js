@@ -100,7 +100,7 @@ window.onload = (function() {
     document.querySelector("#Sboard").addEventListener('click', function(e) {
         document.querySelector('#copied').style.visibility = "hidden";
         let lobbyName = document.getElementById("boardName").value;
-        let lobbyPass = '';
+        let lobbyPass = document.getElementById("boardPass").value || "";
         document.querySelector('#newLobby').style.display = 'none';
         document.querySelector("#lobbyName").innerHTML = lobbyName;
         if (lobbyName !== '') {
@@ -469,27 +469,7 @@ window.onload = (function() {
     loadSave();
     prepareCanvas();
 
-    // https://html-online.com/articles/get-url-parameters-javascript/
-    function getUrlVars() {
-        let vars = {};
-        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            vars[key] = value;
-        });
-        return vars;
-    }
-    // Try connecting using URL
-    if (getUrlVars()["lobby"]){
-        let lobbyName = getUrlVars()["lobby"]; 
-        // prompt user to give pass or something
-        let lobbyPass = "";
-        clearCanvas();
-        strokes = [[]];
-        if (lobbyName !== '') {
-            currentLobbyName = lobbyName
-            localStorage.setItem('lobby', lobbyName);
-            api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
-        }
-    }
+    
      
     document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
@@ -556,5 +536,29 @@ window.onload = (function() {
         }
         topLayerRedraw();
     });
+     // https://html-online.com/articles/get-url-parameters-javascript/
+     function getUrlVars() {
+        let vars = {};
+        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+    }
+    // Try connecting using URL
+    if (getUrlVars()["lobby"]){
+        let lobbyName = getUrlVars()["lobby"]; 
+        // prompt user to give pass or something
+        clearCanvas();
+        strokes = [[]];
+        if (lobbyName !== '') {
+            currentLobbyName = lobbyName
+            localStorage.setItem('lobby', lobbyName);
+            let lobbyPass = ""
+            api.isPasswordProtected( currentLobbyName, function (ispp){
+                lobbyPass = (ispp)? prompt("Please enter password",  ""): "";
+            })
+            api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
+        }
+    }
 
 }());
