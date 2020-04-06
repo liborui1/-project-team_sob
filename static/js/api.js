@@ -4,7 +4,7 @@ let api = (function(){
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
     //{secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'}
-    let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
+    let peer = new Peer({host: 'localhost', port:'3000', path: '/peerjs'});
     let connectedPeer = [];
     let peerIdToUserName = {};
     let localData = {groupName:""};
@@ -151,10 +151,12 @@ let api = (function(){
                     let dataChannel =  newPeer.dataChannel
                     let peerConnection =  newPeer.peerConnection
                     dataChannel.onclose = function () {
+                        redirect(lobbyName);
                         removePeer(newPeer);
                     };
                     peerConnection.oniceconnectionstatechange = function() {
                         if(peerConnection.iceConnectionState == 'disconnected') {
+                            redirect(lobbyName);
                             removePeer(newPeer);
                         }
                     }
@@ -186,10 +188,12 @@ let api = (function(){
                 let dataChannel =  newConnection.dataChannel
                 let peerConnection =  newConnection.peerConnection
                 dataChannel.onclose = function () {
+                    redirect(lobbyName);
                     removePeer(newConnection);
                 };
                 peerConnection.oniceconnectionstatechange = function() {
                     if(peerConnection.iceConnectionState == 'disconnected') {
+                        redirect(lobbyName);
                         removePeer(newConnection);
                     }
                 }
@@ -353,9 +357,16 @@ let api = (function(){
         });
     }
 
+    let redirect= function(lobbyName){
+        send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
+            peerIds = peerIds || [] 
+            if (peerIds.indexOf(peer.id) === -1) window.location.href = '/index.html';;
+        });
+    }
     module.updatePeerList= function(lobbyName){
         send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
             if (err) return notifyErrorListeners(err);
+            redirect(lobbyName);
             connectedPeer.forEach( function(conn){
                 let index = peerIds.indexOf(conn.peer)
                 if (index === -1){
