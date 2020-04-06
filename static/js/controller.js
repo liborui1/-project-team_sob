@@ -29,7 +29,7 @@ window.onload = (function() {
     let currentLobbyName = '';
     let currentScale = 1;
     let userMice = {};
-  
+    let pageAssistRequests = null;
 
     localStorage.removeItem('lobby');
     api.onUserUpdate(function(username){
@@ -153,6 +153,29 @@ window.onload = (function() {
         api.sendResyncBoard(strokes)
         redraw();
     });
+
+    let createPageAssistNotification = function(data){
+        document.querySelector('#alertBar').style.visibility = "visible"
+        let alertTextDiv=  document.querySelector('#alertText')
+        alertTextDiv.innerHTML = '';
+        let text = document.createElement("DIV")
+        let connectedUsers = api.getConnectedUsers();
+        text.innerHTML = "User " + connectedUsers[data.peerId] + " is calling you to their screen"
+        let acceptButton = document.createElement("BUTTON")
+        acceptButton.innerHTML = "Accept"
+        acceptButton.addEventListener("click", function(e){
+            console.log(data)
+            panX = data.panX;
+            panY = data.panY;
+            currentScale = data.currentScale;
+            resize();
+            
+            document.querySelector('#alertBar').style.visibility = "hidden"
+            alertTextDiv.innerHTML = '';
+        })
+        alertTextDiv.append(text)
+        alertTextDiv.append(acceptButton)
+    }   
     
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
@@ -183,15 +206,15 @@ window.onload = (function() {
             let user = data.mouseData;
             //replace mousePosition
             userMice[user.peerId] = user;
-            console.log(user.peerId)
             topLayerRedraw();
         } else if (data.action === "updatePeerList"){
            api.updatePeerList(currentLobbyName);
+        }else if (data.action === "pageAssistRequest"){
+            createPageAssistNotification(data.screenData)
+
         }
-        
         // MouseData
     }
-
 
     let sendSyncData = function(){
         return strokes
@@ -464,8 +487,7 @@ window.onload = (function() {
         panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
         panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
-
-    window.addEventListener("resize", function(e){
+    let resize = function(){
         let canvasWrapper = document.querySelector('#whiteBoard');
         drawingCanvasLayer = document.querySelector('#whiteBoard > #canvasdrawing');
         canvas = document.querySelector('#whiteBoard > #canvasMouseMovements');
@@ -476,8 +498,11 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         drawingContext.scale(currentScale, currentScale)
-      
+        topLayerRedraw();
         redraw();
+    }
+    window.addEventListener("resize", function(e){
+        resize()
     });
  
 
@@ -512,6 +537,12 @@ window.onload = (function() {
         drawingCanvasLayer.height = canvasWrapper.clientHeight;
         drawingCanvasLayer.width = canvasWrapper.clientWidth;
         redraw();
+    });
+    document.querySelector('#pingAll').addEventListener('click', function (e){
+        let data = function (peerId) {
+            return {currentScale, panX, panY, peerId}
+        }
+       api.sendScreenData(data);
     });
     // document.querySelector('#shareBoard').addEventListener('click', function (e){
     //     if (currentLobbyName != ""){

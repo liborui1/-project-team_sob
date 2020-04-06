@@ -10,6 +10,10 @@
 </head>
 <body>
     <div id= "whiteBoard">
+    <div class="alert" id="alertBar">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <div id = "alertText"></div>
+    </div>
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
         <div class="draw-icon icon active" id="draw" ></div>
@@ -55,6 +59,7 @@
         <div class="palette" id="colorPalette"></div>
         <div class="icon-large" id="color"></div>
         <div class="home-icon icon" id="home"></div>
+        <div class="home-icon icon" id="pingAll"></div>
         <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
     </div id = "canvasLayers">
         <canvas id = "canvasdrawing" tabindex='1'></canvas>

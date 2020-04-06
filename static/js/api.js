@@ -253,6 +253,12 @@ let api = (function(){
             connPeer.send({action: "reSync", reSync: data})
         });
     };
+    module.sendScreenData = function(data) {
+        let screenData = data(peer.id);
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "pageAssistRequest", screenData: screenData})
+        });
+    };
 
     sendUpdatePeerList = function() {
         connectedPeer.forEach( function (connPeer){
@@ -328,6 +334,9 @@ let api = (function(){
         });
         return users
     }
+    module.getConnectedUsers = function(){
+        return getConnectedUsers();
+    }
     let connectedUserListeners = [];
 
     function notifyConnectedUsersListeners(){
@@ -380,6 +389,7 @@ let api = (function(){
             callback(ispp)
         });
     }
+    
 
     return module;
 })();

@@ -357,3 +357,30 @@ p {
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
   }
+/*https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_alert*/
+
+  .alert {
+    padding: 20px;
+    background-color: green;
+    color: white;
+    position: absolute;
+    width: 300px;
+    left:40%;
+    z-index: 99;
+    visibility: hidden;
+  }
+   .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+ 
+  }
+  
+  .closebtn:hover {
+    color: black;
+  }
