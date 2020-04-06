@@ -91,8 +91,6 @@ let api = (function(){
     }
 
     module.createLobby = function(callBack, syncData, lobbyName, lobbyPass) {
-        lobbyPass = "";
- 
          let sentRequest = false;
         if (peer.id){
             requestCreateLobby (peer.id, lobbyName, lobbyPass);
@@ -166,7 +164,6 @@ let api = (function(){
     }
 
     module.connectToBoard = function(callBack, getSyncData ,lobbyName, lobbyPass) {
-        lobbyPass = "";
    
         let sentRequest = false;
         if (peer.id){

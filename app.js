@@ -150,7 +150,7 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
         });
 
         req.session.currentLobbies.push(lobbyName);
-        let pp = lobbyPassword === "";
+        let pp = lobbyPassword !== "";
         lobbies.update({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt, owner:req.username, passwordProtected: pp }, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             lobbies.findOne({_id: lobbyName}, function(err, user){
@@ -181,8 +181,7 @@ app.post('/joinLobby/', function (req, res, next) {
             if (err) return res.status(500).end(err);
         });
         req.session.currentLobbies.push(lobbyName) ;
-        let pp = lobbyPassword === "";
-        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner, passwordProtected: pp}, {upsert: true}, function(err){
+        lobbies.update({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner, passwordProtected: lobby.passwordProtected}, {upsert: true}, function(err){
             if (err) return res.status(500).end(err);
             return res.json(lobby.connectedPeers);
         });
