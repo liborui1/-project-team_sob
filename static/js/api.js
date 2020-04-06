@@ -4,7 +4,7 @@ let api = (function(){
     // for local server
     //{host: 'localhost', port:'3000', path: '/peerjs'}
     //{secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'}
-    let peer = new Peer({host: 'localhost', port:'3000', path: '/peerjs'});
+    let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
     let peerIdToUserName = {};
     let localData = {groupName:""};
@@ -217,10 +217,13 @@ let api = (function(){
     let removePeer = function (newConnection){
         for (let i = 0; i < connectedPeer.length; i++){
             if (connectedPeer[i].peer === newConnection.peer){
+                connectedPeer[i].close();
                 connectedPeer.splice(i, 1);
                 break;
             }
         }
+        console.log("removed: ", newConnection.peer)
+      
         notifyConnectedUsersListeners();
     }
     
@@ -355,12 +358,11 @@ let api = (function(){
     module.updatePeerList= function(lobbyName){
         send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
             if (err) return notifyErrorListeners(err);
-            connectedPeer.forEach(function(connection){
-                // remove all connections not in 
-                if (!(connection.peer in peerIds)){
-                    // close Connections that are not in the list anymore
-                    connection.dataChannel.close();
-                    removePeer(connection);
+            connectedPeer.forEach( function(conn){
+                let index = peerIds.indexOf(conn.peer)
+                if (index === -1){
+                    conn.close();
+                    removePeer(conn);
                 }
             })
             notifyUserListeners();
