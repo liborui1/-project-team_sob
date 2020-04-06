@@ -571,8 +571,7 @@ window.onload = (function() {
             let lobbyPass = ""
             api.isPasswordProtected( currentLobbyName, function (ispp){
                 lobbyPass = (ispp)? prompt("Please enter password",  ""): "";
-                console.log(lobbyPass)
-                api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
+                api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass || "");
             })
         }
     }

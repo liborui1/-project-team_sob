@@ -1,8 +1,9 @@
 (function(){
     "use strict";
-    
-    window.addEventListener('load', function(){
 
+    window.addEventListener('load', function(){
+        let lastNumUsers = 0;
+        let badgeReset = false;
         function myFunction() {
             var popup = document.getElementById("myPopup");
             popup.classList.toggle("show");
@@ -12,10 +13,20 @@
         admin.addEventListener("click", function() {
             var popup = document.getElementById("myPopup");
             popup.classList.toggle("show");
+            document.getElementById('badge').innerHTML = 0;
+            document.getElementById('badge').style.visibility = "hidden";
         });
-
+  
         api.onConnectedUserUpdate(function(users){
-           
+            
+            let newNewNumUsers = Object.keys(users).length - lastNumUsers
+            lastNumUsers = Object.keys(users).length
+            if (newNewNumUsers > 0 ){
+                document.getElementById('badge').style.visibility = "visible";
+                let prevnum = parseInt(document.getElementById('badge').innerHTML)
+                document.getElementById('badge').innerHTML = prevnum + newNewNumUsers;
+            } 
+             
             document.getElementById('myPopup').innerHTML = '';
             for (let peerid in users) {
                 let username = users[peerid];

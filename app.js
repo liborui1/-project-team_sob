@@ -48,13 +48,14 @@ let isAuthenticated = function(req, res, next) {
     let id = (req.session.user)? req.session.user._id: null;
     users.findOne({_id: id}, function(err, user){
         if (err) return res.status(500).end(err);
+      
         return (!user)? res.status(401).end("access denied") : next();  
     });
 };
  
 let isPartOfLobby = function(req, res, next) {
     let lobbyName = req.params.id;
-    console.log(req.session.currentLobbies)
+ 
     return (req.session.currentLobbies.indexOf(lobbyName) === -1) ? res.status(401).end("access denied") : next();  
 };
  
