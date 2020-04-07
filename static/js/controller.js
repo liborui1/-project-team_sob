@@ -594,7 +594,7 @@ window.onload = (function() {
                 //remove mouse data off the screen
                 // by deleteing mouse data for that user
                 console.log("deleted")
-                delete userMice[peerId]
+                delete userMice[peerId];
             }
         }
         topLayerRedraw();
