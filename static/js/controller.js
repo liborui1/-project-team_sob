@@ -426,9 +426,9 @@ window.onload = (function() {
             let newX = (user.mouseX - panX)*currentScale
             let newY = (user.mouseY - panY)*currentScale
             context.beginPath();
-            context.arc(newX, newY, 10, 0, 2 * Math.PI);
+            context.arc(newX, newY, 10, 0, 20 * Math.PI);
             context.stroke();
-            context.fillText(user.userName, newX, newY);
+            context.fillText(user.userName, newX + 10, newY -10);
         };
     }
 

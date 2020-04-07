@@ -28,13 +28,13 @@
     margin: 2px 2px 2px 2px;
 }
 .up-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/up.png');
     background-size: cover;
 }
 
 .down-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/down.png');
     background-size: cover;
 }
@@ -50,7 +50,7 @@
     background-repeat: no-repeat;
     background-size:75%;
     margin: 2px 2px 2px 2px;
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/send.png');
     background-size: cover;
 }
