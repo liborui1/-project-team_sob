@@ -176,7 +176,22 @@ window.onload = (function() {
         alertTextDiv.append(text)
         alertTextDiv.append(acceptButton)
     }   
-    
+    let onReadOnlyList= function (isPartOfList){
+        if(isPartOfList){
+            // remove pencil/erase/
+            document.querySelector('#draw').style.visibility = "hidden";
+            document.querySelector('#erase').style.visibility = "hidden";
+            document.querySelector('#clearBoard').style.visibility = "hidden";
+            currentAction = "move";
+        } else {
+            // remove pencil/erase
+            document.querySelector('#draw').style.visibility = "visible";
+            document.querySelector('#erase').style.visibility = "visible";
+            document.querySelector('#clearBoard').style.visibility = "visible";
+        }
+    }
+
+
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
         //console.log( "------------------Incomming----------------- "   ) 
@@ -211,8 +226,10 @@ window.onload = (function() {
            api.updatePeerList(currentLobbyName);
         }else if (data.action === "pageAssistRequest"){
             createPageAssistNotification(data.screenData)
-
+        }else if (data.action === "updateReadOnlyList"){
+            api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
         }
+        
         // MouseData
     }
 

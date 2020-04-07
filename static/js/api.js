@@ -7,8 +7,9 @@ let api = (function(){
     let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
     let peerIdToUserName = {};
+    let readOnlyPeers = [];
     let localData = {groupName:""};
-  
+    let owner = "";
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
         Object.keys(data).forEach(function(key){
@@ -87,6 +88,8 @@ let api = (function(){
     let requestCreateLobby = function (id, lobbyName, lobbyPass){
         send("POST", "/createLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
+            //Created lobby
+            owner = getUsername();
        });
     }
 
@@ -120,16 +123,17 @@ let api = (function(){
             });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
-                callBack(data)
+                 if (readOnlyPeers.indexOf(dataConnection.peer) === -1) callBack(data)
             });
         });
         
     }
 
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
-        send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
+        send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, lobbyData){
             if (err) return notifyErrorListeners(err);
-           
+            let res = lobbyData.connectedPeers
+            owner = lobbyData.owner;
             res.forEach( function(newPeerId, index) {
                 let newPeer = peer.connect(newPeerId)    
                 // all new peers can disconnect
@@ -197,7 +201,7 @@ let api = (function(){
               
             });
             newConnection.on('data', function(data) {
-                callBack(data);
+                if (readOnlyPeers.indexOf(newConnection.peer) === -1) callBack(data);
             })
         
              
@@ -263,6 +267,11 @@ let api = (function(){
     sendUpdatePeerList = function() {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "updatePeerList"})
+        });
+    };
+    sendUpdateReadOnlyList = function() {
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "updateReadOnlyList"})
         });
     };
 
@@ -337,6 +346,9 @@ let api = (function(){
     module.getConnectedUsers = function(){
         return getConnectedUsers();
     }
+    module.getReadOnlyUsers = function(){
+        return readOnlyPeers;
+    }
     let connectedUserListeners = [];
 
     function notifyConnectedUsersListeners(){
@@ -363,6 +375,16 @@ let api = (function(){
         });
     }
 
+       // Server side ReadOnly 
+       module.setReadOnly = function (peerId, lobbyName, action){
+        send("PATCH", "/lobby/readOnly/" + peerId, {action: action, lobby: lobbyName}, function(err,readOnlyList){
+            if (err) return notifyErrorListeners(err);
+            readOnlyPeers = readOnlyList;
+            sendUpdateReadOnlyList();
+            notifyUserListeners();
+        });
+    }
+
     let redirect= function(lobbyName){
         send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
             peerIds = peerIds || [] 
@@ -383,11 +405,23 @@ let api = (function(){
             notifyUserListeners();
         });
     }
+    module.updateReadOnlyList= function(lobbyName, uiCallback){
+        send("GET", "/lobby/readOnly/" + lobbyName , null, function(err, readOnlyList){
+            if (err) return notifyErrorListeners(err);
+            readOnlyPeers = readOnlyList;
+            uiCallback(readOnlyList.indexOf(peer.id) !== -1)
+            notifyUserListeners();
+        });
+    }
+
     module.isPasswordProtected = function(lobbyName, callback){
         send("GET", "/lobby/passwordprotected/" + lobbyName , null, function(err, ispp){
             if (err) return notifyErrorListeners(err);
             callback(ispp)
         });
+    }  
+    module.isOwner = function(){
+        return owner === getUsername();
     }
     
 
