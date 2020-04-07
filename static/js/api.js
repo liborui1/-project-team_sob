@@ -7,8 +7,9 @@ let api = (function(){
     let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
     let peerIdToUserName = {};
+    let readOnlyPeers = [];
     let localData = {groupName:""};
-  
+    let owner = "";
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();
         Object.keys(data).forEach(function(key){
@@ -87,12 +88,12 @@ let api = (function(){
     let requestCreateLobby = function (id, lobbyName, lobbyPass){
         send("POST", "/createLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
             if (err) return notifyErrorListeners(err);
+            //Created lobby
+            owner = getUsername();
        });
     }
 
     module.createLobby = function(callBack, syncData, lobbyName, lobbyPass) {
-        lobbyPass = "";
- 
          let sentRequest = false;
         if (peer.id){
             requestCreateLobby (peer.id, lobbyName, lobbyPass);
@@ -105,10 +106,9 @@ let api = (function(){
         document.querySelector('#peerIddisplay').innerHTML = peer.id
         // lobby created, waiting for connections
         peer.on('connection', function (dataConnection){
- 
-            dataConnection.on('open', function (){
+            addPeer(dataConnection)
+             dataConnection.on('open', function (){
                 dataConnection.send({action: "initialSync", initialSync: syncData})
-                addPeer(dataConnection)
                 // changing to webrtc logic because peerjs destroy bug
                 let dataChannel =  dataConnection.dataChannel
                 let peerConnection =  dataConnection.peerConnection
@@ -123,15 +123,17 @@ let api = (function(){
             });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
-                callBack(data)
+                 if (readOnlyPeers.indexOf(dataConnection.peer) === -1) callBack(data)
             });
         });
         
     }
 
     let requestJoinLobby= function (id, lobbyName, lobbyPass, callback){
-        send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, res){
+        send("POST", "/joinLobby/", {peerId: id, name: lobbyName , password: lobbyPass}, function(err, lobbyData){
             if (err) return notifyErrorListeners(err);
+            let res = lobbyData.connectedPeers
+            owner = lobbyData.owner;
             res.forEach( function(newPeerId, index) {
                 let newPeer = peer.connect(newPeerId)    
                 // all new peers can disconnect
@@ -145,15 +147,18 @@ let api = (function(){
                         callback(newPeerdata);
                     }
                 });
+               
                 newPeer.on('open', function (){
                     addPeer(newPeer);
                     let dataChannel =  newPeer.dataChannel
                     let peerConnection =  newPeer.peerConnection
                     dataChannel.onclose = function () {
+                        redirect(lobbyName);
                         removePeer(newPeer);
                     };
                     peerConnection.oniceconnectionstatechange = function() {
                         if(peerConnection.iceConnectionState == 'disconnected') {
+                            redirect(lobbyName);
                             removePeer(newPeer);
                         }
                     }
@@ -163,7 +168,6 @@ let api = (function(){
     }
 
     module.connectToBoard = function(callBack, getSyncData ,lobbyName, lobbyPass) {
-        lobbyPass = "";
    
         let sentRequest = false;
         if (peer.id){
@@ -178,28 +182,29 @@ let api = (function(){
         // When finished connecting wait for peer to send strokes
         
         peer.on('connection', function (newConnection){
+            addPeer(newConnection);
             newConnection.on('open', function() {
                 newConnection.send({action: "initialSync", initialSync : getSyncData()})
-                
+
                 let dataChannel =  newConnection.dataChannel
                 let peerConnection =  newConnection.peerConnection
                 dataChannel.onclose = function () {
+                    redirect(lobbyName);
                     removePeer(newConnection);
                 };
                 peerConnection.oniceconnectionstatechange = function() {
                     if(peerConnection.iceConnectionState == 'disconnected') {
+                        redirect(lobbyName);
                         removePeer(newConnection);
                     }
                 }
               
             });
             newConnection.on('data', function(data) {
-                callBack(data);
+                if (readOnlyPeers.indexOf(newConnection.peer) === -1) callBack(data);
             })
-            newConnection.on('close', function(data){
-                console.log("weetf")
-            })
-            addPeer(newConnection);
+        
+             
         });
     }
 
@@ -207,7 +212,7 @@ let api = (function(){
         connectedPeer.push(newConnection)
         send("GET", "/peerToUser/" + newConnection.peer , null, function(err, res){
             if (err) return notifyErrorListeners(err);
-            peerIdToUserName[peer] = (res !== "")?  res: newConnection.peer;
+            peerIdToUserName[newConnection.peer] = (res !== "")?  res: newConnection.peer;
             notifyConnectedUsersListeners();
         });
     }
@@ -215,10 +220,13 @@ let api = (function(){
     let removePeer = function (newConnection){
         for (let i = 0; i < connectedPeer.length; i++){
             if (connectedPeer[i].peer === newConnection.peer){
+                connectedPeer[i].close();
                 connectedPeer.splice(i, 1);
                 break;
             }
         }
+        console.log("removed: ", newConnection.peer)
+      
         notifyConnectedUsersListeners();
     }
     
@@ -232,12 +240,9 @@ let api = (function(){
         connectedPeer.forEach( function (connPeer){
             let userName = (getUsername() !== "")? getUsername() : peer.id;
             let data = mouseDataHandler(userName, peer.id)
-           
-            if (connPeer.open){
-                connPeer.send({action: "mouseData", mouseData: data})
-            } else {
-                removePeer(connPeer)
-            }
+       
+            connPeer.send({action: "mouseData", mouseData: data})
+    
         });
     };
 
@@ -250,6 +255,23 @@ let api = (function(){
     module.sendResyncBoard = function(data) {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "reSync", reSync: data})
+        });
+    };
+    module.sendScreenData = function(data) {
+        let screenData = data(peer.id);
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "pageAssistRequest", screenData: screenData})
+        });
+    };
+
+    sendUpdatePeerList = function() {
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "updatePeerList"})
+        });
+    };
+    sendUpdateReadOnlyList = function() {
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "updateReadOnlyList"})
         });
     };
 
@@ -319,18 +341,23 @@ let api = (function(){
     let getConnectedUsers = function(){
         let users = {};
         connectedPeer.forEach( function (connPeer){
-            if (connPeer.open){
-                let id = peerIdToUserName[connPeer.peer]
-                users[connPeer.peer] = ((id)? id:connPeer.peer);
-            }
+        
+            let id = peerIdToUserName[connPeer.peer]
+            users[connPeer.peer] = ((id)? id : connPeer.peer);
+    
         });
         return users
+    }
+    module.getConnectedUsers = function(){
+        return getConnectedUsers();
+    }
+    module.getReadOnlyUsers = function(){
+        return readOnlyPeers;
     }
     let connectedUserListeners = [];
 
     function notifyConnectedUsersListeners(){
         connectedUserListeners.forEach(function(handler){
-            
             handler(getConnectedUsers());
         });
     }
@@ -340,6 +367,68 @@ let api = (function(){
        // if ((localData.groupName != "") && (localData.groupName != null)) {
        handler(getConnectedUsers())
     };
+
+    // Server side kicking 
+    module.kickPeer = function (peerId){
+        send("PATCH", "/lobby/kick/" + peerId, null, function(err,res){
+            if (err) return notifyErrorListeners(err);
+            // after kicking the peer remove connection and signal every other peer to update their peerlist
+            let foundConnection = connectedPeer.find(function (connection) {return connection.peer === peerId})
+            if (foundConnection) removePeer(foundConnection);
+            sendUpdatePeerList();
+            notifyUserListeners();
+        });
+    }
+
+       // Server side ReadOnly 
+       module.setReadOnly = function (peerId, lobbyName, action){
+        send("PATCH", "/lobby/readOnly/" + peerId, {action: action, lobby: lobbyName}, function(err,readOnlyList){
+            if (err) return notifyErrorListeners(err);
+            readOnlyPeers = readOnlyList;
+            sendUpdateReadOnlyList();
+            notifyUserListeners();
+        });
+    }
+
+    let redirect= function(lobbyName){
+        send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
+            peerIds = peerIds || [] 
+            if (peerIds.indexOf(peer.id) === -1) window.location.href = '/index.html';;
+        });
+    }
+    module.updatePeerList= function(lobbyName){
+        send("GET", "/lobby/list/" + lobbyName , null, function(err, peerIds){
+            if (err) return notifyErrorListeners(err);
+            redirect(lobbyName);
+            connectedPeer.forEach( function(conn){
+                let index = peerIds.indexOf(conn.peer)
+                if (index === -1){
+                    conn.close();
+                    removePeer(conn);
+                }
+            })
+            notifyUserListeners();
+        });
+    }
+    module.updateReadOnlyList= function(lobbyName, uiCallback){
+        send("GET", "/lobby/readOnly/" + lobbyName , null, function(err, readOnlyList){
+            if (err) return notifyErrorListeners(err);
+            readOnlyPeers = readOnlyList;
+            uiCallback(readOnlyList.indexOf(peer.id) !== -1)
+            notifyUserListeners();
+        });
+    }
+
+    module.isPasswordProtected = function(lobbyName, callback){
+        send("GET", "/lobby/passwordprotected/" + lobbyName , null, function(err, ispp){
+            if (err) return notifyErrorListeners(err);
+            callback(ispp)
+        });
+    }  
+    module.isOwner = function(){
+        return owner === getUsername();
+    }
+    
 
     return module;
 })();

@@ -11,6 +11,10 @@
 </head>
 <body>
 <div id= "whiteBoard">
+    <div class="alert" id="alertBar">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <div id = "alertText"></div>
+    </div>
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
         <div class="draw-icon icon active" id="draw" ></div>
@@ -26,8 +30,11 @@
                     <div class="copy-icon icon-small" id="copyLink"></div>
                 </div>
             </div>
-            <p>Create New Lobby:</p>
-            <input id ="boardName" class ="textBox">
+            <p id="CreateLobbytxt">Create New Lobby:</p>
+            <p id="LobbyNametxt">LobbyName:</p>
+            <input id="boardName" class ="textBox">
+            <p id="Passwordtxt">Password (Empty for none)</p>
+            <input id ="boardPass" class ="textBox">
             <div class ="confirm">
                 <div class = "smlbtn" id="Sboard">Share Board</div>
                 <div class = "smlbtn" id="exit">Cancel</div>
@@ -53,6 +60,7 @@
         <div class="palette" id="colorPalette"></div>
         <div class="icon-large" id="color"></div>
         <div class="home-icon icon" id="home"></div>
+        <div class="home-icon icon" id="pingAll"></div>
         <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
     
         </div id = "canvasLayers">
@@ -62,14 +70,20 @@
 </div>
 </div>
     <div class="form_style">
-        <div class="admin_popup" id="admin">
-            <button class="btn">Admin</button>
+        <div class="admin_popup">
+            <button class="btn" id="admin">Admin</button>
+            <span class="badge" id = "badge">0</span>
             <span class="popuptext" id="myPopup">
+                
                 <div class="user">
                     User1
                     <div>
                         <button>Kick</button>
-                        <button>Allow to draw</button>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round">
+                            </span>
+                        </label>
                     </div>
                 </div>
 
@@ -77,7 +91,10 @@
                     User2
                     <div>
                         <button>Kick</button>
-                        <button>Allow to draw</button>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
             </span>

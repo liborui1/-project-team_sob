@@ -19,7 +19,7 @@
         });
         
         api.onUserUpdate(function(username){
-            if (username) {
+            if (username && username !== "") {
                 window.location.href = '/index.html';
                 localStorage.setItem("username", username);
             } else {

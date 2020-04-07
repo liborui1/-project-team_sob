@@ -29,11 +29,11 @@ window.onload = (function() {
     let currentLobbyName = '';
     let currentScale = 1;
     let userMice = {};
-  
+    let pageAssistRequests = null;
 
     localStorage.removeItem('lobby');
     api.onUserUpdate(function(username){
-        if (username) {
+        if (username && username !== "") {
             localStorage.setItem("signedIn", "");
         } else {
             localStorage.setItem("signedIn", "not signed in");
@@ -85,6 +85,21 @@ window.onload = (function() {
         if (currentLobbyName != "") {
             document.querySelector("#lobbyInfo").style.visibility = "visible";
             document.querySelector("#lobbylink").value = document.location.host + '/joinBoard/' + currentLobbyName;
+            // hide all the lobby creation option
+            let CreateLobbytxt = document.getElementById("CreateLobbytxt");
+            let LobbyNametxt = document.getElementById("LobbyNametxt");
+            let boardName = document.getElementById("boardName");
+            let Passwordtxt = document.getElementById("Passwordtxt");
+            let boardPass = document.getElementById("boardPass");
+            let Sboard = document.getElementById("Sboard");
+            let newLobby = document.getElementById("newLobby");
+            CreateLobbytxt.style.visibility ="hidden";
+            LobbyNametxt.style.visibility ="hidden";
+            boardName.style.visibility ="hidden";
+            Passwordtxt.style.visibility ="hidden";
+            boardPass.style.visibility ="hidden";
+            Sboard.style.visibility ="hidden";
+            newLobby.style.height ="100px";
         } else {
             document.querySelector("#lobbyInfo").style.visibility = "hidden";
             document.querySelector("#lobbylink").value = "";
@@ -100,7 +115,7 @@ window.onload = (function() {
     document.querySelector("#Sboard").addEventListener('click', function(e) {
         document.querySelector('#copied').style.visibility = "hidden";
         let lobbyName = document.getElementById("boardName").value;
-        let lobbyPass = '';
+        let lobbyPass = document.getElementById("boardPass").value || "";
         document.querySelector('#newLobby').style.display = 'none';
         document.querySelector("#lobbyName").innerHTML = lobbyName;
         if (lobbyName !== '') {
@@ -138,7 +153,45 @@ window.onload = (function() {
         api.sendResyncBoard(strokes)
         redraw();
     });
-    
+
+    let createPageAssistNotification = function(data){
+        document.querySelector('#alertBar').style.visibility = "visible"
+        let alertTextDiv=  document.querySelector('#alertText')
+        alertTextDiv.innerHTML = '';
+        let text = document.createElement("DIV")
+        let connectedUsers = api.getConnectedUsers();
+        text.innerHTML = "User " + connectedUsers[data.peerId] + " is calling you to their screen"
+        let acceptButton = document.createElement("BUTTON")
+        acceptButton.innerHTML = "Accept"
+        acceptButton.addEventListener("click", function(e){
+            console.log(data)
+            panX = data.panX;
+            panY = data.panY;
+            currentScale = data.currentScale;
+            resize();
+            
+            document.querySelector('#alertBar').style.visibility = "hidden"
+            alertTextDiv.innerHTML = '';
+        })
+        alertTextDiv.append(text)
+        alertTextDiv.append(acceptButton)
+    }   
+    let onReadOnlyList= function (isPartOfList){
+        if(isPartOfList){
+            // remove pencil/erase/
+            document.querySelector('#draw').style.visibility = "hidden";
+            document.querySelector('#erase').style.visibility = "hidden";
+            document.querySelector('#clearBoard').style.visibility = "hidden";
+            currentAction = "move";
+        } else {
+            // remove pencil/erase
+            document.querySelector('#draw').style.visibility = "visible";
+            document.querySelector('#erase').style.visibility = "visible";
+            document.querySelector('#clearBoard').style.visibility = "visible";
+        }
+    }
+
+
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
         //console.log( "------------------Incomming----------------- "   ) 
@@ -168,12 +221,17 @@ window.onload = (function() {
             let user = data.mouseData;
             //replace mousePosition
             userMice[user.peerId] = user;
-            console.log(user.peerId)
             topLayerRedraw();
+        } else if (data.action === "updatePeerList"){
+           api.updatePeerList(currentLobbyName);
+        }else if (data.action === "pageAssistRequest"){
+            createPageAssistNotification(data.screenData)
+        }else if (data.action === "updateReadOnlyList"){
+            api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
         }
+        
         // MouseData
     }
-
 
     let sendSyncData = function(){
         return strokes
@@ -446,8 +504,7 @@ window.onload = (function() {
         panX = prevPan.panX + (panFrom.x - panTo.x)/currentScale
         panY = prevPan.panY + (panFrom.y - panTo.y)/currentScale
     }
-
-    window.addEventListener("resize", function(e){
+    let resize = function(){
         let canvasWrapper = document.querySelector('#whiteBoard');
         drawingCanvasLayer = document.querySelector('#whiteBoard > #canvasdrawing');
         canvas = document.querySelector('#whiteBoard > #canvasMouseMovements');
@@ -458,35 +515,18 @@ window.onload = (function() {
         canvas.height = canvasWrapper.clientHeight;
         canvas.width = canvasWrapper.clientWidth;
         drawingContext.scale(currentScale, currentScale)
-      
+        topLayerRedraw();
         redraw();
+    }
+    window.addEventListener("resize", function(e){
+        resize()
     });
  
 
     loadSave();
     prepareCanvas();
 
-    // https://html-online.com/articles/get-url-parameters-javascript/
-    function getUrlVars() {
-        let vars = {};
-        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            vars[key] = value;
-        });
-        return vars;
-    }
-    // Try connecting using URL
-    if (getUrlVars()["lobby"]){
-        let lobbyName = getUrlVars()["lobby"]; 
-        // prompt user to give pass or something
-        let lobbyPass = "";
-        clearCanvas();
-        strokes = [[]];
-        if (lobbyName !== '') {
-            currentLobbyName = lobbyName
-            localStorage.setItem('lobby', lobbyName);
-            api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass);
-        }
-    }
+    
      
     document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
@@ -514,6 +554,12 @@ window.onload = (function() {
         drawingCanvasLayer.height = canvasWrapper.clientHeight;
         drawingCanvasLayer.width = canvasWrapper.clientWidth;
         redraw();
+    });
+    document.querySelector('#pingAll').addEventListener('click', function (e){
+        let data = function (peerId) {
+            return {currentScale, panX, panY, peerId}
+        }
+       api.sendScreenData(data);
     });
     // document.querySelector('#shareBoard').addEventListener('click', function (e){
     //     if (currentLobbyName != ""){
@@ -553,5 +599,29 @@ window.onload = (function() {
         }
         topLayerRedraw();
     });
+     // https://html-online.com/articles/get-url-parameters-javascript/
+     function getUrlVars() {
+        let vars = {};
+        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+    }
+    // Try connecting using URL
+    if (getUrlVars()["lobby"]){
+        let lobbyName = getUrlVars()["lobby"]; 
+        // prompt user to give pass or something
+        clearCanvas();
+        strokes = [[]];
+        if (lobbyName !== '') {
+            currentLobbyName = lobbyName
+            localStorage.setItem('lobby', lobbyName);
+            let lobbyPass = ""
+            api.isPasswordProtected( currentLobbyName, function (ispp){
+                lobbyPass = (ispp)? prompt("Please enter password",  ""): "";
+                api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass || "");
+            })
+        }
+    }
 
 }());

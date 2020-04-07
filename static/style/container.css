@@ -119,7 +119,7 @@ header #title{
 .popup {
     margin-top: 5px;
     width: 250px;
-    height: 150px;
+    height: 250px;
     background: #efefef;
     border: 1px solid #bcbcbc;
     border-radius: 2px;
@@ -292,7 +292,7 @@ p {
     justify-content: space-between;
     padding: 5px 5px 5px 5px;
 }
-/* code taken from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_popup*/
+/* The code below has been taken from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_popup*/
 
 .admin_popup {
     position: relative;
@@ -326,8 +326,18 @@ p {
     right: 110%;
     margin-left: -80px;
   }
+  /* The code below has been taken from https://www.w3schools.com/howto/howto_css_notification_button.asp */
+  .admin_popup .badge {
+    visibility: hidden;
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    padding: 5px 10px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+  }
 
-/* Popup arrow */
 .admin_popup .popuptext::after {
     content: "";
     position: absolute;
@@ -339,9 +349,96 @@ p {
     border-color: #555 transparent transparent transparent;
   }
   
-  /* Toggle this class - hide and show the popup */
   .admin_popup .show {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
+  }
+/* The code below has been take from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_alert*/
+
+  .alert {
+    padding: 20px;
+    background-color: green;
+    color: white;
+    position: absolute;
+    width: 300px;
+    left:40%;
+    z-index: 99;
+    visibility: hidden;
+  }
+   .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+ 
+  }
+  
+  .closebtn:hover {
+    color: black;
+  }
+
+  /* The code below has been taken from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_switch*/
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    height: 22px;
+    width:60px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 1.05px;
+    background-color: white;
+    cursor: pointer;
+    background-image: url('../media/draw.png');
+    background-size: cover;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(35px);
+    -ms-transform: translateX(35px);
+    transform: translateX(35px);
+  }
+  
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
   }
