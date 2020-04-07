@@ -7,19 +7,15 @@ const express = require('express');
 const { ExpressPeerServer } = require('peer');
 
 const app = express();
-let multer  = require('multer');
-let fs  = require('fs');
-let upload = multer({ dest: path.join(__dirname, 'uploads')});
 let bodyParser = require('body-parser');
 let Datastore = require('nedb');
-
+let mongo = require('mongodb');
 const options = {
     debug: true,
     path: '/peerjs'
 }
  
 let users = new Datastore({ filename: 'db/users.db', autoload: true, timestampData : true });
-let imageDB = new Datastore({ filename: './db/images.db', autoload: true, timestampData : true });
 let lobbies = new Datastore({ filename: 'db/lobbies.db', autoload: true, timestampData : true });
 let userSaves = new Datastore({ filename: 'db/userSaves.db', autoload: true, timestampData : true });
 let peerIdtoUser = new Datastore({ filename: 'db/peerIdtoUser.db', autoload: true, timestampData : true });
@@ -34,7 +30,8 @@ let Image = (function() {
     };
 }());
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(express.static('static'));
  
 app.use(session({
