@@ -66,15 +66,18 @@
         <canvas id = "canvasMouseMovements" tabindex='1'></canvas>
     </div>
     <div class="form_style">
-        <div class="admin_popup" id="admin">
-            <button class="btn">Admin</button>
+        <div class="admin_popup">
+            <button class="btn" id="admin">Admin</button>
             <span class="badge" id = "badge">0</span>
             <span class="popuptext" id="myPopup">
                 <div class="user">
                     User1
                     <div>
                         <button>Kick</button>
-                        <button>Allow to draw</button>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -82,7 +85,10 @@
                     User2
                     <div>
                         <button>Kick</button>
-                        <button>Allow to draw</button>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
             </span>

@@ -5,18 +5,25 @@
         let lastNumUsers = 0;
         let badgeReset = false;
         function myFunction() {
-            var popup = document.getElementById("myPopup");
+            let popup = document.getElementById("myPopup");
             popup.classList.toggle("show");
           }
 
         let admin = document.getElementById("admin");
         admin.addEventListener("click", function() {
-            var popup = document.getElementById("myPopup");
+            let popup = document.getElementById("myPopup");
             popup.classList.toggle("show");
             document.getElementById('badge').innerHTML = 0;
             document.getElementById('badge').style.visibility = "hidden";
+            let elem = document.getElementById("admin");
+            if (elem.innerHTML=="Admin") {
+                elem.innerHTML = "Close";
+            }
+            else {
+                elem.innerHTML = "Admin";
+            }
         });
-  
+        
         api.onConnectedUserUpdate(function(users){
             
             let newNewNumUsers = Object.keys(users).length - lastNumUsers
@@ -36,7 +43,10 @@
                 ${username}
                 <div>
                         <button>Kick</button>
-                        <button>Allow to draw</button>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 `;
 
@@ -46,5 +56,6 @@
                 document.querySelector('#myPopup').prepend(cmnt_element);
             }
         });
+        
     });
 }());
