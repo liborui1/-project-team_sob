@@ -538,12 +538,15 @@ window.onload = (function() {
          }
          currentColor = id;
         currentAction = "draw";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/cursor.png')16 16, auto";
     });
     document.querySelector('#erase').addEventListener('click', function (e){
         currentAction = "erase";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/erase_cursor.png')10 20, auto";
     });
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/move_cursor.png')16 16, auto";
     });
     document.querySelector('#home').addEventListener('click', function (e){
         panX = 0;
