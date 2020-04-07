@@ -42,7 +42,7 @@
                 cmnt_element.innerHTML = `
                 ${username}
                 <div>
-                        <button>Kick</button>
+                        <button id= "${peerid}">Kick</button>
                         <label class="switch">
                             <input type="checkbox">
                             <span class="slider round"></span>
@@ -50,10 +50,11 @@
                     </div>
                 `;
 
-                cmnt_element.addEventListener("click", function(e){
+            
+                document.querySelector('#myPopup').append(cmnt_element);
+                document.getElementById(peerid).addEventListener("click", function(e){
                     api.kickPeer(peerid);
                 });
-                document.querySelector('#myPopup').prepend(cmnt_element);
             }
         });
     
