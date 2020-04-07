@@ -23,7 +23,7 @@
                 elem.innerHTML = "Admin";
             }
         });
-        
+        /*
         api.onConnectedUserUpdate(function(users){
             
             let newNewNumUsers = Object.keys(users).length - lastNumUsers
@@ -79,7 +79,7 @@
                 }
             }
         });
-    
+        */
         
     });
 }());

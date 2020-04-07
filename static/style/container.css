@@ -404,8 +404,6 @@ p {
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
     height: 22px;
     width:60px;
   }
@@ -418,8 +416,6 @@ p {
     left: 3px;
     bottom: 1.05px;
     background-color: white;
-    -webkit-transition: .4s;
-    transition: .6s;
     cursor: pointer;
     background-image: url('../media/draw.png');
     background-size: cover;
