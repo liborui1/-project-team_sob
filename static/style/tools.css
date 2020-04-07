@@ -112,3 +112,9 @@
     background-image: url('../media/clear.png');
     background-size: cover;
 }
+
+.ping-icon {
+    cursor: pointer;
+    background-image: url('../media/ping.png');
+    background-size: cover;
+}
