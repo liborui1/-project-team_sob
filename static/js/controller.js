@@ -183,6 +183,7 @@ window.onload = (function() {
             document.querySelector('#erase').style.visibility = "hidden";
             document.querySelector('#clearBoard').style.visibility = "hidden";
             currentAction = "move";
+            document.querySelector('#whiteBoard').style.cursor = "url('../media/move_cursor.png')16 16, auto";
         } else {
             // remove pencil/erase
             document.querySelector('#draw').style.visibility = "visible";
