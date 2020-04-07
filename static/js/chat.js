@@ -38,6 +38,7 @@
             });
 
             function createMessage() {
+                let chat = document.querySelector("#chat");
                 let msg = document.querySelector("#msgBox").value;
                     if (msg.replace(/\s/g,'') != "") {
                         let box = document.querySelector("#chat");
@@ -53,6 +54,7 @@
                         msg_box.append(message);
                         box.append(msg_box);
                         api.sendMessage(msg);
+                        chat.scrollTop = chat.scrollHeight - chat.clientHeight;
                     }
                     document.querySelector("#msgBox").value= "";
             }
