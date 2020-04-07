@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="style/color.css">
 </head>
 <body>
-    <div id= "whiteBoard">
+<div id= "whiteBoard">
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
         <div class="draw-icon icon active" id="draw" ></div>
         <div class="erase-icon icon" id="erase" ></div>
-        <div class="erase-icon icon" id="clearBoard" ></div>
+        <div class="clear-icon icon" id="clearBoard" ></div>
         <div class="move-icon icon" id="move" ></div>
         <div class="share-icon icon" id = "move2"></div>
         <div class="popup" id="newLobby">
@@ -54,10 +54,13 @@
         <div class="icon-large" id="color"></div>
         <div class="home-icon icon" id="home"></div>
         <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
-    </div id = "canvasLayers">
-        <canvas id = "canvasdrawing" tabindex='1'></canvas>
-        <canvas id = "canvasMouseMovements" tabindex='1'></canvas>
-    </div>
+    
+        </div id = "canvasLayers">
+            <canvas id = "canvasdrawing" tabindex='1'></canvas>
+            <canvas id = "canvasMouseMovements" tabindex='1'></canvas>
+        </div>
+</div>
+</div>
     <div class="form_style">
         <div class="admin_popup" id="admin">
             <button class="btn">Admin</button>
@@ -79,12 +82,18 @@
                 </div>
             </span>
         </div>
+        <div id="chat_header" class="chat_header">
+            <div id="collapsBtn" class="up-icon collapsBtn"><div>
+            <div id="chat_title" class="chat_title">Group Chat</div>
+        </div>
     </div>
-    <div id="chat_header" class="chat_header">
-        <div id="collapsBtn" class="up-icon collapsBtn"><div>
-        <div id="chat_title" class="chat_title">Group Name</div>
+    <div id="chat" class="chat-container">
     </div>
-     
+    <div id="messagebox" class="msg-container">
+        <input id="msgBox" class="txtBox" />
+        <div id="sendBtn" class="send-icon collapsBtn"><div></div>
+    </div>
+
 </body>
  <footer>
     <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>

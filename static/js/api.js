@@ -282,7 +282,12 @@ let api = (function(){
     let getAllSaves= function(callback) {
         send("GET", "/api/boadnames/", null, callback);
     };
-
+    let chatListeners = [];
+    module.onChatUpdate = function(handler){
+        chatListeners.push(handler);
+        handler(getUsername());
+    };
+    
     let historyListeners = [];
 
     function notifyHistoryListeners(){

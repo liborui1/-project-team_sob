@@ -1,8 +1,4 @@
 .chat_header {
-	display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
 	width: 300px;
     height: 38px;
     border: 2px solid #424242;
@@ -31,12 +27,97 @@
     background-size:75%;
     margin: 2px 2px 2px 2px;
 }
-.collapsBtn:hover {
-    background-color: #666;
-    color: white;
-}
 .up-icon{
     cursor: pointer;
     background-image: url('../media/up.png');
     background-size: cover;
+}
+
+.down-icon{
+    cursor: pointer;
+    background-image: url('../media/down.png');
+    background-size: cover;
+}
+
+.send-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    margin: 2px 2px 2px 2px;
+    cursor: pointer;
+    background-image: url('../media/send.png');
+    background-size: cover;
+}
+
+
+.chat-container{
+	display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow: auto;
+	width: 300px;
+    height: 450px;
+    border: 2px solid #424242;
+  	background-color: #D3D3D3;
+    position: fixed;
+    bottom: 53px;
+    right: 20px;
+    visibility: hidden;
+}
+
+.msg-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items:center;
+    flex-wrap: wrap;
+	width: 298px;
+    height: 40px;
+    border-top: 3px;
+    border-style: solid;
+    border-color: #424242;
+  	background-color: #f1f1f1;
+    position: fixed;
+    bottom: 5px;
+    right: 20px;
+    visibility: hidden;
+}
+
+.txtBox {
+    width: 240px;
+    height: 25px;
+    border-radius: 15px;
+    border:3px solid #000000;
+    background-color: white;
+    font-size: 20px;
+    padding-left: 10px;
+}
+
+.message-container {
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 5px 5px 5px 5px;
+}
+
+.message-name {
+    font-size: medium;
+    font-family: Arial;
+    color: #8a8a8a;
+}
+.message {
+    font-size: large;
+    font-family: Arial;
+    color: white;
+    background-color: #0099ff;
+    border-radius: 10px;
+    border: #0099ff;
+    flex-wrap:wrap;
+    padding: 8px 8px 8px 8px;
 }

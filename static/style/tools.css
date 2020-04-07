@@ -106,3 +106,9 @@
     background-image: url('../media/eraser.png');
     background-size: cover;
 }
+
+.clear-icon{
+    cursor: pointer;
+    background-image: url('../media/clear.png');
+    background-size: cover;
+}
