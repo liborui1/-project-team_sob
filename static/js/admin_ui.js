@@ -56,7 +56,7 @@
                 document.querySelector('#myPopup').prepend(cmnt_element);
             }
         });
-        */
+    
         
     });
 }());
