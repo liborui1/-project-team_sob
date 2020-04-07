@@ -420,6 +420,9 @@ p {
     background-color: white;
     -webkit-transition: .4s;
     transition: .6s;
+    cursor: pointer;
+    background-image: url('../media/draw.png');
+    background-size: cover;
   }
   
   input:checked + .slider {
