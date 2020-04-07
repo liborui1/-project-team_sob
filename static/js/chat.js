@@ -29,6 +29,7 @@
             document.querySelector("#msgBox").addEventListener('keyup', function(e) {
                 if (e.keyCode === 13) {
                     createMessage();
+                    
                 }
             });
 
@@ -51,6 +52,7 @@
                         msg_box.append(msg_name);
                         msg_box.append(message);
                         box.append(msg_box);
+                        api.sendMessage(msg);
                     }
                     document.querySelector("#msgBox").value= "";
             }

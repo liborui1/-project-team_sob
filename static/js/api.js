@@ -123,6 +123,7 @@ let api = (function(){
             });
             // When connected expect incomming strokes in the data
              dataConnection.on('data', function (data){
+                 data.peerId = peerIdToUserName[dataConnection.peer] || dataConnection.peer
                  if (readOnlyPeers.indexOf(dataConnection.peer) === -1) callBack(data)
             });
         });
@@ -144,7 +145,8 @@ let api = (function(){
                         callback(newPeerdata)
                       
                     } else if (newPeerdata.action !== "initialSync"){
-                        callback(newPeerdata);
+                        newPeerdata.peerId = peerIdToUserName[newPeer.peer] || dataConnection.peer
+                        if (readOnlyPeers.indexOf(newPeer.peer) === -1) callback(newPeerdata);
                     }
                 });
                
@@ -201,10 +203,9 @@ let api = (function(){
               
             });
             newConnection.on('data', function(data) {
+                data.peerId = peerIdToUserName[newConnection.peer] || newConnection.peer
                 if (readOnlyPeers.indexOf(newConnection.peer) === -1) callBack(data);
             })
-        
-             
         });
     }
 
@@ -263,6 +264,13 @@ let api = (function(){
             connPeer.send({action: "pageAssistRequest", screenData: screenData})
         });
     };
+
+    module.sendMessage = function(data) {
+        connectedPeer.forEach( function (connPeer){
+            connPeer.send({action: "chatMessage", message: data})
+        });
+    };
+
 
     sendUpdatePeerList = function() {
         connectedPeer.forEach( function (connPeer){
