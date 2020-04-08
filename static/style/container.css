@@ -282,7 +282,7 @@ p {
 }
 
 .form_style {
-    position: absolute;
+  position: absolute;
   right: 0;
   width: 100px;
   height: 40px;
@@ -318,6 +318,7 @@ p {
 .admin_popup .popuptext {
     visibility: hidden;
     width: 300px;
+    max-height: 300px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -328,6 +329,8 @@ p {
     top: 30%;
     right: 110%;
     margin-left: -80px;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
   /* The code below has been taken from https://www.w3schools.com/howto/howto_css_notification_button.asp */
   .admin_popup .badge {
@@ -350,6 +353,7 @@ p {
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
+
   }
   
   .admin_popup .show {
@@ -408,7 +412,7 @@ p {
     bottom: 0;
     background-color: #ccc;
     height: 22px;
-    width:60px;
+    width:50px;
   }
   
   .slider:before {
@@ -433,9 +437,9 @@ p {
   }
   
   input:checked + .slider:before {
-    -webkit-transform: translateX(35px);
-    -ms-transform: translateX(35px);
-    transform: translateX(35px);
+    -webkit-transform: translateX(25px);
+    -ms-transform: translateX(25px);
+    transform: translateX(25px);
   }
   
   .slider.round {
