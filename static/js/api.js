@@ -14,22 +14,19 @@ let api = (function(){
     let mute = true;
     let audio = true;
     let localMediaStream = null;
-    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-            // Get access to the microphone
+             // Get access to the microphone
             function getLocalAudioStream(cb) {
-                navigator.getUserMedia (
-                {video: false, audio: true},
-                function success(audioStream) {
-                myStream = audioStream;
-                //mute before sending
-                audioStream.getAudioTracks()[0].enabled = false;
-                localMediaStream = audioStream;
-                    if (cb) cb(null, myStream);
-                },
-                function error(err) {
-                    if (cb) cb(err);
+                if (navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({  audio: true, video: false })
+                    .then(function (stream) {
+                           //mute before sending
+                            stream.getAudioTracks()[0].enabled = false;
+                            localMediaStream = stream;
+                        if (cb) cb(null, stream);
+ 
+                     })
+                     .catch(function (e) { if (cb) cb(e); });
                 }
-                );
             }
 
     function playStream(stream) {
