@@ -641,9 +641,12 @@ window.onload = (function() {
             let message = document.createElement('div');
             message.className = "message";
             message.innerHTML = msg;
+            let left = document.createElement('div');
+            left.className = "left-container";
             msg_box.append(msg_name);
             msg_box.append(message);
-            box.append(msg_box);
+            left.append(msg_box);
+            box.append(left);
         }
         document.querySelector("#msgBox").value= "";
     }
