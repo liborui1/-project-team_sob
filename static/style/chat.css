@@ -11,10 +11,12 @@
 .chat_header .badge {
     visibility: hidden;
     position: absolute;
-    top: 10px;
-    right: -10px;
-    padding: 5px 10px;
-    border-radius: 50%;
+    width:10px;
+    height: 10px;
+    top: -15px;
+    right: -15px;
+    padding: 10px 10px;
+    border-radius: 100%;
     background-color: red;
     color: white;
   }
