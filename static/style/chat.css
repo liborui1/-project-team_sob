@@ -6,7 +6,6 @@
     position: fixed;
     bottom: 5px;
     right: 20px;
-    box-shadow: 10px 10px 5px grey;
 }
 .chat_title {
     font-family: Arial;
@@ -71,7 +70,6 @@
     bottom: 53px;
     right: 20px;
     visibility: hidden;
-    box-shadow: 10px 10px 5px grey;
 }
 
 .msg-container{
@@ -90,7 +88,6 @@
     bottom: 5px;
     right: 20px;
     visibility: hidden;
-    box-shadow: 10px 10px 5px grey;
 }
 
 .txtBox {
