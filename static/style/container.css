@@ -147,6 +147,7 @@ header #title{
   background-color: #bcbcbc;
   font-size: 18px;
   overflow: hidden;
+  flex-wrap: nowrap;
 }
 .row {
 	display: flex;
@@ -377,7 +378,7 @@ p {
     color: white;
     position: absolute;
     width: 500px;
-    left:25%;
+    left:40%;
     z-index: 99;
     visibility: hidden;
     opacity: 0.5;
