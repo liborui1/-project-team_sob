@@ -12,7 +12,7 @@
 <body>
 <div id= "whiteBoard">
     <div class="alert" id="alertBar">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <!-- <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>  -->
         <div id = "alertText"></div>
     </div>
     <div class= "tool-bar" id ="toolBar">
@@ -26,7 +26,7 @@
             <div id = "lobbyInfo">
                 <p>Current Lobby Link:</p> <p id="copied" class="inform">Copied</p>
                 <div class ="row">
-                    <input id="lobbylink" class="textBox">
+                    <div id="lobbylink" class="fakeTextBox"> </div>
                     <div class="copy-icon icon-small" id="copyLink"></div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
         </div>
         <!-- <p id="peerIddisplay"></p> -->
         <!-- <button id = "shareBoard"> Link Button </button> -->
-        <p id="peerIddisplay"></p>
+        <!-- <p id="peerIddisplay"></p> -->
         <div class="download-icon icon" id="dload" ></div>
         <!-- <div class="upload-icon icon" id="upload" ></div> -->
         <!-- <textarea id="saveName"></textarea> -->
@@ -62,7 +62,7 @@
         <div class="home-icon icon" id="home"></div>
         <div class="ping-icon icon" id="pingAll"></div>
         <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
-    
+        <!-- <div class="home-icon icon" id="testAlert"></div> -->
         </div id = "canvasLayers">
             <canvas id = "canvasdrawing" tabindex='1'></canvas>
             <canvas id = "canvasMouseMovements" tabindex='1'></canvas>

@@ -140,6 +140,14 @@ header #title{
     font-size: 18px;
 }
 
+.fakeTextBox {
+  width: 220px;
+  height: 25px;
+  border:2px solid #000000;
+  background-color: #bcbcbc;
+  font-size: 18px;
+  overflow: hidden;
+}
 .row {
 	display: flex;
     flex-direction: row;
@@ -362,16 +370,20 @@ p {
 /* The code below has been take from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_alert*/
 
   .alert {
+    text-align: center;
+    font-size: 20px;
     padding: 20px;
-    background-color: green;
+    background-color: limegreen;
     color: white;
     position: absolute;
-    width: 300px;
-    left:40%;
+    width: 500px;
+    left:25%;
     z-index: 99;
     visibility: hidden;
+    opacity: 0.5;
+    border-radius: 5px;
   }
-   .closebtn {
+   /* .closebtn {
     margin-left: 15px;
     color: white;
     font-weight: bold;
@@ -381,7 +393,7 @@ p {
     cursor: url('../media/point.png'), auto;
     transition: 0.3s;
  
-  }
+  } */
   
   .closebtn:hover {
     color: black;
