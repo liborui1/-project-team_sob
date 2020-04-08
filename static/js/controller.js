@@ -84,7 +84,7 @@ window.onload = (function() {
         }
         if (currentLobbyName != "") {
             document.querySelector("#lobbyInfo").style.visibility = "visible";
-            document.querySelector("#lobbylink").value = document.location.host + '/joinBoard/' + currentLobbyName;
+            document.querySelector("#lobbylink").innerHTML = "https://" + document.location.host + '/joinBoard/' + currentLobbyName;
             // hide all the lobby creation option
             let CreateLobbytxt = document.getElementById("CreateLobbytxt");
             let LobbyNametxt = document.getElementById("LobbyNametxt");
@@ -100,6 +100,7 @@ window.onload = (function() {
             boardPass.style.visibility ="hidden";
             Sboard.style.visibility ="hidden";
             newLobby.style.height ="100px";
+            // document.getElementById("lobbylink").disabled = true;
         } else {
             document.querySelector("#lobbyInfo").style.visibility = "hidden";
             document.querySelector("#lobbylink").value = "";
@@ -139,10 +140,13 @@ window.onload = (function() {
     document.querySelector('#copyLink').addEventListener('click', function(e) {
         //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard
         document.querySelector('#copied').style.visibility = "visible";
-        let copyText = document.querySelector("#lobbylink");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        document.execCommand("copy");
+        let copyText = document.querySelector("#lobbylink").innerHTML;
+        let el = document.createElement('textarea');
+        el.value = copyText;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
         
     });
     document.querySelector('#clearBoard').addEventListener('click', function(e) {
