@@ -1,4 +1,5 @@
 const path = require('path');
+const cors = require('cors');
 const session = require('express-session');
 const crypto = require('crypto');
 const cookie = require('cookie');
@@ -11,10 +12,10 @@ const options = {
     debug: true,
     path: '/peerjs'
 }
-const mongoUrl = 'mongodb://TeamSOB:Nnh7Xs3QLxnK7t@ds263808.mlab.com:63808/heroku_k5n4csr8'
+const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost/'
 const dbName = 'drawshare'
 app.use(bodyParser.urlencoded({ extended: false }));
- 
+app.use(cors());
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(express.static('static'));
@@ -31,7 +32,7 @@ let isAuthenticated = function(req, res, next) {
         let drawshare = client.db(dbName);
         let users2 = drawshare.collection('users')
         users2.findOne({_id: id}, function(err, user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             return (!user)? res.status(401).end("access denied") : next();  
         });
     });
@@ -63,11 +64,12 @@ app.post('/signup/', function (req, res, next) {
     let password = req.body.password;
 
     mongo.connect(mongoUrl, function (err, client){
+        if (err) return res.status(500).end(err.errmsg);
         let drawshare = client.db(dbName);
         let users2 = drawshare.collection('users')
         
         users2.findOne({_id:username}, function (err, found){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (found) return res.status(409).end("username " + username + " already exists");
         });
         let salt = crypto.randomBytes(16).toString('base64');
@@ -76,7 +78,7 @@ app.post('/signup/', function (req, res, next) {
         let saltedHash = hash.digest('base64');
         let item = {_id: username, password: saltedHash, salt: salt}
         users2.insertOne(item, function (err, inserted){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             res.setHeader('Set-Cookie', cookie.serialize('username', username, {
                 path : '/', 
                 maxAge: 60 * 60 * 24 * 7
@@ -97,7 +99,7 @@ app.post('/signin/', function (req, res, next) {
         let users2 = drawshare.collection('users')
     
         users2.findOne({_id: username}, function(err, user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (!user) return res.status(401).end("access denied");
             let salt = user.salt;
             let hash = crypto.createHmac('sha512', salt);
@@ -134,7 +136,7 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
         let lobbies2 = drawshare.collection('lobbies')
         let peerIdtoUser2 = drawshare.collection('peerIdtoUser')
         lobbies2.findOne({_id: lobbyName}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (lobby) return res.status(409).end("lobby " + lobby + " already exists");
             let salt = crypto.randomBytes(16).toString('base64');
             let hash = crypto.createHmac('sha512', salt);
@@ -142,13 +144,13 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
             let saltedHash = hash.digest('base64');
             let name = (req.username !== '')? req.username : peerId; 
             peerIdtoUser2.replaceOne( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err);
+                if (err) return res.status(500).end(err.errmsg);
             });
 
             req.session.currentLobbies.push(lobbyName);
             let pp = lobbyPassword !== "";
             lobbies2.replaceOne({_id: lobbyName},{_id: lobbyName, connectedPeers: [peerId], password: saltedHash, salt: salt, owner:req.username, passwordProtected: pp, readOnly: [] }, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err);
+                if (err) return res.status(500).end(err.errmsg);
                 lobbies2.findOne({_id: lobbyName}, function(err, user){
                     return res.json("lobby " + lobbyName + " created");
                 });
@@ -167,7 +169,7 @@ app.post('/joinLobby/', function (req, res, next) {
         let peerIdtoUser2 = drawshare.collection('peerIdtoUser')
     // retrieve user from the database
     lobbies2.findOne({_id: lobbyName}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (!lobby) return res.status(404).end("Lobby not found");
             let salt = lobby.salt;
             let hash = crypto.createHmac('sha512', salt);
@@ -178,11 +180,11 @@ app.post('/joinLobby/', function (req, res, next) {
             newConnections.push(peerId);
             let name = (req.username !== '')? req.username : peerId; 
             peerIdtoUser2.replaceOne( {_id: peerId},{_id: peerId, userName: name}, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err);
+                if (err) return res.status(500).end(err.errmsg);
             });
             req.session.currentLobbies.push(lobbyName) ;
             lobbies2.replaceOne({_id: lobbyName},{ _id: lobbyName, connectedPeers: newConnections, password: saltedHash, salt: salt, owner:lobby.owner, passwordProtected: lobby.passwordProtected, readOnly: lobby.readOnly}, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err);
+                if (err) return res.status(500).end(err.errmsg);
                 return res.json({connectedPeers: lobby.connectedPeers, owner: lobby.owner});
             });
         });
@@ -195,7 +197,7 @@ app.get('/peerToUser/:peerId', function (req, res, next) {
         let drawshare = client.db(dbName);
         let peerIdtoUser2 = drawshare.collection('peerIdtoUser')
         peerIdtoUser2.findOne({_id: peer}, function (err,user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             let result = (user)? user.userName: "";
             return res.json(result);
         });
@@ -213,11 +215,11 @@ app.post('/api/saveboard/', isAuthenticated, function (req, res, next) {
         let userSaves2 = drawshare.collection('userSaves')
         let username = req.session.user._id;
         userSaves2.findOne({_id: username}, function(err, user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
                 // boards saved with names
             user.savedBoards.push({name : req.body.name, boardData: req.body.boardData});
             userSaves2.replaceOne({_id: username},{_id: username,  savedBoards: user.savedBoards}, function(err){
-                if (err) return res.status(500).end(err);
+                if (err) return res.status(500).end(err.errmsg);
                 res.json("Board saved")
             });
         });
@@ -229,7 +231,7 @@ app.get('/api/saveboard/:index', isAuthenticated, function (req, res, next) {
         let drawshare = client.db(dbName);
         let userSaves2 = drawshare.collection('userSaves')
         userSaves2.findOne({_id: req.session.user._id}, function(err, user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             console.log(parseInt(req.params.index))
             res.json(user.savedBoards[parseInt(req.params.index)])
         });
@@ -241,7 +243,7 @@ app.get('/api/boadnames/', isAuthenticated, function (req, res, next) {
         let drawshare = client.db(dbName);
         let userSaves2 = drawshare.collection('userSaves')
         userSaves2.findOne({_id: req.session.user._id}, function(err, user){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             let bname = [];
             user.savedBoards.forEach(function (item){
                 bname.push(item.name);
@@ -260,15 +262,15 @@ app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
         let client = req.params.id
         let lobbyName = req.body.lobby
         peerIdtoUser2.deleteOne( {_id: client}, {}, function(err){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
         });
 
         lobbies2.findOne({_id: lobbyName}, function (err, found){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (found.owner === req.username){
                 let newConnections = found.connectedPeers.filter(item => item !== client);
                 lobbies2.updateOne({_id: found._id}, {$set: {connectedPeers: newConnections}} , {upsert: true}, function(err){
-                    if (err) return res.status(500).end(err);
+                    if (err) return res.status(500).end(err.errmsg);
                     return  res.json("kicked")
                 });
             }  else {
@@ -285,7 +287,7 @@ app.get('/lobby/list/:id', isPartOfLobby, function (req, res, next) {
         let drawshare = client.db(dbName);
         let lobbies2 = drawshare.collection('lobbies')
         lobbies2.findOne({_id: req.params.id}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (!lobby) return res.status(404).end("Lobby not found");
             return res.json(lobby.connectedPeers)
         });
@@ -297,7 +299,7 @@ app.get('/lobby/passwordprotected/:id', function (req, res, next) {
         let drawshare = client.db(dbName);
         let lobbies2 = drawshare.collection('lobbies')
         lobbies2.findOne({_id: req.params.id}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (!lobby) return res.status(404).end("Lobby not found");
             return res.json(lobby.passwordProtected)
         });
@@ -310,7 +312,7 @@ app.get('/lobby/readOnly/:id', isPartOfLobby, function (req, res, next) {
         let drawshare = client.db(dbName);
         let lobbies2 = drawshare.collection('lobbies')
         lobbies2.findOne({_id: req.params.id}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             if (!lobby) return res.status(404).end("Lobby not found");
             return res.json(lobby.readOnly)
         });
@@ -326,7 +328,7 @@ app.patch('/lobby/readOnly/:id', isAuthenticated, function (req, res, next) {
         let drawshare = clientDataBase.db(dbName);
         let lobbies2 = drawshare.collection('lobbies')
         lobbies2.findOne({_id: lobbyName}, function(err, lobby){
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.errmsg);
             // find lobby with unique peerid -- garenteed thers only one peerid in all popssible lobbies
             let newReadOnly = lobby.readOnly
             if (action === "add"){
@@ -337,7 +339,7 @@ app.patch('/lobby/readOnly/:id', isAuthenticated, function (req, res, next) {
             // check for owner
             if (lobby.owner === req.username){
                 lobbies2.replaceOne({_id: lobby._id},{ _id: lobby._id, connectedPeers: lobby.connectedPeers, password: lobby.password, salt: lobby.salt,  owner:lobby.owner, passwordProtected: lobby.passwordProtected, readOnly: newReadOnly}, {upsert: true}, function(err){
-                    if (err) return res.status(500).end(err);
+                    if (err) return res.status(500).end(err.errmsg);
                     return res.json(newReadOnly)
                 });
             } else {
