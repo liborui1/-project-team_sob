@@ -17,6 +17,7 @@
                     chatBtn.className = "down-icon collapsBtn";
                     chat.style.visibility="visible";
                     messagebox.style.visibility="visible";
+                    document.querySelector("#msgBox").focus();
                     chatMin = false;
                 } else {
                     chatHeader.style.bottom = "5px";
@@ -54,9 +55,12 @@
                         let message = document.createElement('div');
                         message.className = "mymessage";
                         message.innerHTML = msg;
+                        let right = document.createElement('div');
+                        right.className = "right-container";
                         msg_box.append(msg_name);
                         msg_box.append(message);
-                        box.append(msg_box);
+                        right.append(msg_box);
+                        box.append(right);
                         api.sendMessage(msg);
                         chat.scrollTop = chat.scrollHeight - chat.clientHeight;
                     }
