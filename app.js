@@ -13,7 +13,7 @@ const options = {
     path: '/peerjs'
 }
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost/'
-const dbName = 'drawshare'
+const dbName = 'heroku_k5n4csr8'
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(bodyParser.json({limit: "50mb"}));
