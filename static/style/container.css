@@ -442,3 +442,19 @@ p {
   .slider.round:before {
     border-radius: 50%;
   }
+
+  .audio_section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 92px;
+    text-align: center;
+    /* margin: 50px; */
+    top: 55px;
+    position: absolute;
+    right: 0;
+    font-size: 20px;
+    border:2px solid #000000;
+    z-index: 2;
+  }

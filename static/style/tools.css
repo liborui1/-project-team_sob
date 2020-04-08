@@ -106,3 +106,15 @@
     background-image: url('../media/eraser.png');
     background-size: cover;
 }
+
+.audio-icon{
+    cursor: pointer;
+    background-image: url('../media/audio.png');
+    background-size: cover;
+}
+
+.microphone-icon{
+    cursor: pointer;
+    background-image: url('../media/microphone.png');
+    background-size: cover;
+}
