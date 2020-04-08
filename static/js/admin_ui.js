@@ -54,12 +54,12 @@
                         </div>
                     `;
                     let cb = cmnt_element.querySelector("#editSlider");
-                    cb.checked = (readOnly.indexOf(peerid) !== -1)
+                    cb.checked = !(readOnly.indexOf(peerid) !== -1)
                 
                     document.querySelector('#myPopup').append(cmnt_element);
                     cmnt_element.querySelector("#editSlider").addEventListener("click", function(){
                         let cb = cmnt_element.querySelector("#editSlider");
-                        if (cb.checked){
+                        if (!cb.checked){
                             // api calls to server to add to cant edit
                             //gray out the pencil/eraser/ability to load/reload
                             api.setReadOnly( peerid, localStorage.getItem('lobby'), "add")
