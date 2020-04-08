@@ -630,21 +630,22 @@ window.onload = (function() {
     }
 
     function createMessage(user, msg) {
-            if (msg.replace(/\s/g,'') != "") {
-                let box = document.querySelector("#chat");
-                let msg_box = document.createElement('div');
-                msg_box.className = "message-container";
-                let msg_name = document.createElement('div');
-                msg_name.className = "message-name";
-                msg_name.innerHTML = user;
-                let message = document.createElement('div');
-                message.className = "message";
-                message.innerHTML = msg;
-                msg_box.append(msg_name);
-                msg_box.append(message);
-                box.append(msg_box);
-            }
-            document.querySelector("#msgBox").value= "";
+        msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        if (msg.replace(/\s/g,'') != "") {
+            let box = document.querySelector("#chat");
+            let msg_box = document.createElement('div');
+            msg_box.className = "message-container";
+            let msg_name = document.createElement('div');
+            msg_name.className = "message-name";
+            msg_name.innerHTML = user;
+            let message = document.createElement('div');
+            message.className = "message";
+            message.innerHTML = msg;
+            msg_box.append(msg_name);
+            msg_box.append(message);
+            box.append(msg_box);
+        }
+        document.querySelector("#msgBox").value= "";
     }
 
 

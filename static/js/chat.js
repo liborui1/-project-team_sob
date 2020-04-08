@@ -28,25 +28,29 @@
             });
             document.querySelector("#msgBox").addEventListener('keyup', function(e) {
                 if (e.keyCode === 13) {
-                    createMessage();
+                    createMessage(username);
                     
                 }
             });
 
             document.querySelector("#sendBtn").addEventListener('click', function(e) {
-                    createMessage();
+                    createMessage(username);
             });
 
-            function createMessage() {
+            function createMessage(user) {
+                if (user == "") {
+                    user = "anonymous";
+                }
                 let chat = document.querySelector("#chat");
                 let msg = document.querySelector("#msgBox").value;
+                    msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     if (msg.replace(/\s/g,'') != "") {
                         let box = document.querySelector("#chat");
                         let msg_box = document.createElement('div');
                         msg_box.className = "message-container";
                         let msg_name = document.createElement('div');
                         msg_name.className = "message-name";
-                        msg_name.innerHTML = username;
+                        msg_name.innerHTML = user;
                         let message = document.createElement('div');
                         message.className = "mymessage";
                         message.innerHTML = msg;
