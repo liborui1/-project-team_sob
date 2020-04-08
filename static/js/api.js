@@ -6,25 +6,41 @@ let api = (function(){
     //{secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'}
     let peer = new Peer({secure: true, host: 'draw-share.herokuapp.com', path: '/peerjs'});
     let connectedPeer = [];
+    let mediaStreams = [];
+    let audioList = [];
     let peerIdToUserName = {};
     let readOnlyPeers = [];
     let owner = "";
-    function sendFiles(method, url, data, callback){
-        let formdata = new FormData();
-        Object.keys(data).forEach(function(key){
-            let value = data[key];
-            formdata.append(key, value);
-        });
-        let xhr = new XMLHttpRequest();
-        xhr.onload = function() {
-            if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
-            else callback(null, JSON.parse(xhr.responseText));
-        };
-        xhr.open(method, url, true);
-        xhr.send(formdata);
+    let mute = true;
+    let audio = true;
+    let localMediaStream = null;
+    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+            // Get access to the microphone
+            function getLocalAudioStream(cb) {
+                navigator.getUserMedia (
+                {video: false, audio: true},
+                function success(audioStream) {
+                myStream = audioStream;
+                //mute before sending
+                audioStream.getAudioTracks()[0].enabled = false;
+                localMediaStream = audioStream;
+                    if (cb) cb(null, myStream);
+                },
+                function error(err) {
+                    if (cb) cb(err);
+                }
+                );
+            }
+
+    function playStream(stream) {
+        let audio = document.createElement("audio")
+        audio.srcObject = stream;
+        audio.autoplay = true;
+        document.body.append(audio);
+        audioList.push(audio);
     }
-
-
+    
+ 
     function send(method, url, data, callback){
         let xhr = new XMLHttpRequest();
         xhr.onload = function() {
@@ -124,6 +140,16 @@ let api = (function(){
                  if (readOnlyPeers.indexOf(dataConnection.peer) === -1) callBack(data)
             });
         });
+        peer.on('call', function(incoming) {
+            getLocalAudioStream(function(err, res){
+                incoming.answer(res)
+            })
+            incoming.on('stream', function(stream) {
+              // Do something with this audio stream
+                playStream(stream)
+                mediaStreams.push(stream)
+            });
+          });
         
     }
 
@@ -145,10 +171,18 @@ let api = (function(){
                         newPeerdata.peerId = peerIdToUserName[newPeer.peer] || dataConnection.peer
                         if (readOnlyPeers.indexOf(newPeer.peer) === -1) callback(newPeerdata);
                     }
+             
                 });
                
                 newPeer.on('open', function (){
                     addPeer(newPeer);
+                    getLocalAudioStream(function (err,res){
+                        let ms = peer.call(newPeerId, res);
+                        ms.on('stream', function(stream){
+                            mediaStreams.push(stream)
+                            playStream(stream)
+                        })
+                    });
                     let dataChannel =  newPeer.dataChannel
                     let peerConnection =  newPeer.peerConnection
                     dataChannel.onclose = function () {
@@ -162,6 +196,7 @@ let api = (function(){
                         }
                     }
                 });
+ 
             });
        });
     }
@@ -179,7 +214,19 @@ let api = (function(){
             if (!sentRequest) requestJoinLobby(id, lobbyName, lobbyPass, callBack);
         });
         // When finished connecting wait for peer to send strokes
-        
+        peer.on('call', function(incoming) {
+            getLocalAudioStream(function(err, res){
+                incoming.answer(res)
+            })
+            incoming.on('stream', function(stream) {
+            // Do something with this audio stream
+                playStream(stream)
+                mediaStreams.push(stream)
+            });
+        });
+
+     
+
         peer.on('connection', function (newConnection){
             addPeer(newConnection);
             newConnection.on('open', function() {
@@ -241,6 +288,14 @@ let api = (function(){
        
             connPeer.send({action: "mouseData", mouseData: data})
     
+        });
+    };
+    
+    module.callPeers = function(){
+        connectedPeer.forEach( function (connPeer){
+            getLocalAudioStream(function (err,res){
+                peer.call(connPeer, res);
+            });
         });
     };
 
@@ -433,8 +488,17 @@ let api = (function(){
     module.isOwner = function(){
         return owner === getUsername();
     }
-    
-
+    module.toggleMute = function(){
+        mute = !mute
+       if (localMediaStream)localMediaStream.getAudioTracks()[0].enabled = !mute;
+    }
+    module.toggleAudio = function(){
+        audio = !audio
+        mediaStreams.forEach(function(audioStream){
+            audioStream.getAudioTracks()[0].enabled = audio
+        })
+     }
+ 
     return module;
 })();
 

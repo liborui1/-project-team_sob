@@ -230,7 +230,7 @@ window.onload = (function() {
         }else if (data.action === "updateReadOnlyList"){
             api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
         } else if (data.action === "chatMessage"){
-            createMessage(data.peerId, escape(data.message))
+            createMessage(data.peerId, data.message)
         }
         // MouseData
     }

@@ -35,9 +35,15 @@
             });
 
             document.querySelector("#sendBtn").addEventListener('click', function(e) {
-                    createMessage(username);
+                createMessage(username);
             });
-
+            document.querySelector("#microphone").addEventListener('click', function(e){
+                api.toggleMute();
+            })
+            document.querySelector("#audio").addEventListener('click', function(e){
+                api.toggleAudio();
+            })
+      
             function createMessage(user) {
                 if (user == "") {
                     user = "Anonymous";
