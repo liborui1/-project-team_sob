@@ -283,7 +283,7 @@ p {
 
 .form_style {
     position: absolute;
-  right: 0;
+  right: 10px;
   width: 100px;
   height: 40px;
   z-index: 2;
