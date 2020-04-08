@@ -16,6 +16,7 @@ let api = (function(){
     let localMediaStream = null;
              // Get access to the microphone
             function getLocalAudioStream(cb) {
+                if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
                 if (navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({  audio: true, video: false })
                     .then(function (stream) {
