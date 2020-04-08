@@ -8,7 +8,6 @@ let api = (function(){
     let connectedPeer = [];
     let peerIdToUserName = {};
     let readOnlyPeers = [];
-    let localData = {groupName:""};
     let owner = "";
     function sendFiles(method, url, data, callback){
         let formdata = new FormData();

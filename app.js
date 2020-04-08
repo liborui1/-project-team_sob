@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const session = require('express-session');
 const crypto = require('crypto');
@@ -387,13 +388,19 @@ app.patch('/lobby/readOnly/:id',[ check('lobby').escape(), check('action').escap
 });
 
 // Change to Https with certificate, ask how to get certificate
-const http = require('http');
+const https = require('https');
 const PORT = process.env.PORT || 3000;
-
-const server = http.createServer(app).listen(PORT, function (err) {
+var privateKey = fs.readFileSync( 'server.key' );
+var certificate = fs.readFileSync( 'server.crt' );
+var config = {
+        key: privateKey,
+        cert: certificate
+};
+const server = https.createServer(config, app).listen(PORT, function (err) {
     if (err) console.log(err);
-    else console.log("HTTP server on http://localhost:%s", PORT);
+    else console.log("HTTPS server on https://localhost:%s", PORT);
 });
+
 
 const peerserver = ExpressPeerServer(server, options);
     peerserver.on('connection', (client) => { 
