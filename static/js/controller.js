@@ -30,8 +30,37 @@ window.onload = (function() {
     let currentScale = 1;
     let userMice = {};
     let pageAssistRequests = null;
-
+    let localError ='';
     localStorage.removeItem('lobby');
+    api.onError(function(err) {
+        if (err.includes("401")) {
+            localStorage.setItem("signedIn", "**You must be signed in to create Lobby**");
+            window.location.href = '/login.html';
+            localError = "401";
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "You must be signed in to create Lobby";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+        } else if (err.includes("404")) {
+            localError = "404";
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "This lobby does not exit!";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+            setTimeout(function () { window.location.href = '/index.html';}, 3000);
+        } else if (err.includes("409")) {
+            localError = "409";
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "Lobby Name already exists!";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+        } else {
+            localError ="";
+        }
+    });
     api.onUserUpdate(function(username){
         if (username && username !== "") {
             localStorage.setItem("signedIn", "");
@@ -83,24 +112,26 @@ window.onload = (function() {
             window.location.href = '/login.html';
         }
         if (currentLobbyName != "") {
-            document.querySelector("#lobbyInfo").style.visibility = "visible";
-            document.querySelector("#lobbylink").innerHTML = "https://" + document.location.host + '/joinBoard/' + currentLobbyName;
-            // hide all the lobby creation option
-            let CreateLobbytxt = document.getElementById("CreateLobbytxt");
-            let LobbyNametxt = document.getElementById("LobbyNametxt");
-            let boardName = document.getElementById("boardName");
-            let Passwordtxt = document.getElementById("Passwordtxt");
-            let boardPass = document.getElementById("boardPass");
-            let Sboard = document.getElementById("Sboard");
-            let newLobby = document.getElementById("newLobby");
-            CreateLobbytxt.style.visibility ="hidden";
-            LobbyNametxt.style.visibility ="hidden";
-            boardName.style.visibility ="hidden";
-            Passwordtxt.style.visibility ="hidden";
-            boardPass.style.visibility ="hidden";
-            Sboard.style.visibility ="hidden";
-            newLobby.style.height ="100px";
-            // document.getElementById("lobbylink").disabled = true;
+            if (!localError.includes("401") && !localError.includes("404") && !localError.includes("409")) {
+                document.querySelector("#lobbyInfo").style.visibility = "visible";
+                document.querySelector("#lobbylink").innerHTML = "https://" + document.location.host + '/joinBoard/' + currentLobbyName;
+                // hide all the lobby creation option
+                let CreateLobbytxt = document.getElementById("CreateLobbytxt");
+                let LobbyNametxt = document.getElementById("LobbyNametxt");
+                let boardName = document.getElementById("boardName");
+                let Passwordtxt = document.getElementById("Passwordtxt");
+                let boardPass = document.getElementById("boardPass");
+                let Sboard = document.getElementById("Sboard");
+                let newLobby = document.getElementById("newLobby");
+                CreateLobbytxt.style.visibility ="hidden";
+                LobbyNametxt.style.visibility ="hidden";
+                boardName.style.visibility ="hidden";
+                Passwordtxt.style.visibility ="hidden";
+                boardPass.style.visibility ="hidden";
+                Sboard.style.visibility ="hidden";
+                newLobby.style.height ="100px";
+                // document.getElementById("lobbylink").disabled = true;
+            }
         } else {
             document.querySelector("#lobbyInfo").style.visibility = "hidden";
             document.querySelector("#lobbylink").value = "";
@@ -123,6 +154,13 @@ window.onload = (function() {
             currentLobbyName = lobbyName;
             localStorage.setItem('lobby', lobbyName);
             api.createLobby(onIncommingData, strokes, lobbyName,lobbyPass);
+            localError = "409";
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "limegreen";
+            document.querySelector("#alertText").innerHTML = "Lobby '" + lobbyName+ "' created!";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+            localError ="";
         }
     });
     
@@ -532,7 +570,14 @@ window.onload = (function() {
     loadSave();
     prepareCanvas();
 
-    
+    // document.querySelector('#testAlert').addEventListener('click', function (e) {
+    //     // https://stackoverflow.com/questions/16127115/closing-popup-window-after-3-seconds
+    //     let popup = document.querySelector('#alertBar');
+    //     popup.style.visibility = "visible";
+    //     popup.style.backgroundColor = "limegreen";
+    //     document.querySelector("#alertText").innerHTML = "test test test";
+    //     setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+    // });
      
     document.querySelector('#color').style.background = currentColor;
     document.querySelector('#draw').addEventListener('click', function (e){
@@ -629,6 +674,11 @@ window.onload = (function() {
             api.isPasswordProtected( currentLobbyName, function (ispp){
                 lobbyPass = (ispp)? prompt("Please enter password",  ""): "";
                 api.connectToBoard(onIncommingData, sendSyncData, lobbyName, lobbyPass || "");
+                let popup = document.querySelector('#alertBar');
+                popup.style.visibility = "visible";
+                popup.style.backgroundColor = "limegreen";
+                document.querySelector("#alertText").innerHTML = "Welcome to lobby '" + lobbyName + "'!";
+                setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
             })
         }
     }
