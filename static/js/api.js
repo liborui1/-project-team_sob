@@ -377,8 +377,8 @@ let api = (function(){
     };
 
     // Server side kicking 
-    module.kickPeer = function (peerId){
-        send("PATCH", "/lobby/kick/" + peerId, null, function(err,res){
+    module.kickPeer = function (peerId, lobbyName){
+        send("PATCH", "/lobby/kick/" + peerId, {lobby: lobbyName}, function(err,res){
             if (err) return notifyErrorListeners(err);
             // after kicking the peer remove connection and signal every other peer to update their peerlist
             let foundConnection = connectedPeer.find(function (connection) {return connection.peer === peerId})

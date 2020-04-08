@@ -71,7 +71,7 @@
                         }
                     })
                     document.getElementById(peerid).addEventListener("click", function(e){
-                        api.kickPeer(peerid);
+                        api.kickPeer(peerid, localStorage.getItem('lobby'));
                     });
                 } else {
                     cmnt_element.innerHTML = username

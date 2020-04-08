@@ -16,7 +16,6 @@
     "express-session": "^1.17.0",
     "mongodb": "^3.5.5",
     "multer": "^1.4.2",
-    "nedb": "^1.8.0",
     "peer": "^0.2.10",
     "peerjs": "^1.2.0"
   }
