@@ -231,6 +231,7 @@ window.onload = (function() {
             api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
         } else if (data.action === "chatMessage"){
             createMessage(data.peerId, data.message)
+
         }
         // MouseData
     }
@@ -631,6 +632,11 @@ window.onload = (function() {
 
     function createMessage(user, msg) {
         let chat = document.querySelector("#chat");
+   
+        if (chat.style.visibility !== "visible"){
+            let chatBadge=  document.querySelector("#chatBadge");
+            chatBadge.style.visibility = "visible";
+        }
         msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         if (msg.replace(/\s/g,'') != "") {
             let box = document.querySelector("#chat");

@@ -18,6 +18,8 @@
                     chat.style.visibility="visible";
                     messagebox.style.visibility="visible";
                     document.querySelector("#msgBox").focus();
+                    let chatBadge=  document.querySelector("#chatBadge");
+                    chatBadge.style.visibility = "hidden";
                     chatMin = false;
                 } else {
                     chatHeader.style.bottom = "5px";
