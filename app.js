@@ -83,11 +83,12 @@ app.post('/signup/',  [check('username').escape(), check('password').escape() ],
         let item = {_id: username, password: saltedHash, salt: salt}
         users2.insertOne(item, function (err, inserted){
             if (err) return res.status(500).end(err.errmsg);
+            console.log(username)
             res.setHeader('Set-Cookie', cookie.serialize('username', username, {
                 path : '/', 
                 maxAge: 60 * 60 * 24 * 7
             }));
-            req.session.user = inserted;
+            req.session.user = item;
             return res.json("user " + username + " signed up");
         });
     });
@@ -115,8 +116,8 @@ app.post('/signin/',[check('username').escape(), check('password').escape() ], f
             let saltedHash = hash.digest('base64');
             if (user.password !== saltedHash) return res.status(401).end("access denied"); 
             req.session.user = user;
+          
             // initialize cookie
-           
             res.setHeader('Set-Cookie', cookie.serialize('username', username, {
                 path : '/', 
                 maxAge: 60 * 60 * 24 * 7
