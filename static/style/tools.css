@@ -107,6 +107,17 @@
     background-size: cover;
 }
 
+
+.audio-icon{
+    cursor: pointer;
+    background-image: url('../media/audio.png');
+    background-size: cover;
+}
+
+.microphone-icon{
+    cursor: pointer;
+    background-image: url('../media/microphone.png');
+  
 .clear-icon{
     cursor: url('../media/point.png'), auto;
     background-image: url('../media/clear.png');
@@ -116,5 +127,6 @@
 .ping-icon {
     cursor: url('../media/point.png'), auto;
     background-image: url('../media/ping.png');
+
     background-size: cover;
 }
