@@ -40,7 +40,7 @@
 
             function createMessage(user) {
                 if (user == "") {
-                    user = "anonymous";
+                    user = "Anonymous";
                 }
                 let chat = document.querySelector("#chat");
                 let msg = document.querySelector("#msgBox").value;

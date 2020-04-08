@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const cookie = require('cookie');
 const express = require('express');
 const { ExpressPeerServer } = require('peer');
+const { check, validationResult } = require('express-validator');
 const app = express();
 let bodyParser = require('body-parser');
 let mongo = require('mongodb');
@@ -27,6 +28,7 @@ app.use(session({
 }));
 
 let isAuthenticated = function(req, res, next) {
+    
     let id = (req.session.user)? req.session.user._id: null;
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
@@ -40,7 +42,6 @@ let isAuthenticated = function(req, res, next) {
  
 let isPartOfLobby = function(req, res, next) {
     let lobbyName = req.params.id;
- 
     return (req.session.currentLobbies.indexOf(lobbyName) === -1) ? res.status(401).end("access denied") : next();  
 };
  
@@ -59,10 +60,13 @@ app.use(function (req, res, next){
     
 });
 
-app.post('/signup/', function (req, res, next) {
+app.post('/signup/',  [check('username').escape(), check('password').escape() ],function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let username = req.body.username;
     let password = req.body.password;
-
     mongo.connect(mongoUrl, function (err, client){
         if (err) return res.status(500).end(err.errmsg);
         let drawshare = client.db(dbName);
@@ -90,14 +94,18 @@ app.post('/signup/', function (req, res, next) {
 });
 
 // curl -H "Content-Type: application/json" -X POST -d '{"username":"alice","password":"alice"}' -c cookie.txt localhost:3000/signin/
-app.post('/signin/', function (req, res, next) {
+app.post('/signin/',[check('username').escape(), check('password').escape() ], function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let username = req.body.username;
     let password = req.body.password;
     // retrieve user from the database
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
         let users2 = drawshare.collection('users')
-    
+        
         users2.findOne({_id: username}, function(err, user){
             if (err) return res.status(500).end(err.errmsg);
             if (!user) return res.status(401).end("access denied");
@@ -108,10 +116,12 @@ app.post('/signin/', function (req, res, next) {
             if (user.password !== saltedHash) return res.status(401).end("access denied"); 
             req.session.user = user;
             // initialize cookie
+           
             res.setHeader('Set-Cookie', cookie.serialize('username', username, {
                 path : '/', 
                 maxAge: 60 * 60 * 24 * 7
             }));
+     
             return res.json("user " + username + " signed in");
         });
     });
@@ -127,7 +137,11 @@ app.get('/signout/',  function (req, res, next) {
 });
 
 
-app.post('/createLobby/', isAuthenticated, function (req, res, next) {
+app.post('/createLobby/', [check('peerId').escape(), check('name').escape() , check('password').escape() ], isAuthenticated,  function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let peerId = req.body.peerId;
     let lobbyName = req.body.name;
     let lobbyPassword = req.body.password;
@@ -159,7 +173,11 @@ app.post('/createLobby/', isAuthenticated, function (req, res, next) {
     });
 });
 
-app.post('/joinLobby/', function (req, res, next) {
+app.post('/joinLobby/',[check('peerId').escape(), check('name').escape() , check('password').escape() ], function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let peerId = req.body.peerId;
     let lobbyName = req.body.name;
     let lobbyPassword = req.body.password;
@@ -191,7 +209,11 @@ app.post('/joinLobby/', function (req, res, next) {
     });
 });
 
-app.get('/peerToUser/:peerId', function (req, res, next) {
+app.get('/peerToUser/:peerId', [check('peerId').escape()], function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let peer = req.params.peerId;
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
@@ -204,12 +226,16 @@ app.get('/peerToUser/:peerId', function (req, res, next) {
     });
 });
 
-app.get('/joinBoard/:id', function (req, res, next) {
+app.get('/joinBoard/:id', [ check('name').escape()], function (req, res, next) {
     // just a simpler way of joining the board
     res.redirect('/drawshare.html?lobby=' + req.params.id)
 });
 
 app.post('/api/saveboard/', isAuthenticated, function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
         let userSaves2 = drawshare.collection('userSaves')
@@ -227,6 +253,7 @@ app.post('/api/saveboard/', isAuthenticated, function (req, res, next) {
 });
 
 app.get('/api/saveboard/:index', isAuthenticated, function (req, res, next) {
+    
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
         let userSaves2 = drawshare.collection('userSaves')
@@ -254,13 +281,18 @@ app.get('/api/boadnames/', isAuthenticated, function (req, res, next) {
 });
 
 
-app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
+app.patch('/lobby/kick/:id', [ check('lobby').escape()], isAuthenticated, function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     mongo.connect(mongoUrl, function (err, clientDataBase){
         let drawshare = clientDataBase.db(dbName);
         let peerIdtoUser2 = drawshare.collection('peerIdtoUser')
         let lobbies2 = drawshare.collection('lobbies')
         let client = req.params.id
         let lobbyName = req.body.lobby
+        
         peerIdtoUser2.deleteOne( {_id: client}, {}, function(err){
             if (err) return res.status(500).end(err.errmsg);
         });
@@ -271,7 +303,7 @@ app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
                 let newConnections = found.connectedPeers.filter(item => item !== client);
                 lobbies2.updateOne({_id: found._id}, {$set: {connectedPeers: newConnections}} , {upsert: true}, function(err){
                     if (err) return res.status(500).end(err.errmsg);
-                    return  res.json("kicked")
+                    return res.json("kicked " + client);
                 });
             }  else {
                 console.log(found )
@@ -283,6 +315,7 @@ app.patch('/lobby/kick/:id', isAuthenticated, function (req, res, next) {
 });
 
 app.get('/lobby/list/:id', isPartOfLobby, function (req, res, next) {
+    
     mongo.connect(mongoUrl, function (err, client){
         let drawshare = client.db(dbName);
         let lobbies2 = drawshare.collection('lobbies')
@@ -320,7 +353,11 @@ app.get('/lobby/readOnly/:id', isPartOfLobby, function (req, res, next) {
 });
 
 
-app.patch('/lobby/readOnly/:id', isAuthenticated, function (req, res, next) {
+app.patch('/lobby/readOnly/:id',[ check('lobby').escape(), check('action').escape()], isAuthenticated, function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     let client = req.params.id;
     let action = req.body.action;
     let lobbyName = req.body.lobby;

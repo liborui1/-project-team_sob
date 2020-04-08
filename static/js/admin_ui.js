@@ -67,7 +67,6 @@
                         } else {
                             // api calls to server to remove  cant edit
                             api.setReadOnly( peerid, localStorage.getItem('lobby'), "remove")
-                      
                         }
                     })
                     document.getElementById(peerid).addEventListener("click", function(e){

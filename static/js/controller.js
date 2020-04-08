@@ -230,7 +230,7 @@ window.onload = (function() {
         }else if (data.action === "updateReadOnlyList"){
             api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
         } else if (data.action === "chatMessage"){
-            createMessage(data.peerId, data.message)
+            createMessage(data.peerId, escape(data.message))
         }
         // MouseData
     }
@@ -630,6 +630,7 @@ window.onload = (function() {
     }
 
     function createMessage(user, msg) {
+        let chat = document.querySelector("#chat");
         msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         if (msg.replace(/\s/g,'') != "") {
             let box = document.querySelector("#chat");
@@ -647,8 +648,8 @@ window.onload = (function() {
             msg_box.append(message);
             left.append(msg_box);
             box.append(left);
+            chat.scrollTop = chat.scrollHeight - chat.clientHeight;
         }
-        document.querySelector("#msgBox").value= "";
     }
 
 

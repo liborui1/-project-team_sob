@@ -61,7 +61,6 @@ let api = (function(){
         send("POST", "/signin/", {username, password}, function(err, res){
              if (err) return notifyErrorListeners(err);
              notifyUserListeners(getUsername());
-             api.showUsers(0);
         });
     };
     
@@ -69,7 +68,6 @@ let api = (function(){
         send("POST", "/signup/", {username, password}, function(err, res){
              if (err) return notifyErrorListeners(err);
              notifyUserListeners(getUsername());
-             api.showUsers(0);
         });
     };
 
