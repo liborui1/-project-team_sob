@@ -460,6 +460,7 @@ p {
     font-size: 20px;
     border:2px solid #000000;
     z-index: 2;
+  }
 
   .otherCursor {
     cursor: url('../media/point.png'), auto;

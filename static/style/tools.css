@@ -117,6 +117,7 @@
 .microphone-icon{
     cursor: pointer;
     background-image: url('../media/microphone.png');
+}
   
 .clear-icon{
     cursor: url('../media/point.png'), auto;
