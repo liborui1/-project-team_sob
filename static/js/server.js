@@ -51,10 +51,14 @@
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
                 let id = document.querySelector('#serverKey').value.trim();
-                alert(id);
                 window.location.href = '/drawshare.html?lobby=' + id;
             });
-
+            document.querySelector('#serverKey').addEventListener('keyup', function (e){
+                if (e.keyCode === 13) {
+                    let id = document.querySelector('#serverKey').value.trim();
+                    window.location.href = '/drawshare.html?lobby=' + id;
+                }
+            });
             userInfo.addEventListener('click', function (e) {
                 localStorage.setItem("signedIn", "");
                 window.location.href = '/login.html';

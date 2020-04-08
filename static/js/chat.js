@@ -3,7 +3,6 @@
     
     window.addEventListener('load', function(){
         let chatMin = true;
-        let name = "";
         api.onChatUpdate(function(username){
             console.log(username);
         
