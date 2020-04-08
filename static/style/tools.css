@@ -109,14 +109,15 @@
 
 
 .audio-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/audio.png');
     background-size: cover;
 }
 
 .microphone-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/microphone.png');
+    background-size: cover;
 }
   
 .clear-icon{
