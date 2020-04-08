@@ -48,7 +48,7 @@
                         msg_name.className = "message-name";
                         msg_name.innerHTML = username;
                         let message = document.createElement('div');
-                        message.className = "message";
+                        message.className = "mymessage";
                         message.innerHTML = msg;
                         msg_box.append(msg_name);
                         msg_box.append(message);
