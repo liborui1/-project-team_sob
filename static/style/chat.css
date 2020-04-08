@@ -121,3 +121,14 @@
     flex-wrap:wrap;
     padding: 8px 8px 8px 8px;
 }
+
+.mymessage {
+    font-size: large;
+    font-family: Arial;
+    color: white;
+    background-color: #ff8800;
+    border-radius: 10px;
+    border: #ff8800;
+    flex-wrap:wrap;
+    padding: 8px 8px 8px 8px;
+}
