@@ -112,9 +112,9 @@ let api = (function(){
         }
         peer.on('open', function(id) {
             if (!sentRequest) requestCreateLobby (id, lobbyName, lobbyPass);
-            document.querySelector('#peerIddisplay').innerHTML = peer.id
+            // document.querySelector('#peerIddisplay').innerHTML = peer.id
         });
-        document.querySelector('#peerIddisplay').innerHTML = peer.id
+        // document.querySelector('#peerIddisplay').innerHTML = peer.id
         // lobby created, waiting for connections
         peer.on('connection', function (dataConnection){
             addPeer(dataConnection)
