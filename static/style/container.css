@@ -76,6 +76,7 @@ header #title{
     margin-left: auto;
     margin-right: auto;
     margin-top: 100px;
+    align-items: baseline;
 }
 
 .btn {
@@ -310,6 +311,7 @@ p {
 
 .btn {
     text-align:center;
+    align-items: center;
     font-size: 17px;
     color: #0c0b0b;
     margin: 5px;
