@@ -38,74 +38,75 @@
     
 }
 .color-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/colour\ wheel.png');
     background-size: cover;
 }
 
 .draw-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/draw.png');
     background-size: cover;
 }
 
 .move-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/move.png');
     background-size: cover;
 }
 
 .download-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/download.png');
     background-size: cover;
 }
 
 .upload-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/upload.png');
     background-size: cover;
 }
 
 .save-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/save.png');
     background-size: cover;
 }
 
 .load-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/load.png');
     background-size: cover;
 }
 
 .share-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/share.png');
     background-size: cover;
 }
 
 .home-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/home.png');
     background-size: cover;
 }
 
 .signout-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/sign_out.png');
     background-size: cover;
 }
 .copy-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/copy.png');
     background-size: cover;
 }
 .erase-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/eraser.png');
     background-size: cover;
 }
+
 
 .audio-icon{
     cursor: pointer;
@@ -116,5 +117,16 @@
 .microphone-icon{
     cursor: pointer;
     background-image: url('../media/microphone.png');
+  
+.clear-icon{
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/clear.png');
+    background-size: cover;
+}
+
+.ping-icon {
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/ping.png');
+
     background-size: cover;
 }

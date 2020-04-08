@@ -176,7 +176,23 @@ window.onload = (function() {
         alertTextDiv.append(text)
         alertTextDiv.append(acceptButton)
     }   
-    
+    let onReadOnlyList= function (isPartOfList){
+        if(isPartOfList){
+            // remove pencil/erase/
+            document.querySelector('#draw').style.visibility = "hidden";
+            document.querySelector('#erase').style.visibility = "hidden";
+            document.querySelector('#clearBoard').style.visibility = "hidden";
+            currentAction = "move";
+            document.querySelector('#whiteBoard').style.cursor = "url('../media/move_cursor.png')16 16, auto";
+        } else {
+            // remove pencil/erase
+            document.querySelector('#draw').style.visibility = "visible";
+            document.querySelector('#erase').style.visibility = "visible";
+            document.querySelector('#clearBoard').style.visibility = "visible";
+        }
+    }
+
+
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
         //console.log( "------------------Incomming----------------- "   ) 
@@ -211,7 +227,10 @@ window.onload = (function() {
            api.updatePeerList(currentLobbyName);
         }else if (data.action === "pageAssistRequest"){
             createPageAssistNotification(data.screenData)
-
+        }else if (data.action === "updateReadOnlyList"){
+            api.updateReadOnlyList(currentLobbyName, onReadOnlyList)
+        } else if (data.action === "chatMessage"){
+            createMessage(data.peerId, escape(data.message))
         }
         // MouseData
     }
@@ -408,9 +427,9 @@ window.onload = (function() {
             let newX = (user.mouseX - panX)*currentScale
             let newY = (user.mouseY - panY)*currentScale
             context.beginPath();
-            context.arc(newX, newY, 10, 0, 2 * Math.PI);
+            context.arc(newX, newY, 10, 0, 20 * Math.PI);
             context.stroke();
-            context.fillText(user.userName, newX, newY);
+            context.fillText(user.userName, newX + 10, newY -10);
         };
     }
 
@@ -520,12 +539,15 @@ window.onload = (function() {
          }
          currentColor = id;
         currentAction = "draw";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/cursor.png')16 16, auto";
     });
     document.querySelector('#erase').addEventListener('click', function (e){
         currentAction = "erase";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/erase_cursor.png')10 20, auto";
     });
     document.querySelector('#move').addEventListener('click', function (e){
         currentAction = "move";
+        document.querySelector('#whiteBoard').style.cursor = "url('../media/move_cursor.png')16 16, auto";
     });
     document.querySelector('#home').addEventListener('click', function (e){
         panX = 0;
@@ -577,7 +599,7 @@ window.onload = (function() {
                 //remove mouse data off the screen
                 // by deleteing mouse data for that user
                 console.log("deleted")
-                delete userMice[peerId]
+                delete userMice[peerId];
             }
         }
         topLayerRedraw();
@@ -606,5 +628,29 @@ window.onload = (function() {
             })
         }
     }
+
+    function createMessage(user, msg) {
+        let chat = document.querySelector("#chat");
+        msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        if (msg.replace(/\s/g,'') != "") {
+            let box = document.querySelector("#chat");
+            let msg_box = document.createElement('div');
+            msg_box.className = "message-container";
+            let msg_name = document.createElement('div');
+            msg_name.className = "message-name";
+            msg_name.innerHTML = user;
+            let message = document.createElement('div');
+            message.className = "message";
+            message.innerHTML = msg;
+            let left = document.createElement('div');
+            left.className = "left-container";
+            msg_box.append(msg_name);
+            msg_box.append(message);
+            left.append(msg_box);
+            box.append(left);
+            chat.scrollTop = chat.scrollHeight - chat.clientHeight;
+        }
+    }
+
 
 }());
