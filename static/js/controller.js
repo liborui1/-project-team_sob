@@ -104,6 +104,7 @@ window.onload = (function() {
         //     api.saveBoard(strokes, name);
         // }
         document.querySelector('#newSave').style.display = 'block';
+        document.querySelector('#newSave').style.height = "100px";
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
@@ -173,6 +174,11 @@ window.onload = (function() {
         let name = document.querySelector("#saveName").value || "";
         if (name !== ""){
             api.saveBoard(strokes, name);
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "limegreen";
+            document.querySelector("#alertText").innerHTML = "Saved to history!";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
         }
     });
     document.querySelector('#copyLink').addEventListener('click', function(e) {
