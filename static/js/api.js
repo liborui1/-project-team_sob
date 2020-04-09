@@ -339,7 +339,7 @@ let api = (function(){
     module.saveBoard = function(boardData, boardName) {
         send("POST", "/api/saveboard/", {boardData, name: boardName}, function (err,res){
             if (err) return notifyErrorListeners("Board was unable to be added");
-            alert(res);
+            // alert(res);
         });
     };
     let loadSaveListener = [];
