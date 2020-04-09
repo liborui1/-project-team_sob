@@ -31,11 +31,12 @@ let api = (function(){
             }
 
     function playStream(stream) {
-        let audio = document.createElement("audio")
-        audio.srcObject = stream;
-        audio.autoplay = audio;
-        document.body.append(audio);
-        audioList.push(audio);
+        let audioPlayer = document.createElement("audio")
+        audioPlayer.srcObject = stream;
+        audioPlayer.autoplay = true;
+        stream.getAudioTracks()[0].enabled = audio;
+        document.body.append(audioPlayer);
+        audioList.push(audioPlayer);
     }
     
  
