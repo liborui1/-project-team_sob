@@ -105,14 +105,20 @@ window.onload = (function() {
     document.querySelector('#save').addEventListener('click', function (e){
         if ((localStorage.getItem("signedIn") != "")) {
             localStorage.setItem("signedIn", "**You must be signed in to create save**");
-            window.location.href = '/login.html';
-        }
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "You must be signed in to create save";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 2000);
+            setTimeout(function () { window.location.href = '/login.html';}, 1000);
+        } else {
         // let name = document.querySelector("#saveName").value || "";
         // if (name !== ""){
         //     api.saveBoard(strokes, name);
         // }
-        document.querySelector('#newSave').style.display = 'block';
-        document.querySelector('#newSave').style.height = "100px";
+            document.querySelector('#newSave').style.display = 'block';
+            document.querySelector('#newSave').style.height = "100px";
+        }
     });
     
     document.querySelector('#move2').addEventListener('click',function(e) {
