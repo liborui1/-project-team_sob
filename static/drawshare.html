@@ -17,11 +17,11 @@
     </div>
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
-        <div class="draw-icon icon active" id="draw" ></div>
-        <div class="erase-icon icon" id="erase" ></div>
-        <div class="clear-icon icon" id="clearBoard" ></div>
-        <div class="move-icon icon" id="move" ></div>
-        <div class="share-icon icon" id = "move2"></div>
+        <div class="draw-icon icon active" id="draw" ><span class="tooltiptext">Draw</span></div>
+        <div class="erase-icon icon" id="erase" ><span class="tooltiptext">Erase</span></div>
+        <div class="clear-icon icon" id="clearBoard" ><span class="tooltiptext">Clear Board</span></div>
+        <div class="move-icon icon" id="move" ><span class="tooltiptext">Move</span></div>
+        <div class="share-icon icon" id = "move2"><span class="tooltiptext">Create Lobby</span></div>
         <div class="popup" id="newLobby">
             <div id = "lobbyInfo">
                 <p>Current Lobby Link:</p> <p id="copied" class="inform">Copied</p>
@@ -43,10 +43,10 @@
         <!-- <p id="peerIddisplay"></p> -->
         <!-- <button id = "shareBoard"> Link Button </button> -->
         <!-- <p id="peerIddisplay"></p> -->
-        <div class="download-icon icon" id="dload" ></div>
+        <div class="download-icon icon" id="dload" ><span class="tooltiptext">Sreen Capture</span></div>
         <!-- <div class="upload-icon icon" id="upload" ></div> -->
         <!-- <textarea id="saveName"></textarea> -->
-        <div class="save-icon icon" id="save" ></div>
+        <div class="save-icon icon" id="save" ><span class="tooltiptext">Save</span></div>
         <div class="popup" id="newSave">
             <p>Enter name for new save: </p>
             <input id ="saveName" class ="textBox">
@@ -55,13 +55,13 @@
                 <div class = "smlbtn" id="exitS">Cancel</div>
             </div>
         </div>
-        <a href="/history.html"><div class="load-icon icon" id="load"> </div></a>
-        <div class="color-icon icon" id="colorId"></div>
+        <a href="/history.html"><div class="load-icon icon" id="load"><span class="tooltiptext">Load</span></div></a>
+        <div class="color-icon icon" id="colorId"><span class="tooltiptext">Colour Wheel</span></div>
         <div class="palette" id="colorPalette"></div>
-        <div class="icon-large" id="color"></div>
-        <div class="home-icon icon" id="home"></div>
-        <div class="ping-icon icon" id="pingAll"></div>
-        <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
+        <div class="icon-large" id="color"><span class="tooltiptext">Current Colour</span></div>
+        <div class="home-icon icon" id="home"><span class="tooltiptext">Home View</span></div>
+        <div class="ping-icon icon" id="pingAll"><span class="tooltiptext">Ping All</span></div>
+        <a href="/index.html" ><div class = "signout-icon icon" id = "signout_button"><span class="tooltiptext">Back</span></div></a>
         <!-- <div class="home-icon icon" id="testAlert"></div> -->
         </div id = "canvasLayers">
             <canvas id = "canvasdrawing" tabindex='1'></canvas>
