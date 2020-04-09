@@ -5,13 +5,13 @@
         let lastNumUsers = 0;
   
         function myFunction() {
-            let popup = document.getElementById("myPopup");
+            let popup = document.getElementById("adminPopup");
             popup.classList.toggle("show");
           }
 
         let admin = document.getElementById("admin");
         admin.addEventListener("click", function() {
-            let popup = document.getElementById("myPopup");
+            let popup = document.getElementById("adminPopup");
             popup.classList.toggle("show");
             document.getElementById('badge').innerHTML = 0;
             document.getElementById('badge').style.visibility = "hidden";
@@ -23,7 +23,11 @@
                 elem.innerHTML = "Admin";
             }
         });
-        
+        document.querySelector('#updatePassword').addEventListener("click", function(e){
+            let pass = document.querySelector('#newPassword').value
+            api.updatePassword(localStorage.getItem('lobby'),pass )
+        });
+
         api.onConnectedUserUpdate(function(users){
             
             let newNewNumUsers = Object.keys(users).length - lastNumUsers
@@ -73,12 +77,11 @@
                         api.kickPeer(peerid, localStorage.getItem('lobby'));
                     });
                 } else {
+                    document.getElementById('updatePasswordContainer').innerHTML = '';
                     cmnt_element.innerHTML = username
                     document.querySelector('#myPopup').append(cmnt_element);
                 }
             }
         });
-        
-        
     });
 }());

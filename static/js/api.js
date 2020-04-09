@@ -25,7 +25,6 @@ let api = (function(){
                             stream.getAudioTracks()[0].enabled = !mute;
                             localMediaStream = stream;
                             if (cb) cb(null,localMediaStream || stream);
- 
                      })
                      .catch(function (e) { if (cb) cb(e); });
                 }
@@ -470,6 +469,12 @@ let api = (function(){
                     removePeer(conn);
                 }
             })
+            notifyUserListeners();
+        });
+    }
+    module.updatePassword= function(lobbyName, password){
+        send("PATCH", "/lobby/password/" + lobbyName , {password: password}, function(err, res){
+            if (err) return notifyErrorListeners(err);
             notifyUserListeners();
         });
     }

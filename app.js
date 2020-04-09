@@ -39,6 +39,17 @@ let isAuthenticated = function(req, res, next) {
         });
     });
 };
+
+let isOwner = function(req, res, next) {
+    mongo.connect(mongoUrl, function (err, client){
+        let drawshare = client.db(dbName);
+        let lobbies2 = drawshare.collection('lobbies')
+        lobbies2.findOne({_id: req.params.id}, function(err, lobby){
+            if (err) return res.status(500).end(err.errmsg);
+            return (lobby.owner !== req.username)? res.status(401).end("access denied") : next();  
+        });
+    });
+}
  
 let isPartOfLobby = function(req, res, next) {
     let lobbyName = req.params.id;
@@ -327,6 +338,24 @@ app.get('/lobby/list/:id', isPartOfLobby, function (req, res, next) {
             if (err) return res.status(500).end(err.errmsg);
             if (!lobby) return res.status(404).end("Lobby not found");
             return res.json(lobby.connectedPeers)
+        });
+    });
+});
+
+app.patch('/lobby/password/:id', isAuthenticated, isOwner, function (req, res, next) {
+    let newPassword = req.body.password
+    mongo.connect(mongoUrl, function (err, client){
+        let drawshare = client.db(dbName);
+        let lobbies2 = drawshare.collection('lobbies')
+        let salt = crypto.randomBytes(16).toString('base64');
+        let hash = crypto.createHmac('sha512', salt);
+        hash.update(newPassword);
+        let saltedHash = hash.digest('base64');
+        let pp = newPassword !== "";
+        lobbies2.updateOne({_id: req.params.id}, {$set: {password: saltedHash, salt: salt, passwordProtected: pp,}}, function(err, lobby){
+            if (err) return res.status(500).end(err.errmsg);
+            if (!lobby) return res.status(404).end("Lobby not found");
+            return res.json("Password Updated")
         });
     });
 });

@@ -342,6 +342,9 @@ p {
     top: 30%;
     right: 110%;
     margin-left: -80px;
+    display: flex;
+    flex-direction: column;
+    
   }
   /* The code below has been taken from https://www.w3schools.com/howto/howto_css_notification_button.asp */
   .admin_popup .badge {
