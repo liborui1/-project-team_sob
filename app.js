@@ -71,7 +71,7 @@ app.post('/signup/',  [check('username').escape(), check('password').escape() ],
         if (err) return res.status(500).end(err.errmsg);
         let drawshare = client.db(dbName);
         let users2 = drawshare.collection('users')
-        
+        let userSaves2 = drawshare.collection('userSaves')
         users2.findOne({_id:username}, function (err, found){
             if (err) return res.status(500).end(err.errmsg);
             if (found) return res.status(409).end("username " + username + " already exists");
@@ -83,13 +83,16 @@ app.post('/signup/',  [check('username').escape(), check('password').escape() ],
         let item = {_id: username, password: saltedHash, salt: salt}
         users2.insertOne(item, function (err, inserted){
             if (err) return res.status(500).end(err.errmsg);
-            console.log(username)
-            res.setHeader('Set-Cookie', cookie.serialize('username', username, {
-                path : '/', 
-                maxAge: 60 * 60 * 24 * 7
-            }));
-            req.session.user = item;
-            return res.json("user " + username + " signed up");
+            
+            userSaves2.replaceOne({_id: username},{_id: username,  savedBoards: []}, {upsert: true}, function(err){	      
+                if (err) return res.status(500).end(err);	
+                res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+                    path : '/', 
+                    maxAge: 60 * 60 * 24 * 7
+                }));
+                req.session.user = item;
+                return res.json("user " + username + " signed up");
+            });
         });
     });
 });
