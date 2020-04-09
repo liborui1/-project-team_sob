@@ -23,7 +23,7 @@ header #title{
 }
 
 .sml_container {
-    display:flex;
+    /* display:flex; */
     width: 250px;
     height: 150px;
     text-align: center;
@@ -31,7 +31,10 @@ header #title{
     font-size: 18px;
     font-family: Arial;
     border-radius: 20px;
-    border:2px solid #000000;
+    background-color: lightcyan;
+    border: 5px solid transparent;
+    border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+    border-image-slice: 1;
     margin:20px 20px 20px 20px;
     cursor: url('../media/point.png'), auto;
 } 
