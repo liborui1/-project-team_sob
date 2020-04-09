@@ -21,7 +21,7 @@ let api = (function(){
                     navigator.mediaDevices.getUserMedia({  audio: true, video: false })
                     .then(function (stream) {
                            //mute before sending
-                            stream.getAudioTracks()[0].enabled = false;
+                            stream.getAudioTracks()[0].enabled = !mute;
                             localMediaStream = stream;
                         if (cb) cb(null, stream);
  
