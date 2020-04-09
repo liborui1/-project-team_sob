@@ -33,15 +33,23 @@ window.onload = (function() {
     let localError ='';
     localStorage.removeItem('lobby');
     api.onError(function(err) {
-        if (err.includes("401")) {
+        if (err == "(401)access denied inccorect password ") {
+            localError = "401";
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "You password was incorrect!";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+            setTimeout(function () { window.location.href = '/index.html';}, 3000);
+        } else if (err.includes("401")) {
             localStorage.setItem("signedIn", "**You must be signed in to create Lobby**");
-            window.location.href = '/login.html';
             localError = "401";
             let popup = document.querySelector('#alertBar');
             popup.style.visibility = "visible";
             popup.style.backgroundColor = "red";
             document.querySelector("#alertText").innerHTML = "You must be signed in to create Lobby";
             setTimeout(function () { popup.style.visibility = "hidden";}, 4000);
+            setTimeout(function () { window.location.href = '/login.html';}, 3000);
         } else if (err.includes("404")) {
             localError = "404";
             let popup = document.querySelector('#alertBar');
@@ -110,34 +118,40 @@ window.onload = (function() {
     document.querySelector('#move2').addEventListener('click',function(e) {
         if ((localStorage.getItem("signedIn") != "")) {
             localStorage.setItem("signedIn", "**You must be signed in to create lobby**");
-            window.location.href = '/login.html';
-        }
-        if (currentLobbyName != "") {
-            if (!localError.includes("401") && !localError.includes("404") && !localError.includes("409")) {
-                document.querySelector("#lobbyInfo").style.visibility = "visible";
-                document.querySelector("#lobbylink").innerHTML = "https://" + document.location.host + '/joinBoard/' + currentLobbyName;
-                // hide all the lobby creation option
-                let CreateLobbytxt = document.getElementById("CreateLobbytxt");
-                let LobbyNametxt = document.getElementById("LobbyNametxt");
-                let boardName = document.getElementById("boardName");
-                let Passwordtxt = document.getElementById("Passwordtxt");
-                let boardPass = document.getElementById("boardPass");
-                let Sboard = document.getElementById("Sboard");
-                let newLobby = document.getElementById("newLobby");
-                CreateLobbytxt.style.visibility ="hidden";
-                LobbyNametxt.style.visibility ="hidden";
-                boardName.style.visibility ="hidden";
-                Passwordtxt.style.visibility ="hidden";
-                boardPass.style.visibility ="hidden";
-                Sboard.style.visibility ="hidden";
-                newLobby.style.height ="100px";
-                // document.getElementById("lobbylink").disabled = true;
-            }
+            let popup = document.querySelector('#alertBar');
+            popup.style.visibility = "visible";
+            popup.style.backgroundColor = "red";
+            document.querySelector("#alertText").innerHTML = "You must be signed in to create Lobby";
+            setTimeout(function () { popup.style.visibility = "hidden";}, 2000);
+            setTimeout(function () { window.location.href = '/login.html';}, 1000);
         } else {
-            document.querySelector("#lobbyInfo").style.visibility = "hidden";
-            document.querySelector("#lobbylink").value = "";
+            if (currentLobbyName != "") {
+                if (!localError.includes("401") && !localError.includes("404") && !localError.includes("409")) {
+                    document.querySelector("#lobbyInfo").style.visibility = "visible";
+                    document.querySelector("#lobbylink").innerHTML = "https://" + document.location.host + '/joinBoard/' + currentLobbyName;
+                    // hide all the lobby creation option
+                    let CreateLobbytxt = document.getElementById("CreateLobbytxt");
+                    let LobbyNametxt = document.getElementById("LobbyNametxt");
+                    let boardName = document.getElementById("boardName");
+                    let Passwordtxt = document.getElementById("Passwordtxt");
+                    let boardPass = document.getElementById("boardPass");
+                    let Sboard = document.getElementById("Sboard");
+                    let newLobby = document.getElementById("newLobby");
+                    CreateLobbytxt.style.visibility ="hidden";
+                    LobbyNametxt.style.visibility ="hidden";
+                    boardName.style.visibility ="hidden";
+                    Passwordtxt.style.visibility ="hidden";
+                    boardPass.style.visibility ="hidden";
+                    Sboard.style.visibility ="hidden";
+                    newLobby.style.height ="100px";
+                    // document.getElementById("lobbylink").disabled = true;
+                }
+            } else {
+                document.querySelector("#lobbyInfo").style.visibility = "hidden";
+                document.querySelector("#lobbylink").value = "";
+            }
+            document.querySelector('#newLobby').style.display = 'block';
         }
-        document.querySelector('#newLobby').style.display = 'block';
     });
 
     document.querySelector('#exit').addEventListener('click',function(e) {
