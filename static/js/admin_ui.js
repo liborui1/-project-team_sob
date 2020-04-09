@@ -49,8 +49,8 @@
                 if (api.isOwner()){      
                     cmnt_element.innerHTML =  `
                     ${username}
-                    <divid= "container_${peerid}">
-                            <button id= "${peerid}">Kick</button>
+                    <div id= "container_${peerid}">
+                            <button class="kbtn" id= "${peerid}">Kick</button>
                             <label class="switch">
                                 <input id="editSlider" type="checkbox">
                                 <span class="slider round"></span>
