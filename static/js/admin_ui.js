@@ -3,11 +3,6 @@
 
     window.addEventListener('load', function(){
         let lastNumUsers = 0;
-  
-        function myFunction() {
-            let popup = document.getElementById("myPopup");
-            popup.classList.toggle("show");
-          }
 
         let admin = document.getElementById("admin");
         admin.addEventListener("click", function() {
@@ -23,6 +18,7 @@
                 elem.innerHTML = "Admin";
             }
         });
+        
         
         api.onConnectedUserUpdate(function(users){
             
@@ -45,8 +41,8 @@
                 if (api.isOwner()){      
                     cmnt_element.innerHTML =  `
                     ${username}
-                    <divid= "container_${peerid}">
-                            <button id= "${peerid}">Kick</button>
+                    <div id= "container_${peerid}">
+                            <button class="kbtn" id= "${peerid}">Kick</button>
                             <label class="switch">
                                 <input id="editSlider" type="checkbox">
                                 <span class="slider round"></span>
