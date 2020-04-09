@@ -15,20 +15,19 @@ let api = (function(){
     let audio = true;
     let localMediaStream = null;
              // Get access to the microphone
-            function getLocalAudioStream(cb) {
 
-                if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
-                if (navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({  audio: true, video: false })
-                    .then(function (stream) {
-                           //mute before sending
-                            stream.getAudioTracks()[0].enabled = !mute;
-                            localMediaStream = stream;
-                            if (cb) cb(null,localMediaStream || stream);
-                     })
-                     .catch(function (e) { if (cb) cb(e); });
-                }
-            }
+    if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({  audio: true, video: false })
+        .then(function (stream) {
+                //mute before sending
+                stream.getAudioTracks()[0].enabled = !mute;
+                localMediaStream = stream;
+                if (cb) cb(null, localMediaStream || stream);
+            })
+            .catch(function (e) { if (cb) cb(e); });
+    }
+           
 
     function playStream(stream) {
         let audioPlayer = document.createElement("audio")
@@ -140,10 +139,9 @@ let api = (function(){
             });
         });
         peer.on('call', function(incoming) {
-            getLocalAudioStream(function(err, res){
-                console.log(err)
-                incoming.answer(res)
-            })
+   
+            incoming.answer(localMediaStream)
+         
             incoming.on('stream', function(stream) {
               // Do something with this audio stream
                 playStream(stream)
@@ -176,15 +174,14 @@ let api = (function(){
                
                 newPeer.on('open', function (){
                     addPeer(newPeer);
-                    getLocalAudioStream(function (err,res){
-                        let ms = peer.call(newPeerId, res);
-                        if (ms){
-                            ms.on('stream', function(stream){
-                                mediaStreams.push(stream)
-                                playStream(stream)
-                            })
-                        }
-                    });
+                    let ms = peer.call(newPeerId, localMediaStream);
+                    if (ms){
+                        ms.on('stream', function(stream){
+                            mediaStreams.push(stream)
+                            playStream(stream)
+                        })
+                    }
+             
                     let dataChannel =  newPeer.dataChannel
                     let peerConnection =  newPeer.peerConnection
                     dataChannel.onclose = function () {
@@ -217,11 +214,10 @@ let api = (function(){
         });
         // When finished connecting wait for peer to send strokes
         peer.on('call', function(incoming) {
-            getLocalAudioStream(function(err, res){
-                incoming.answer(res)
-            })
+            incoming.answer(localMediaStream)
             incoming.on('stream', function(stream) {
             // Do something with this audio stream
+            console.log("stream got")
                 playStream(stream)
                 mediaStreams.push(stream)
             });
@@ -293,14 +289,6 @@ let api = (function(){
         });
     };
     
-    module.callPeers = function(){
-        connectedPeer.forEach( function (connPeer){
-            getLocalAudioStream(function (err,res){
-                peer.call(connPeer, res);
-            });
-        });
-    };
-
     module.sendRemoveStrokes = function(data) {
         connectedPeer.forEach( function (connPeer){
             connPeer.send({action: "removeStrokes", strokes: data})
