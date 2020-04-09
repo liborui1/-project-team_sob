@@ -98,6 +98,37 @@ header #title{
     cursor: url('../media/point.png'), auto;
 }
 
+.kbtn {
+  height: 25px;
+  width:40px;
+  text-align: center;
+  border-radius: 5px;
+  border:2px solid #000000;
+  font-size: 13px;
+  color: #0c0b0b;
+  margin: 5px;
+  background-color: white;
+}
+.kbtn:hover {
+  background-color: gray;
+  cursor: url('../media/point.png'), auto;
+}
+
+.abtn {
+  height: 25px;
+  width:60px;
+  text-align: center;
+  border-radius: 5px;
+  border:2px solid #000000;
+  font-size: 13px;
+  color: #0c0b0b;
+  margin: 5px;
+  background-color: white;
+}
+.abtn:hover {
+  background-color: gray;
+  cursor: url('../media/point.png'), auto;
+}
 
 .confirm {
 	display: flex;
@@ -306,6 +337,7 @@ p {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     padding: 5px 5px 5px 5px;
 }
 /* The code below has been taken from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_popup*/
@@ -332,6 +364,7 @@ p {
 .admin_popup .popuptext {
     visibility: hidden;
     width: 300px;
+    max-height: 300px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -342,6 +375,8 @@ p {
     top: 30%;
     right: 110%;
     margin-left: -80px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   /* The code below has been taken from https://www.w3schools.com/howto/howto_css_notification_button.asp */
   .admin_popup .badge {
@@ -426,7 +461,7 @@ p {
     bottom: 0;
     background-color: #ccc;
     height: 22px;
-    width:60px;
+    width:50px;
   }
   
   .slider:before {
@@ -451,9 +486,9 @@ p {
   }
   
   input:checked + .slider:before {
-    -webkit-transform: translateX(35px);
-    -ms-transform: translateX(35px);
-    transform: translateX(35px);
+    -webkit-transform: translateX(25px);
+    -ms-transform: translateX(25px);
+    transform: translateX(25px);
   }
   
   .slider.round {
@@ -466,18 +501,21 @@ p {
 
   .audio_section {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
-    width: 92px;
+    width: 100px;
+    height: 33px;
     text-align: center;
-    /* margin: 50px; */
-    top: 55px;
-    position: absolute;
-    right: 0;
+    bottom:5px;
+    position: fixed;
+    right: 330px;
     font-size: 20px;
     border:2px solid #000000;
     z-index: 2;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
   }
 
   .otherCursor {

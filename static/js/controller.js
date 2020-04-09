@@ -210,6 +210,7 @@ window.onload = (function() {
         let connectedUsers = api.getConnectedUsers();
         text.innerHTML = "User " + connectedUsers[data.peerId] + " is calling you to their screen"
         let acceptButton = document.createElement("BUTTON")
+        acceptButton.classList = "abtn"
         acceptButton.innerHTML = "Accept"
         acceptButton.addEventListener("click", function(e){
             console.log(data)

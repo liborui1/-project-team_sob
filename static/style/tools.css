@@ -107,16 +107,63 @@
     background-size: cover;
 }
 
-
 .audio-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
     cursor: url('../media/point.png'), auto;
     background-image: url('../media/audio.png');
     background-size: cover;
 }
 
+.no-audio-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/no-audio.png');
+    background-size: cover;
+}
+
 .microphone-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
     cursor: url('../media/point.png'), auto;
     background-image: url('../media/microphone.png');
+    background-size: cover;
+}
+
+.block-microphone-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/block-microphone.png');
     background-size: cover;
 }
   
