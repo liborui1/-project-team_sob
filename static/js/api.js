@@ -33,7 +33,7 @@ let api = (function(){
     function playStream(stream) {
         let audio = document.createElement("audio")
         audio.srcObject = stream;
-        audio.autoplay = true;
+        audio.autoplay = audio;
         document.body.append(audio);
         audioList.push(audio);
     }
