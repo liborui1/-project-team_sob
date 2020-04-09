@@ -16,6 +16,7 @@ let api = (function(){
     let localMediaStream = null;
              // Get access to the microphone
             function getLocalAudioStream(cb) {
+
                 if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
                 if (navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({  audio: true, video: false })
@@ -23,7 +24,7 @@ let api = (function(){
                            //mute before sending
                             stream.getAudioTracks()[0].enabled = !mute;
                             localMediaStream = stream;
-                        if (cb) cb(null, stream);
+                            if (cb) cb(null,localMediaStream || stream);
  
                      })
                      .catch(function (e) { if (cb) cb(e); });
@@ -141,6 +142,7 @@ let api = (function(){
         });
         peer.on('call', function(incoming) {
             getLocalAudioStream(function(err, res){
+                console.log(err)
                 incoming.answer(res)
             })
             incoming.on('stream', function(stream) {
@@ -492,6 +494,7 @@ let api = (function(){
     module.toggleMute = function(){
         mute = !mute
        if (localMediaStream)localMediaStream.getAudioTracks()[0].enabled = !mute;
+       console.log("mute: ", mute)
     }
     module.toggleAudio = function(){
         audio = !audio

@@ -237,10 +237,9 @@ window.onload = (function() {
 
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        console.log( "------------------Incomming----------------- "   ) 
+        //console.log( "------------------Incomming----------------- "   ) 
         //console.log( "Incomming data Length: " + (checkedData.length)  ) 
-       console.log( "Incomming data : " +  (JSON.stringify(data))) 
-        if (isLoad){
+         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
             api.sendResyncBoard(strokes)
