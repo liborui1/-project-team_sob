@@ -177,10 +177,12 @@ let api = (function(){
                     addPeer(newPeer);
                     getLocalAudioStream(function (err,res){
                         let ms = peer.call(newPeerId, res);
-                        ms.on('stream', function(stream){
-                            mediaStreams.push(stream)
-                            playStream(stream)
-                        })
+                        if (ms){
+                            ms.on('stream', function(stream){
+                                mediaStreams.push(stream)
+                                playStream(stream)
+                            })
+                        }
                     });
                     let dataChannel =  newPeer.dataChannel
                     let peerConnection =  newPeer.peerConnection

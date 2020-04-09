@@ -237,9 +237,9 @@ window.onload = (function() {
 
     let onIncommingData = function(data){
         let checkedData = data.strokes || [];
-        //console.log( "------------------Incomming----------------- "   ) 
+        console.log( "------------------Incomming----------------- "   ) 
         //console.log( "Incomming data Length: " + (checkedData.length)  ) 
-       // console.log( "Incomming data : " +  (JSON.stringify(data))) 
+       console.log( "Incomming data : " +  (JSON.stringify(data))) 
         if (isLoad){
             isLoad = false
             // if we want to load in strokes to everyone else, then wait for the initialsync and reload
@@ -389,7 +389,6 @@ window.onload = (function() {
                 currentFont = 5;
                 // send dot
                 api.sendStrokes([[addPoint(newX , newY, false), addPoint(newX , newY, false)]]);
-
             } else if (currentAction === "move"){
                 lastClick = {x:newX, y: newY};
                 prevPan = {panX, panY};
@@ -398,7 +397,8 @@ window.onload = (function() {
                 paint = true;
                 currentColor = "#F5F5F5";
                 currentFont = 50;
-                addPoint(newX , newY, false);
+                // send dot
+                api.sendStrokes([[addPoint(newX , newY, false), addPoint(newX , newY, false)]]);
             }
             redraw();
         };
@@ -429,11 +429,10 @@ window.onload = (function() {
             move = false;
             let lastStroke = strokes[strokes.length - 1]
             // only add last stroke if we're drawing
-            if (currentAction === "draw"){
+            if (currentAction === "draw" || currentAction === "erase"){
                 lastStrokes.push(lastStroke)
                 strokes.push([]);
             }
-          
         };
 
         canvas.onmouseleave = function(e){
