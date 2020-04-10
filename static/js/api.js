@@ -15,17 +15,21 @@ let api = (function(){
     let audio = true;
     let localMediaStream = null;
              // Get access to the microphone
-
-    if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
-    if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({  audio: true, video: false })
-        .then(function (stream) {
-                //mute before sending
-                stream.getAudioTracks()[0].enabled = !mute;
-                localMediaStream = stream;
-            })
-            .catch(function (e) { console.log(e)});
+    function createLocalStream(cb){
+        if (localMediaStream) return cb(localMediaStream);
+        if (!navigator.mediaDevices) return console.log("Not on a secure HTTPS connection")
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({  audio: true, video: false })
+            .then(function (stream) {
+                    //mute before sending
+                    stream.getAudioTracks()[0].enabled = !mute;
+                    localMediaStream = stream;
+                    cb(localMediaStream)
+                })
+                .catch(function (e) { console.log(e)});
+        }
     }
+    
            
 
     function playStream(stream) {
@@ -138,9 +142,9 @@ let api = (function(){
             });
         });
         peer.on('call', function(incoming) {
-   
-            incoming.answer(localMediaStream)
-         
+            createLocalStream(function (stream){
+                incoming.answer(stream)
+            });
             incoming.on('stream', function(stream) {
               // Do something with this audio stream
                 playStream(stream)
@@ -155,48 +159,53 @@ let api = (function(){
             if (err) return notifyErrorListeners(err);
             let res = lobbyData.connectedPeers
             owner = lobbyData.owner;
-            res.forEach( function(newPeerId, index) {
-                let newPeer = peer.connect(newPeerId)    
-                // all new peers can disconnect
-                    // all new peers can add to the local board
-                newPeer.on('data', function (newPeerdata){
-                    // so that it only syncs with one user rather than all connecting users
-                    if (index === res.length - 1 && newPeerdata.action === "initialSync"){
-                        callback(newPeerdata)
-                      
-                    } else if (newPeerdata.action !== "initialSync"){
-                        newPeerdata.peerId = peerIdToUserName[newPeer.peer] || dataConnection.peer
-                        if (readOnlyPeers.indexOf(newPeer.peer) === -1) callback(newPeerdata);
-                    }
-             
-                });
-               
-                newPeer.on('open', function (){
-                    addPeer(newPeer);
-                    let ms = peer.call(newPeerId, localMediaStream);
-                    if (ms){
-                        ms.on('stream', function(stream){
-                            mediaStreams.push(stream)
-                            playStream(stream)
-                        })
-                    }
-             
-                    let dataChannel =  newPeer.dataChannel
-                    let peerConnection =  newPeer.peerConnection
-                    dataChannel.onclose = function () {
-                        redirect(lobbyName);
-                        removePeer(newPeer);
-                    };
-                    peerConnection.oniceconnectionstatechange = function() {
-                        if(peerConnection.iceConnectionState == 'disconnected') {
+            createLocalStream(function (gotLocalStream){
+                res.forEach( function(newPeerId, index) {
+                    let newPeer = peer.connect(newPeerId)    
+                    // all new peers can disconnect
+                        // all new peers can add to the local board
+                    newPeer.on('data', function (newPeerdata){
+                        // so that it only syncs with one user rather than all connecting users
+                        if (index === res.length - 1 && newPeerdata.action === "initialSync"){
+                            callback(newPeerdata)
+                        
+                        } else if (newPeerdata.action !== "initialSync"){
+                            newPeerdata.peerId = peerIdToUserName[newPeer.peer] || dataConnection.peer
+                            if (readOnlyPeers.indexOf(newPeer.peer) === -1) callback(newPeerdata);
+                        }
+                
+                    });
+                
+                    newPeer.on('open', function (){
+                        addPeer(newPeer);
+                    
+                        let ms = peer.call(newPeerId, gotLocalStream);
+                        if (ms){
+                            ms.on('stream', function(stream){
+                                mediaStreams.push(stream)
+                                playStream(stream)
+                            })
+                        }
+                
+                    
+                
+                        let dataChannel =  newPeer.dataChannel
+                        let peerConnection =  newPeer.peerConnection
+                        dataChannel.onclose = function () {
                             redirect(lobbyName);
                             removePeer(newPeer);
+                        };
+                        peerConnection.oniceconnectionstatechange = function() {
+                            if(peerConnection.iceConnectionState == 'disconnected') {
+                                redirect(lobbyName);
+                                removePeer(newPeer);
+                            }
                         }
-                    }
+                    });
+    
                 });
- 
-            });
-       });
+        });
+        });
     }
 
     module.connectToBoard = function(callBack, getSyncData ,lobbyName, lobbyPass) {
@@ -213,7 +222,9 @@ let api = (function(){
         });
         // When finished connecting wait for peer to send strokes
         peer.on('call', function(incoming) {
-            incoming.answer(localMediaStream)
+            createLocalStream(function (stream){
+                incoming.answer(stream)
+            });
             incoming.on('stream', function(stream) {
             // Do something with this audio stream
             console.log("stream got")
