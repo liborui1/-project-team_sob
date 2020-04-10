@@ -23,9 +23,8 @@ let api = (function(){
                 //mute before sending
                 stream.getAudioTracks()[0].enabled = !mute;
                 localMediaStream = stream;
-                if (cb) cb(null, localMediaStream || stream);
             })
-            .catch(function (e) { if (cb) cb(e); });
+            .catch(function (e) { console.log(e)});
     }
            
 
@@ -223,8 +222,7 @@ let api = (function(){
             });
         });
 
-     
-
+    
         peer.on('connection', function (newConnection){
             addPeer(newConnection);
             newConnection.on('open', function() {
