@@ -23,21 +23,24 @@ header #title{
 }
 
 .sml_container {
-    /* display:flex; */
+    display:flex;
     width: 250px;
     height: 150px;
-    text-align: center;
+    justify-content: center;
     align-items: center;
     font-size: 18px;
     font-family: Arial;
-    border-radius: 20px;
     background-color: lightcyan;
-    border: 5px solid transparent;
-    border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
-    border-image-slice: 1;
-    margin:20px 20px 20px 20px;
+    border: 5px solid #000000;
     cursor: url('../media/point.png'), auto;
+    margin:20px 20px 20px 20px;
 } 
+.sml_container:hover {
+  background-color: lightgreen;
+  border: 5px solid transparent;
+  border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+  border-image-slice: 1;
+}
 
 .credit_container {
   display:flex;
@@ -50,7 +53,6 @@ header #title{
   font-family: Arial;
   border: 5px solid #000000;
   background-color: lightgreen;
-
   margin:20px 20px 20px 20px;
   cursor: url('../media/point.png'), auto;
 } 
