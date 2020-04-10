@@ -26,7 +26,9 @@ let api = (function(){
                     localMediaStream = stream;
                     cb(localMediaStream)
                 })
-                .catch(function (e) { console.log(e)});
+                .catch(function (e) { 
+                    cb(localMediaStream);
+                    console.log(e)});
         }
     }
     
