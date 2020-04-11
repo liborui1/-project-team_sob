@@ -4,7 +4,7 @@
     window.addEventListener('load', function(){
         let chatMin = true;
         api.onChatUpdate(function(username){
-            console.log(username);
+            // console.log(username);
         
             document.querySelector("#collapsBtn").addEventListener('click', function(e) {
                 let chatHeader = document.querySelector("#chat_header");
