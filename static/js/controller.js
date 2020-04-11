@@ -92,7 +92,7 @@ window.onload = (function() {
  
     document.querySelector('#dload').addEventListener('click', function (){
         let dataURI = drawingCanvasLayer.toDataURL('image/png', 0.5);
-        console.log(dataURI);
+        // console.log(dataURI);
         let element = document.createElement('a');
         element.setAttribute('href', dataURI);
         element.setAttribute('download', "Image");
@@ -233,7 +233,7 @@ window.onload = (function() {
         acceptButton.classList = "abtn"
         acceptButton.innerHTML = "Accept"
         acceptButton.addEventListener("click", function(e){
-            console.log(data)
+            // console.log(data)
             panX = data.panX;
             panY = data.panY;
             currentScale = data.currentScale;
@@ -658,7 +658,7 @@ window.onload = (function() {
 
     let header = document.getElementById("toolBar");
     let icons = header.getElementsByClassName("icon");
-    console.log(icons.length);
+    // console.log(icons.length);
     for (var i = 0; i < icons.length; i++) {
     icons[i].addEventListener("click", function() {
         var current = document.getElementsByClassName("active");
@@ -673,7 +673,7 @@ window.onload = (function() {
             if (!(peerId in connectedUsers)){
                 //remove mouse data off the screen
                 // by deleteing mouse data for that user
-                console.log("deleted")
+                // console.log("deleted")
                 delete userMice[peerId];
             }
         }

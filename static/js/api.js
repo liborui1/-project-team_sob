@@ -498,7 +498,7 @@ let api = (function(){
     module.toggleMute = function(){
         mute = !mute
        if (localMediaStream)localMediaStream.getAudioTracks()[0].enabled = !mute;
-       console.log("mute: ", mute)
+    //    console.log("mute: ", mute)
     }
     module.toggleAudio = function(){
         audio = !audio
