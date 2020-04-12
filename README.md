@@ -1,4 +1,4 @@
-# app URL
+# App URL
 
 https://www.drawshare.me/
 
