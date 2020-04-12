@@ -1,3 +1,11 @@
+# app URL
+
+https://www.drawshare.me/
+
+# Video URL
+
+https://www.youtube.com/watch?v=-9HKllvfvMI&feature=youtu.be
+
 # project-team_sob
 project-team_sob created by GitHub Classroom
 
