@@ -8,6 +8,7 @@ body, html {
 #whiteBoard{
     height: 100%;
     width: 100%;
+    cursor: url('../media/cursor.png')16 16, auto;	
 }
 
 #move34{
@@ -22,13 +23,31 @@ body, html {
     position: absolute;
     top: 0px;
     left: 0px;
+    z-index: 2;
 }
 
-canvas{
+#canvasLayers{
+    position: relative;
+}
+
+#canvasdrawing{
     user-select: none;
     height: 100%;
     width: 100%;
     background-color: whitesmoke;
+    left: 0px;
+    position: absolute; 
+    z-index: 0;
+}
+
+#canvasMouseMovements{
+    user-select: none;
+    height: 100%;
+    width: 100%;
+    position: absolute; 
+    left: 0px;
+    top: 0;
+    z-index: 1;
 }
 
  

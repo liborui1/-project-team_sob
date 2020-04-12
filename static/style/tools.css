@@ -38,71 +38,173 @@
     
 }
 .color-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/colour\ wheel.png');
     background-size: cover;
 }
 
 .draw-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/draw.png');
     background-size: cover;
 }
 
 .move-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/move.png');
     background-size: cover;
 }
 
 .download-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/download.png');
     background-size: cover;
 }
 
 .upload-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/upload.png');
     background-size: cover;
 }
 
 .save-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/save.png');
     background-size: cover;
 }
 
 .load-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/load.png');
     background-size: cover;
 }
 
 .share-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/share.png');
     background-size: cover;
 }
 
 .home-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/home.png');
     background-size: cover;
 }
 
 .signout-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/sign_out.png');
     background-size: cover;
 }
 .copy-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/copy.png');
     background-size: cover;
 }
 .erase-icon{
-    cursor: pointer;
+    cursor: url('../media/point.png'), auto;
     background-image: url('../media/eraser.png');
     background-size: cover;
 }
+
+.audio-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/audio.png');
+    background-size: cover;
+}
+
+.no-audio-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/no-audio.png');
+    background-size: cover;
+}
+
+.microphone-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/microphone.png');
+    background-size: cover;
+}
+
+.block-microphone-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #424242;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size:75%;
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/block-microphone.png');
+    background-size: cover;
+}
+  
+.clear-icon{
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/clear.png');
+    background-size: cover;
+}
+
+.ping-icon {
+    cursor: url('../media/point.png'), auto;
+    background-image: url('../media/ping.png');
+
+    background-size: cover;
+}
+/* https://www.w3schools.com/css/css_tooltip.asp */
+  .icon .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: darkgrey;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    left: 100%;
+    margin-left: -40px;
+    margin-top: 5px;
+  }
+  
+  .icon .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent darkgrey transparent transparent;
+  }
+  .icon:hover .tooltiptext {
+    visibility: visible;
+  }

@@ -29,15 +29,17 @@ Users should be able to save their changes on the whiteboard
 
 ## Features to implement in Final Version
 
-### Uploading images, videos
-Users should be able to upload images and videos on the whiteboard
-### chat system
-There should be a chat system for users to communicate with each other
-### Calculator
-There should be a calculator on the whiteboard for users to do their calculations
-### Draw to Text
+### Admin operations
 
-When user writes text on the the whiteboard, there should be an option of converting their handwritten text into formal text
+Admins (users who create a Lobby and invite others to join the Lobby) should be able to kick users and give them permission or prevent them from drawing on the board.
+
+### chat system
+
+There should be a chat system for users in a lobby to communicate with each other.
+
+### Audio chat
+
+Users in a lobby should be able to communicate with each other through audio and mute themselves or block audio if they want.
 
 ### Ping and page assist
 

@@ -6,26 +6,35 @@
     <link href="style/main.css" rel="stylesheet" type="text/css"/>
     <link href="style/tools.css" rel="stylesheet" type="text/css"/>
     <link href="style/container.css" rel="stylesheet" type="text/css"/>
+    <link href="style/chat.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="style/color.css">
 </head>
 <body>
-    <div id= "whiteBoard">
+<div id= "whiteBoard">
+    <div class="alert" id="alertBar">
+        <!-- <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>  -->
+        <div id = "alertText"></div>
+    </div>
     <div class= "tool-bar" id ="toolBar">
         <div id="lobbyName"></div>
-        <div class="draw-icon icon active" id="draw" ></div>
-        <div class="erase-icon icon" id="erase" ></div>
-        <div class="move-icon icon" id="move" ></div>
-        <div class="share-icon icon" id = "move2"></div>
+        <div class="draw-icon icon active" id="draw" ><span class="tooltiptext">Draw</span></div>
+        <div class="erase-icon icon" id="erase" ><span class="tooltiptext">Erase</span></div>
+        <div class="clear-icon icon" id="clearBoard" ><span class="tooltiptext">Clear Board</span></div>
+        <div class="move-icon icon" id="move" ><span class="tooltiptext">Move</span></div>
+        <div class="share-icon icon" id = "move2"><span class="tooltiptext">Create Lobby</span></div>
         <div class="popup" id="newLobby">
             <div id = "lobbyInfo">
                 <p>Current Lobby Link:</p> <p id="copied" class="inform">Copied</p>
                 <div class ="row">
-                    <input id="lobbylink" class="textBox">
+                    <div id="lobbylink" class="fakeTextBox"> </div>
                     <div class="copy-icon icon-small" id="copyLink"></div>
                 </div>
             </div>
-            <p>Create New Lobby:</p>
-            <input id ="boardName" class ="textBox">
+            <p id="CreateLobbytxt">Create New Lobby:</p>
+            <p id="LobbyNametxt">LobbyName:</p>
+            <input id="boardName" class ="textBox">
+            <p id="Passwordtxt">Password (Empty for none)</p>
+            <input id ="boardPass" class ="textBox">
             <div class ="confirm">
                 <div class = "smlbtn" id="Sboard">Share Board</div>
                 <div class = "smlbtn" id="exit">Cancel</div>
@@ -33,11 +42,11 @@
         </div>
         <!-- <p id="peerIddisplay"></p> -->
         <!-- <button id = "shareBoard"> Link Button </button> -->
-        <p id="peerIddisplay"></p>
-        <div class="download-icon icon" id="dload" ></div>
+        <!-- <p id="peerIddisplay"></p> -->
+        <div class="download-icon icon" id="dload" ><span class="tooltiptext">Sreen Capture</span></div>
         <!-- <div class="upload-icon icon" id="upload" ></div> -->
         <!-- <textarea id="saveName"></textarea> -->
-        <div class="save-icon icon" id="save" ></div>
+        <div class="save-icon icon" id="save" ><span class="tooltiptext">Save</span></div>
         <div class="popup" id="newSave">
             <p>Enter name for new save: </p>
             <input id ="saveName" class ="textBox">
@@ -46,23 +55,61 @@
                 <div class = "smlbtn" id="exitS">Cancel</div>
             </div>
         </div>
-        <a href="/history.html"><div class="load-icon icon" id="load"> </div></a>
-        <div class="color-icon icon" id="colorId"></div>
+        <a href="/history.html"><div class="load-icon icon" id="load"><span class="tooltiptext">Load</span></div></a>
+        <div class="color-icon icon" id="colorId"><span class="tooltiptext">Colour Wheel</span></div>
         <div class="palette" id="colorPalette"></div>
         <div class="icon-large" id="color"></div>
-        <div class="home-icon icon" id="home"></div>
-        <a href="/signout/" ><div class = "signout-icon icon" id = "signout_button"  ></div></a>
-    </div>
-   
-        <canvas  tabindex='1'></canvas>
+        <div class="home-icon icon" id="home"><span class="tooltiptext">Home View</span></div>
+        <div class="ping-icon icon" id="pingAll"><span class="tooltiptext">Ping All</span></div>
+        <a href="/index.html" ><div class = "signout-icon icon" id = "signout_button"><span class="tooltiptext">Back</span></div></a>
+        <!-- <div class="home-icon icon" id="testAlert"></div> -->
+        </div id = "canvasLayers">
+            <canvas id = "canvasdrawing" tabindex='1'></canvas>
+            <canvas id = "canvasMouseMovements" tabindex='1'></canvas>
+        </div>
+</div>
+</div>
+    <div class="form_style">
+        <div class="admin_popup">
+            <button class="btn" id="admin">Admin</button>
+            <span class="badge" id = "badge">0</span>
+            <span class="popuptext" id="adminPopup">
+                <span id="myPopup">
+                </span>
+                <span id="updatePasswordContainer">
+                    <input id = "newPassword">
+                    <button id= "updatePassword" class="ubtn">Update Password</button> 
+                </span>
+            
+            </span>
+
+        </div>
+        <div class="audio_section">
+            <div class="audio-icon icon" id="audio" ></div>
+            <div class="block-microphone-icon icon" id="microphone"></div>
+        </div>
+        <div id="chat_header" class="chat_header">
+            <span class="badge" id = "chatBadge"></span>
+            <div id="collapsBtn" class="up-icon collapsBtn"><div>
+            <div id="chat_title" class="chat_title">Group Chat</div>
+        </div>
     </div>
      
+    <div id="chat" class="chat-container">
+    </div>
+    <div id="messagebox" class="msg-container">
+        <input id="msgBox" class="txtBox" />
+        <div id="sendBtn" class="send-icon collapsBtn"><div></div>
+    </div>
+
 </body>
  <footer>
     <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/controller.js"></script>
     <script src="js/color.js"></script>
-    
+    <script src="js/admin_ui.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/audio_ui.js"></script>
 </footer>
 </html>

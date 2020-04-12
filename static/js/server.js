@@ -3,7 +3,7 @@
     
     window.addEventListener('load', function(){
         api.onServerUpdate(function(username){
-            if (username) {
+            if (username && username !== "") {
                 localStorage.setItem("signedIn", "");
             } else {
                 localStorage.setItem("signedIn", "not signed in");
@@ -11,7 +11,7 @@
             let header = document.querySelector("header");
             let userInfo = document.createElement("div");
             userInfo.className = "userInfo";
-            if (username) {
+            if (username && username !== "") {
                 userInfo.innerHTML = "Welcome " + username;
                 let signout = document.createElement("div");
                 signout.className = "signout";
@@ -40,7 +40,7 @@
             
 
             document.querySelector("#genBoard").addEventListener('click', function(e){
-                // if (username) {
+                // if (username && username !== "") {
                     window.location.href = '/drawshare.html';
                 //     localStorage.setItem("signedIn", "");
                 // } else {
@@ -51,10 +51,14 @@
 
             document.querySelector('#joinBoard').addEventListener('click', function (e){
                 let id = document.querySelector('#serverKey').value.trim();
-                alert(id);
                 window.location.href = '/drawshare.html?lobby=' + id;
             });
-
+            document.querySelector('#serverKey').addEventListener('keyup', function (e){
+                if (e.keyCode === 13) {
+                    let id = document.querySelector('#serverKey').value.trim();
+                    window.location.href = '/drawshare.html?lobby=' + id;
+                }
+            });
             userInfo.addEventListener('click', function (e) {
                 localStorage.setItem("signedIn", "");
                 window.location.href = '/login.html';
