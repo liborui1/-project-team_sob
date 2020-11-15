@@ -1,6 +1,6 @@
 # App URL
 
-https://www.drawshare.me/
+https://draw-share.herokuapp.com/
 
 # Video URL
 
